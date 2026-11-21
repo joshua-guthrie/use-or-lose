@@ -48,8 +48,7 @@
         "share_note": 2,
         "items": [
           {"type": "document_preview", "file": "calendar-desktop-pdf-reference.png", "note": 1},
-          {"type": "text", "text": "Pinch to zoom or rotate the phone to read the full page."},
-          {"type": "action", "text": "Print", "emphasis": false}
+          {"type": "text", "text": "Pinch to zoom or rotate the phone to read the full page."}
         ]
       },
       {
@@ -58,7 +57,8 @@
         "subtitle": "Android Sharesheet · illustrative",
         "items": [
           {"type": "card", "text": "fedleave-2026-01.pdf", "body": "PDF document · January 2026", "note": 3},
-          {"type": "row", "text": "Mail", "value": "›"},
+          {"type": "row", "text": "Email", "value": "›"},
+          {"type": "row", "text": "Messaging", "value": "›"},
           {"type": "row", "text": "Nearby sharing", "value": "›"},
           {"type": "action", "text": "Back", "emphasis": false}
         ]

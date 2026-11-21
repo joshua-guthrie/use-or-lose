@@ -201,7 +201,7 @@
   },
   {
     "file": "reports-share.png",
-    "title": "Preview, share, and print a report",
+    "title": "Preview and share a report",
     "subtitle": "The preview and its active date selection travel with the shared artifact.",
     "screens": [
       {
@@ -212,8 +212,7 @@
         "share_note": 2,
         "items": [
           {"type": "document_preview", "file": "calendar-desktop-pdf-reference.png", "note": 1},
-          {"type": "text", "text": "Pinch to zoom or rotate the phone to read the full page."},
-          {"type": "action", "text": "Print", "emphasis": false}
+          {"type": "text", "text": "Pinch to zoom or rotate the phone to read the full page."}
         ]
       },
       {
@@ -233,21 +232,10 @@
         "subtitle": "Android system sheet · illustrative",
         "items": [
           {"type": "card", "text": "FedLeave January 2026", "body": "PDF document", "note": 4},
-          {"type": "row", "text": "Mail", "value": "›"},
+          {"type": "row", "text": "Email", "value": "›"},
+          {"type": "row", "text": "Messaging", "value": "›"},
           {"type": "row", "text": "Nearby sharing", "value": "›"},
           {"type": "action", "text": "Back", "emphasis": false}
-        ]
-      },
-      {
-        "id": "PRINT-REPORT",
-        "title": "Print preview",
-        "subtitle": "Android print service · illustrative",
-        "items": [
-          {"type": "row", "text": "Destination", "value": "Choose printer", "note": 5},
-          {"type": "row", "text": "Page", "value": "Landscape"},
-          {"type": "card", "text": "January 2026", "body": "Calendar with leave entries, pay-period marks and balance summary."},
-          {"type": "action", "text": "Print"},
-          {"type": "action", "text": "Cancel", "emphasis": false}
         ]
       }
     ]

@@ -36,5 +36,5 @@ Use the [feature parity matrix](verification/feature-parity.md) to trace a deskt
 ## Decisions carried into the first release
 
 - Use Kotlin and Compose with Material 3 as the starting stack. Scope the first release using the [GitHub issue decisions](planning/specification-plan.md#github-issues-reflected-in-this-draft). The What-if Planner is deferred. Android's interface and help use app language, and MCP and AI are outside the Android scope.
-- Keep the phone's working datastore in private, desktop-compatible JSON. A user opens the system file picker to restore a compatible FedLeave backup. Use the Sharesheet for backups and reports.
+- Keep the phone's working datastore in private, desktop-compatible JSON. A user opens the system file picker to restore a compatible FedLeave backup. Use the Sharesheet for backups and reports. Calendar Share automatically generates the desktop-equivalent month PDF and hands it off as an attachment. Printing is outside Android scope.
 - Use one Calendar balance panel for today, any selected date, and a pay-period closing date. Show future balances as projections. The [Calendar section](chapters/01-calendar/01-02-balances.md) defines the first slice and the decisions that still need review.

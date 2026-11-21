@@ -6,7 +6,7 @@ Start with the [Android project directory](android/README.md), [specification in
 
 The owner selected the [Calendar main screen](android/specification/chapters/01-calendar/01-01-main-screen.md). The balance card previews eight values and opens a scrollable list with date controls. QA evidence for this path is required in I05. [Calendar balances passdown](android/specification/passdowns/16-calendar-balances.md)
 
-The phone Calendar uses four [date markers](android/specification/chapters/01-calendar/01-04-date-markers.md), with full descriptions in day details and TalkBack. The desktop-equivalent shared PDF keeps its printed legend.
+The phone Calendar uses four [date markers](android/specification/chapters/01-calendar/01-04-date-markers.md), with full descriptions in day details and TalkBack. The desktop-equivalent shared PDF keeps its report legend. Tapping Calendar Share generates the PDF and passes it as an attachment to Android’s Sharesheet. Printing is outside Android scope. [PDF attachment checkpoint](android/specification/passdowns/19-pdf-attachment-sharing.md)
 
 Close implementation milestones through the [QA gates and retest loop](android/specification/chapters/05-quality/05-02-quality-gates.md). Use the [QA report template](android/qa/reports/template.md) and link the separate AI review.
 
