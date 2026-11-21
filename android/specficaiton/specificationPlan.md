@@ -59,7 +59,7 @@ Break the first inventory into groups that can be finished independently.
 
 Start with a navigation sketch for the most frequent jobs. Compare candidates such as **Today**, **Calendar**, and **Reports**, with less frequent settings and maintenance actions grouped separately. Walk through a few realistic tasks before choosing a structure. Check how quickly a new user can see a balance, enter leave, correct an entry, share a chart, and share a backup.
 
-Mock up a single **Balances** panel for Android Calendar. A fresh open shows **As of today** with the date. Tap the balance card to see the complete list and open the date picker, where pay-period end dates are bold and labeled. Try nearby period ends as quick choices. Any selected date updates the same panel, and **Today** resets it. Label future balances as projections. Explore an expandable section for the selected pay period's earned and used hours. Annotate these states and write acceptance checks for the default, an ordinary day, a pay-period end, a projected date, and the return to Today.
+Mock up a single **Balances** panel for Android Calendar. A fresh open shows **As of today** with the date. Tap the balance card to see the complete list and open the date picker, where pay-period end dates are marked with flags and accessible labels. Try nearby period ends as quick choices. Any selected date updates the same panel, and **Today** resets it. Label future balances as projections. Explore an expandable section for the selected pay period's earned and used hours. Annotate these states and write acceptance checks for the default, an ordinary day, a pay-period end, a projected date, and the return to Today.
 
 ### Calendar design reference
 

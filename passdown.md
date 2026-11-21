@@ -6,6 +6,8 @@ The Android specification draft is complete through milestone 11, with the Novem
 
 The owner selected the [Calendar main screen](android/specficaiton/sections/calendar-main-screen.md). The balance card previews eight values and opens a scrollable list with date controls. QA evidence for this path is required in I05. [Calendar balances passdown](android/specficaiton/passdowns/16-calendar-balances.md)
 
+The phone Calendar uses four [date markers](android/specficaiton/sections/calendar-date-markers.md), with full descriptions in day details and TalkBack. The desktop-equivalent shared PDF keeps its printed legend.
+
 Close implementation milestones through the [QA gates and retest loop](android/specficaiton/sections/quality-gates.md). Use the [QA report template](android/qa/reports/template.md) and link the separate AI review.
 
 Specification work finished with 62% of the five-hour window remaining. Milestones 3–11 each have their own local commit.

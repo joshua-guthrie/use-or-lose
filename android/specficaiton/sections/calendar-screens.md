@@ -1,6 +1,6 @@
 # Phone navigation and Calendar screens
 
-The [Calendar main-screen boards](calendar-main-screen.md) show the balance card, full list, date and month selectors, day grid, and full-width day list. [Calendar menu and PDF](calendar-menu-and-pdf.md)
+The [Calendar main-screen boards](calendar-main-screen.md) show the balance card, full list, date and month selectors, day grid, and full-width day list. [Calendar menu and PDF](calendar-menu-and-pdf.md) · [Date markers](calendar-date-markers.md)
 
 Use three persistent destinations for familiar tasks. **Calendar** opens first and keeps daily work nearby. **Reports** owns analytical views and month previews. **Settings** owns preferences, data maintenance and help. Opening a detailed task or system sheet retains the calling destination. Use the Calendar, Reports and Settings labels alongside any icons. The main screens use a fixed blue Material 3 palette for the specification. Implementation also needs a coordinated dark palette, 48 dp touch targets, Android text scaling, keyboard-safe layouts and TalkBack labels. Numbers on the mockups are specification annotations.
 

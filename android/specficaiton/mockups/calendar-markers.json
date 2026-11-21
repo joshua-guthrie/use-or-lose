@@ -1,0 +1,45 @@
+[
+  {
+    "file": "calendar-markers.png",
+    "title": "Calendar · Schedule markers",
+    "subtitle": "Icons sit to the right of the date. Tap a day for the full description.",
+    "phone_height": 776,
+    "screens": [
+      {
+        "id": "CALENDAR-YEAR-END",
+        "title": "Calendar",
+        "nav": "Calendar",
+        "toolbar": ["menu", "share"],
+        "items": [
+          {"type": "balance_card", "text": "As of today · Jan 16, 2026", "balances": [["Annual", "90 h"], ["Sick", "20 h"]]},
+          {"type": "row", "text": "January 2027", "dropdown": true},
+          {
+            "type": "activity_calendar",
+            "start": 5,
+            "days": 31,
+            "holidays": [1, 18],
+            "paydays": [1, 15],
+            "ends": [9],
+            "year_ends": [9],
+            "activity": {"9": [{"text": "A +6"}, {"text": "S +4"}]},
+            "note": 1
+          }
+        ]
+      },
+      {
+        "id": "CALENDAR-DAY-MARKERS",
+        "title": "Edit day",
+        "subtitle": "Saturday, Jan 9, 2027",
+        "top_action": "Add entry",
+        "items": [
+          {"type": "row", "text": "Pay-period end", "value": "Period 26", "note": 2},
+          {"type": "row", "text": "Leave-year end", "value": "Leave year 2026"},
+          {"type": "heading", "text": "Leave activity"},
+          {"type": "row", "text": "Annual leave", "value": "6 h earned"},
+          {"type": "row", "text": "Sick leave", "value": "4 h earned"},
+          {"type": "action", "text": "Add leave type", "emphasis": false}
+        ]
+      }
+    ]
+  }
+]

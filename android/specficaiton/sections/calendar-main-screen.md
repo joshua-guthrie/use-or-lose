@@ -8,7 +8,7 @@ The owner selected this layout with daily leave inside the month grid. Calendar 
 | --- | --- |
 | 1 | The whole card opens **Balances & date** at the same cutoff. The main screen shows two rows of four labeled amounts at the reference size. When two amounts are hidden, the card reads **View all 10 balances · 2 more**. TalkBack announces the date, visible balances, additional count, and action **Open balances and date**. |
 | 2 | Tap the month and year to choose a month. Selecting a month changes the grid while preserving the balance cutoff. |
-| 3 | Every day cell opens the editor for its date. A minus sign shows hours used, a plus sign shows hours earned, and **P** marks a planned entry. A day with no entries opens the same editor ready to add one. **Menu > Calendar legend** explains the symbols. TalkBack reads the date, category, amounts, status and schedule markers. |
+| 3 | Every day cell opens the editor for its date. A minus sign shows hours used, a plus sign shows hours earned, and **P** marks a planned entry. A day with no entries opens the same editor ready to add one. The day editor and TalkBack describe the symbols, leave categories, amounts, and status. [Date marker rules](calendar-date-markers.md) |
 | 4–5 | The full view displays the cutoff and a **Choose date** control above the scrollable list. The list includes both values omitted by the card, with full labels and exact amounts. Back returns to Calendar at its prior month and shows the currently confirmed balance cutoff. |
 | 6–7 | Choose an ordinary date or a nearby pay-period end, then confirm to update the full list and card to the same result. Back or Cancel returns to the full list with its previous cutoff and values. |
 

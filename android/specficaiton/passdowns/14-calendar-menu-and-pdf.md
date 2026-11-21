@@ -1,6 +1,6 @@
 # Passdown 14 — Calendar menu and PDF sharing
 
-November 21, 2026. Calendar uses Menu at upper left and Share at upper right. **Today** and **Calendar legend** live in the menu. The grid uses the remaining space for daily leave. [Calendar main screen](../sections/calendar-main-screen.md)
+November 21, 2026. Calendar uses Menu at upper left and Share at upper right. **Today** lives in the menu. The later marker checkpoint gives event descriptions in the day editor and TalkBack. [Date marker update](17-calendar-date-markers.md). The grid uses the remaining space for daily leave. [Calendar main screen](../sections/calendar-main-screen.md)
 
 - The top-right Calendar Share action prepares the displayed month's desktop-style PDF and invokes Android's Sharesheet. A menu action opens the same page for preview or printing. Reports use the same top-right Share placement.
 - The preview uses an actual desktop PDF rendered via **Save Month as PDF** with the fixed January 2026 synthetic fixture. The single landscape page includes the full pay-period and balances tables and printed legend. [Menu, legend, and PDF mockups](../sections/calendar-menu-and-pdf.md)

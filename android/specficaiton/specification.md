@@ -27,7 +27,8 @@ For a visual review, start with the [Calendar mockups](sections/calendar-screens
 | [Calendar balances](sections/calendar-balances.md) | One date-driven balance panel, its screen states, and the rules for today, historical dates, and pay-period ends. |
 | [Phone navigation and Calendar screens](sections/calendar-screens.md) | Annotated first use, balance states, Calendar navigation, day editing, history and corrections. |
 | [Calendar main screen](sections/calendar-main-screen.md) | Tappable balances, date and month selection, daily activity, and direct day editing. |
-| [Calendar menu and PDF sharing](sections/calendar-menu-and-pdf.md) | Calendar menu, on-demand legend, and direct sharing of the desktop month PDF. |
+| [Calendar date markers](sections/calendar-date-markers.md) | Symbols, date sources, concurrent events, and accessible descriptions. |
+| [Calendar menu and PDF sharing](sections/calendar-menu-and-pdf.md) | Calendar menu and direct sharing of the desktop month PDF. |
 | [Ledger and leave years](sections/ledger-and-leave-years.md) | Missing-year setup, editing and history, accrual, carryover, expiration, and PPL/FMLA. |
 | [Acceptance plan](testPlan.md) | Synthetic fixtures, desktop reference results, phone workflow tests, and storage gates. |
 | [Reports, data, and preferences](sections/reports-data-and-preferences.md) | Report calculations and display, compatible sharing and restore, preferences, help, and platform equivalents. |

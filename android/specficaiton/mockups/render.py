@@ -215,33 +215,53 @@ class Screen:
         self.mark(item.get("note"), y + 18)
         self.cursor += page.height + 24
 
+    def day_markers(self, item, day, x, y, color=PRIMARY):
+        keys = ("holidays", "paydays", "ends", "year_ends")
+        visible = [key for key in keys if day in item.get(key, ())]
+        for index, key in enumerate(visible):
+            row, column = divmod(index, 2)
+            self.day_marker(key, x + column * 11, y + row * 11, color)
+
+    def day_marker(self, key, x, y, color):
+        if key == "holidays":
+            self.draw.polygon(
+                ((x + 4, y), (x + 5, y + 3), (x + 8, y + 3), (x + 6, y + 5), (x + 7, y + 8),
+                 (x + 4, y + 6), (x + 1, y + 8), (x + 2, y + 5), (x, y + 3), (x + 3, y + 3)),
+                fill=color,
+            )
+        elif key == "paydays":
+            self.draw.ellipse((x, y, x + 8, y + 8), outline=color)
+            self.draw.line((x + 4, y + 2, x + 4, y + 6), fill=color)
+        elif key == "ends":
+            self.draw.line((x + 1, y, x + 1, y + 8), fill=color)
+            self.draw.polygon(((x + 2, y), (x + 8, y + 2), (x + 2, y + 5)), fill=color)
+        elif key == "year_ends":
+            self.draw.rectangle((x, y + 1, x + 8, y + 8), outline=color)
+            self.draw.line((x + 2, y, x + 2, y + 2), fill=color)
+            self.draw.line((x + 6, y, x + 6, y + 2), fill=color)
+            self.draw.line((x + 2, y + 5, x + 4, y + 7, x + 6, y + 4), fill=color)
+
     def calendar(self, item):
         y = self.cursor
         self.text(self.left, y, item["text"], 17, bold=True)
         self.text(self.inner_right - 6, y, "‹   ›", 17, PRIMARY, bold=True, anchor="ra")
-        step = self.width // 7
-        first_row = y + 54
+        left = self.x + 8
+        step = (PHONE_WIDTH - 16) // 7
+        first_row = y + 44
         for column, label in enumerate(("S", "M", "T", "W", "T", "F", "S")):
-            self.text(self.left + step * column + step // 2, y + 36, label, 12, MUTED, anchor="mm")
-        marks = item.get("ends", [])
-        paydays = item.get("paydays", [])
-        for number in range(1, item.get("days", 31) + 1):
-            row, column = divmod(item["start"] + number - 1, 7)
-            x = self.left + step * column + step // 2
-            cell_y = first_row + row * 28
-            active = number == item.get("selected")
+            self.text(left + step * column + step // 2, y + 34, label, 12, MUTED, anchor="mm")
+        for day in range(1, item.get("days", 31) + 1):
+            row, column = divmod(item["start"] + day - 1, 7)
+            x = left + step * column
+            cell_y = first_row + row * 48
+            active = day == item.get("selected")
             if active:
-                self.draw.ellipse((x - 12, cell_y - 12, x + 12, cell_y + 12), fill=PRIMARY)
-            self.text(x, cell_y, str(number), 13, "#FFFFFF" if active else INK, number in marks, "mm")
-            if number in marks:
-                self.draw.ellipse((x - 2, cell_y + 9, x + 2, cell_y + 13), fill="#FFFFFF" if active else PRIMARY)
-            if number in paydays:
-                self.box(x - 4, cell_y + 10, x + 4, cell_y + 12, "#FFFFFF" if active else "#667D5E", 1)
-        self.mark(item.get("note"), first_row + 18)
-        self.cursor = first_row + 28 * ((item["start"] + item.get("days", 31) - 1) // 7) + 25
-        legend = "●  Pay-period end      ▬  Payday" if paydays else "●  Pay-period end"
-        if item.get("show_legend", True):
-            self.paragraph({"text": item.get("legend", legend)}, 12, MUTED, padding=8)
+                self.box(x + 1, cell_y + 1, x + step - 1, cell_y + 44, PRIMARY, 6)
+            self.text(x + 4, cell_y + 15, str(day), 13, "#FFFFFF" if active else INK, bold=active)
+            self.day_markers(item, day, x + 25, cell_y + 12, "#FFFFFF" if active else PRIMARY)
+        self.mark(item.get("note"), first_row + 28)
+        row_count = (item["start"] + item.get("days", 31) + 6) // 7
+        self.cursor = first_row + 48 * row_count + 9
 
     def activity_calendar(self, item):
         left = self.x + 8
@@ -252,8 +272,6 @@ class Screen:
             x = left + column * column_width + column_width // 2
             self.text(x, self.cursor + 5, label, 11, MUTED, anchor="mm")
 
-        period_ends = set(item.get("ends", []))
-        paydays = set(item.get("paydays", []))
         activity = item.get("activity", {})
         for day in range(1, item["days"] + 1):
             row, column = divmod(item["start"] + day - 1, 7)
@@ -265,11 +283,8 @@ class Screen:
                 self.draw.rounded_rectangle(
                     (x + 1, y + 1, x + column_width - 1, y + row_height - 2), 7, outline=PRIMARY, width=1,
                 )
-            self.text(x + 5, y + 4, str(day), 13, PRIMARY if today else INK, today or day in period_ends)
-            if day in period_ends:
-                self.draw.ellipse((x + 37, y + 9, x + 43, y + 15), fill=PRIMARY)
-            if day in paydays:
-                self.box(x + 34, y + 10, x + 43, y + 13, "#597451", 1)
+            self.text(x + 5, y + 4, str(day), 13, PRIMARY if today else INK, bold=today)
+            self.day_markers(item, day, x + 26, y + 4)
 
             entries = activity.get(str(day), [])
             for index, entry in enumerate(entries[:2]):

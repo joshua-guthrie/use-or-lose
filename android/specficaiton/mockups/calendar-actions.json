@@ -12,8 +12,7 @@
         "items": [
           {
             "type": "menu_panel",
-            "entries": ["Today", "Calendar legend", "Transactions", "Preview month PDF"],
-            "highlight": "Calendar legend",
+            "entries": ["Today", "Transactions", "Preview month PDF"],
             "note": 1
           },
           {
@@ -32,28 +31,6 @@
             "hint": "View all 10 balances · 2 more"
           },
           {"type": "row", "text": "January 2026", "dropdown": true}
-        ]
-      }
-    ]
-  },
-  {
-    "file": "calendar-legends.png",
-    "title": "On-demand Calendar legend",
-    "subtitle": "Schedule markers and the leave activity inside day cells.",
-    "screens": [
-      {
-        "id": "CALENDAR-LEGEND",
-        "title": "Calendar legend",
-        "items": [
-          {"type": "row", "text": "Pay-period end", "value": "●  Bold date and dot"},
-          {"type": "row", "text": "Payday", "value": "—  Short line"},
-          {"type": "heading", "text": "Leave in a day", "note": 1},
-          {"type": "row", "text": "A  S  C", "value": "Annual, Sick, Comp", "note": 2},
-          {"type": "row", "text": "A −8", "value": "8 h annual used"},
-          {"type": "row", "text": "S +4", "value": "4 h sick earned"},
-          {"type": "row", "text": "P", "value": "Planned"},
-          {"type": "row", "text": "+1 without a category", "value": "One more entry"},
-          {"type": "action", "text": "Done"}
         ]
       }
     ]

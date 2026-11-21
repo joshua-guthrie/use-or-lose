@@ -12,7 +12,7 @@ Calendar gives the user one **Balances** panel. They can see their position toda
 | --- | --- |
 | `CAL-BAL-01` | A fresh open of Calendar starts on the device's current local date. The panel reads **As of today** and shows the date and balances in hours. Follow the device's local date while Today is active. |
 | `CAL-BAL-02` | Tap anywhere on the balance card to open **Balances & date** at the current cutoff. **Choose date** opens the picker. Confirmation updates the full list and card together. Dismissing the picker preserves the prior date, amounts and list position. |
-| `CAL-BAL-03` | Mark a pay-period end from the stored schedule in the month grid and picker. Announce **Pay-period end** in the date's accessible label. Provide nearby period ends as quick choices with the date and period number. A selected end date shows that day's closing balance in the same panel. Period details provide the number, start and end dates, payday, and earned and used hours by category. Period activity opens from the full balance view. |
+| `CAL-BAL-03` | Use the flag from the [date marker table](calendar-date-markers.md) for a pay-period end in the month grid and picker. Announce **Pay-period end** in the date's accessible label. Provide nearby period ends as quick choices with the date and period number. A selected end date shows that day's closing balance in the same panel. Period details provide the number, start and end dates, payday, and earned and used hours by category. Period activity opens from the full balance view. |
 | `CAL-BAL-04` | For a date later than today, show **Projected balance** and the exact selected date. Use the calculation for that day, with effective scheduled activity and accrued hours through that date. |
 | `CAL-BAL-05` | **Menu > Today** restores the current month, active calendar day, and balance date. A fresh open also starts on today after a previous manual date choice. |
 | `CAL-BAL-06` | Keep a balance result paired with the date it covers. If a requested date cannot be loaded, show it with an unavailable state and a retry or date-change action. Carry forward applicable warnings and show an unavailable category value as unavailable. A slow older request must never replace the result for the current selection. |
@@ -37,7 +37,7 @@ Calendar gives the user one **Balances** panel. They can see their position toda
 
 | Screen or state ID | Key visual or interaction |
 | --- | --- |
-| `CALENDAR-MONTH` | Current month, a month selector, tappable day cells, and separate markers for pay-period end and payday. |
+| `CALENDAR-MONTH` | Current month, a month selector, tappable days, daily leave, and schedule markers. |
 | `BALANCES-TODAY` | A tappable preview with today's date and up to eight exact values. The main-screen menu contains **Today**. |
 | `BALANCES-ALL` | Full scrollable list with the current cutoff, precise amounts and **Choose date**. |
 | `BALANCE-DATE-PICKER` | Date grid with the current selection, ordinary days, marked pay-period ends, nearby period shortcuts, and cancellation. |
