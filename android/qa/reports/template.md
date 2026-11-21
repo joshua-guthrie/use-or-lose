@@ -7,6 +7,7 @@
 | Status | In progress |
 | Spec revision and approved decisions | |
 | Code revision, build ID and source identity | |
+| Implementation brief, starting revision, and preflight results | |
 | Affected requirements, acceptance and screen IDs | |
 | Device, API, density, font scale, theme and locale | |
 | Fixture revision, checksum and fixed clock | |
