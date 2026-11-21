@@ -59,13 +59,11 @@ Break the first inventory into groups that can be finished independently.
 
 Start with a navigation sketch for the most frequent jobs. Compare candidates such as **Today**, **Calendar**, and **Reports**, with less frequent settings and maintenance actions grouped separately. Walk through a few realistic tasks before choosing a structure. Check how quickly a new user can see a balance, enter leave, correct an entry, share a chart, and share a backup.
 
-Mock up a single **Balances** panel for Android Calendar. A fresh open shows **As of today** with the date. **Change date** opens the calendar picker, where pay-period end dates are bold and labeled. Try nearby period ends as quick choices. Any selected date updates the same panel, and **Today** resets it. Label future balances as projections. Explore an expandable section for the selected pay period's earned and used hours. Annotate these states and write acceptance checks for the default, an ordinary day, a pay-period end, a projected date, and the return to Today.
+Mock up a single **Balances** panel for Android Calendar. A fresh open shows **As of today** with the date. Tap the balance card to see the complete list and open the date picker, where pay-period end dates are bold and labeled. Try nearby period ends as quick choices. Any selected date updates the same panel, and **Today** resets it. Label future balances as projections. Explore an expandable section for the selected pay period's earned and used hours. Annotate these states and write acceptance checks for the default, an ordinary day, a pay-period end, a projected date, and the return to Today.
 
-### Front-window sample for review
+### Calendar design reference
 
-![FedLeave Calendar concept with one dated balance panel, a month grid with marked pay-period ends, and bottom navigation](mockups/calendar-front-window.png)
-
-The sample uses fictional balances and a fixed blue Material 3 palette. The single **Balances** card gives today's numbers priority. **Change date** selects the balance date, and the calendar marks pay-period ends with bold text and a dot as well as a legend. Review whether Calendar, Reports, and Settings work as the first-level destinations.
+Use the [selected Calendar mockup](sections/calendar-main-screen.md) to review the balance card, month grid, and first-level Calendar, Reports and Settings destinations. The balance card starts on Today and opens a full list with date controls. The mockup uses fictional amounts and a fixed blue Material 3 palette.
 
 | Style option | What to compare |
 | --- | --- |

@@ -30,14 +30,14 @@ def get_font(font_dir, size, bold=False):
 
 
 class Screen:
-    def __init__(self, image, font_dir, x, top, screen):
+    def __init__(self, image, font_dir, x, top, screen, height):
         self.image = image
         self.draw = ImageDraw.Draw(image)
         self.font_dir = font_dir
         self.x = x
         self.top = top
         self.right = x + PHONE_WIDTH
-        self.bottom = top + PHONE_HEIGHT
+        self.bottom = top + height
         self.left = x + PADDING
         self.inner_right = self.right - PADDING
         self.width = PHONE_WIDTH - 2 * PADDING
@@ -160,6 +160,24 @@ class Screen:
             self.text(self.inner_right - 14, y + 10, indicator, 21, PRIMARY, bold=True, anchor="ra")
         for index, text in enumerate(lines):
             self.text(self.left + 14, y + 34 + 19 * index, text, 14, color)
+        self.mark(item.get("note"), y + 19)
+        self.cursor += height + 10
+
+    def balance_card(self, item):
+        y = self.cursor
+        balances = item["balances"]
+        height = 60 + 41 * ((len(balances) + 3) // 4)
+        self.box(self.left, y, self.inner_right, y + height, SELECTED, 13)
+        self.text(self.left + 14, y + 9, item["text"], 16, bold=True)
+        self.text(self.inner_right - 14, y + 9, "›", 21, PRIMARY, True, "ra")
+        for index, (label, hours) in enumerate(balances):
+            row, column = divmod(index, 4)
+            x = self.left + 14 + column * ((self.width - 28) // 4)
+            row_y = y + 34 + row * 41
+            self.text(x, row_y, label, 12, MUTED)
+            self.text(x, row_y + 15, hours, 17, bold=True)
+        if hint := item.get("hint"):
+            self.text(self.left + 14, y + height - 23, hint, 13, PRIMARY, True)
         self.mark(item.get("note"), y + 19)
         self.cursor += height + 10
 
@@ -319,7 +337,8 @@ class Screen:
 def render_board(board, font_dir, destination):
     screens = board["screens"]
     width = len(screens) * PHONE_WIDTH + (len(screens) + 1) * GAP
-    image = Image.new("RGB", (width, PHONE_HEIGHT + 118), CANVAS)
+    height = board.get("phone_height", PHONE_HEIGHT)
+    image = Image.new("RGB", (width, height + 118), CANVAS)
     draw = ImageDraw.Draw(image)
     draw.text((GAP, 16), board["title"], font=get_font(font_dir, 25, True), fill=INK)
     draw.text((GAP, 54), board["subtitle"], font=get_font(font_dir, 14), fill=MUTED)
@@ -328,7 +347,7 @@ def render_board(board, font_dir, destination):
         raise ValueError(f"Duplicate screen in {board['file']}")
     for index, screen in enumerate(screens):
         x = GAP + index * (PHONE_WIDTH + GAP)
-        Screen(image, font_dir, x, 82, screen).render()
+        Screen(image, font_dir, x, 82, screen, height).render()
     image.save(destination / board["file"], optimize=True)
 
 

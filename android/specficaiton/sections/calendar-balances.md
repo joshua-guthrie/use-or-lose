@@ -4,27 +4,28 @@
 
 Calendar gives the user one **Balances** panel. They can see their position today, look back to an ordinary date, or look ahead to a pay-period closing date in the same place. Pay-period activity remains available beside the balance it explains. [Parity matrix](../parity.md) · [Acceptance cases](../testPlan.md#calendar-acceptance-cases)
 
-![Calendar front-window concept with annotated features described below](../mockups/calendar-front-window.png)
-
-1. **Balances** shows the active date above the figures. In this concept, a short set of categories fits on the front window and **View all balances** opens the complete set for that same date.
-2. **Change date** in the panel opens the balance date picker. The concept shows an early placement of **Today**.
-3. The month grid marks pay-period ends with bold numerals and a dot. The date picker uses the same marker and an accessible label.
-4. The selected calendar day above **Edit day** is the date the user is preparing to edit. The date in the Balances heading is the cutoff used for the balance calculation.
-
-This front-window sample uses fictional November data. The current layouts use the fixed January acceptance fixture and put **Today** and the legend in the menu. [Current Calendar layouts](calendar-layout-options.md) · [Calendar menu and PDF](calendar-menu-and-pdf.md)
+[Selected Calendar and balance flow](calendar-main-screen.md) · [Calendar menu and PDF](calendar-menu-and-pdf.md)
 
 ## Requirements
 
 | ID | Android behavior |
 | --- | --- |
 | `CAL-BAL-01` | A fresh open of Calendar starts on the device's current local date. The panel reads **As of today** and shows the date and balances in hours. Follow the device's local date while Today is active. |
-| `CAL-BAL-02` | Open a calendar picker at the panel's current date. Option A uses a **Change date** button. Option B makes the balance card tappable. After confirmation, update the panel's date and figures together. Dismissing the picker preserves both. [Layout decision](calendar-layout-options.md) |
-| `CAL-BAL-03` | Mark a pay-period end from the stored schedule in the month grid and picker. Announce **Pay-period end** in the date's accessible label. Provide nearby period ends as quick choices with the date and period number. A selected end date shows that day's closing balance in the same panel. Period details provide the number, start and end dates, payday, and earned and used hours by category. Review the proposed collapsed disclosure in the screen milestone. |
+| `CAL-BAL-02` | Tap anywhere on the balance card to open **Balances & date** at the current cutoff. **Choose date** opens the picker. Confirmation updates the full list and card together. Dismissing the picker preserves the prior date, amounts and list position. |
+| `CAL-BAL-03` | Mark a pay-period end from the stored schedule in the month grid and picker. Announce **Pay-period end** in the date's accessible label. Provide nearby period ends as quick choices with the date and period number. A selected end date shows that day's closing balance in the same panel. Period details provide the number, start and end dates, payday, and earned and used hours by category. Period activity opens from the full balance view. |
 | `CAL-BAL-04` | For a date later than today, show **Projected balance** and the exact selected date. Use the calculation for that day, with effective scheduled activity and accrued hours through that date. |
 | `CAL-BAL-05` | **Menu > Today** restores the current month, active calendar day, and balance date. A fresh open also starts on today after a previous manual date choice. |
 | `CAL-BAL-06` | Keep a balance result paired with the date it covers. If a requested date cannot be loaded, show it with an unavailable state and a retry or date-change action. Carry forward applicable warnings and show an unavailable category value as unavailable. A slow older request must never replace the result for the current selection. |
 | `CAL-BAL-07` | Use the stored leave-year start and end dates to resolve the selected day. A January date can belong to the preceding leave year. Prompt from the current task when an intentional date request needs a missing current or future year. [Leave-year setup](ledger-and-leave-years.md#start-or-find-a-leave-year) |
 | `CAL-NAV-01` | Browsing another month or selecting a calendar day for inspection and editing keeps the balance date selected in the panel. Confirming a balance date in the picker or using **Today** changes the balance cutoff. |
+| `CAL-BAL-08` | Show up to eight actual values in two rows of four at the reference phone size and default text scale. With hidden amounts, report how many are hidden. The full view scrolls through every balance at the same cutoff and also gives access to the date picker. |
+
+## Preview and full list
+
+- Build both views from one dated result. Order enabled annual and sick leave first, followed by comp, credit, travel comp, time-off award, restored annual, religious comp, PPL and FMLA remaining. Put other supported balance categories afterward in the desktop category order, then by stable category key if the source supplies no order. Usage-only categories stay in daily activity and reports. Do not sum overlapping parental or FMLA windows in the UI. Use the core's remaining-hours fields.
+- Include a reported annual or sick zero and any other category included by desktop balance presentation. Preserve legitimate zeroes, negative amounts and exact fractional values. Label a reported missing value **Unavailable**. Leave omitted categories out. Use full labels in the list and for accessibility.
+- At the reference width and default text scale, render the first eight in row-major order. If fewer values fit legibly at the user's width or text scale, use fewer columns and preview values. Keep the first values in the same order, compute the remainder from the actual visible count, and never shrink or clip the amount. With no hidden values the action still opens the full list and date controls.
+- Compute the hint as **View all {total} balances · {hidden} more** when `hidden > 0`. Keep it part of the single button, with a localized quantity and a 48 dp minimum target. Scroll the full list vertically at any text scale. Keep date controls reachable with large text. Back returns to the same month, with focus on the card. Cancel in the picker returns to the full view without changing the cutoff.
 
 ## Data and calculation rules
 
@@ -36,8 +37,9 @@ This front-window sample uses fictional November data. The current layouts use t
 
 | Screen or state ID | Key visual or interaction |
 | --- | --- |
-| `CALENDAR-MONTH` | Current month, previous and next actions, selected editing day, and separate markers for pay-period end and payday. |
-| `BALANCES-TODAY` | One panel with today's date and category values. The chosen layout opens the picker. The main-screen menu contains **Today**. |
+| `CALENDAR-MONTH` | Current month, a month selector, tappable day cells, and separate markers for pay-period end and payday. |
+| `BALANCES-TODAY` | A tappable preview with today's date and up to eight exact values. The main-screen menu contains **Today**. |
+| `BALANCES-ALL` | Full scrollable list with the current cutoff, precise amounts and **Choose date**. |
 | `BALANCE-DATE-PICKER` | Date grid with the current selection, ordinary days, marked pay-period ends, nearby period shortcuts, and cancellation. |
 | `BALANCES-DATED` | Selected historical date, balances and warning area, with the same controls as Today. |
 | `BALANCES-PERIOD` | Closing date and the same balance values, plus the collapsed and expanded period activity. |
@@ -47,4 +49,3 @@ This front-window sample uses fictional November data. The current layouts use t
 ## Decisions for later milestones
 
 - Annotate the selected date and return path for missing-year setup opened from a future balance lookup or edit. [Leave-year setup](ledger-and-leave-years.md#start-or-find-a-leave-year)
-- Review the number of quick period choices, the period-detail placement, category ordering and zero display, and how the full balance list fits on a compact phone.

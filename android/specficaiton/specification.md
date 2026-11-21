@@ -19,15 +19,15 @@ Use the pinned source to resolve differences between the older documentation and
 
 For a visual review, start with the [Calendar mockups](sections/calendar-screens.md), [Reports mockups](sections/report-screens.md), or [Data and preferences mockups](sections/data-settings-screens.md).
 
-**Calendar layout decision pending.** Choose the existing layout or the alternative with daily activity in the calendar grid. [Compare Options A and B](sections/calendar-layout-options.md)
+**Calendar main screen selected.** Use a tappable balance card, a month selector and daily activity inside the day cells. [View the selected Calendar](sections/calendar-main-screen.md)
 
 | Topic | Draft coverage |
 | --- | --- |
 | [Feature parity matrix](parity.md) | Calendar, ledger, reports, data maintenance, preferences, and scope exceptions. |
 | [Calendar balances](sections/calendar-balances.md) | One date-driven balance panel, its screen states, and the rules for today, historical dates, and pay-period ends. |
 | [Phone navigation and Calendar screens](sections/calendar-screens.md) | Annotated first use, balance states, Calendar navigation, day editing, history and corrections. |
-| [Calendar layout options](sections/calendar-layout-options.md) | Original controls and the alternative with a tappable balance card, a month selector, and direct day editing. Owner choice pending. |
-| [Calendar menu and PDF sharing](sections/calendar-menu-and-pdf.md) | Menu and legend for both layouts, and direct sharing of the desktop month PDF. |
+| [Calendar main screen](sections/calendar-main-screen.md) | Tappable balances, date and month selection, daily activity, and direct day editing. |
+| [Calendar menu and PDF sharing](sections/calendar-menu-and-pdf.md) | Calendar menu, on-demand legend, and direct sharing of the desktop month PDF. |
 | [Ledger and leave years](sections/ledger-and-leave-years.md) | Missing-year setup, editing and history, accrual, carryover, expiration, and PPL/FMLA. |
 | [Acceptance plan](testPlan.md) | Synthetic fixtures, desktop reference results, phone workflow tests, and storage gates. |
 | [Reports, data, and preferences](sections/reports-data-and-preferences.md) | Report calculations and display, compatible sharing and restore, preferences, help, and platform equivalents. |

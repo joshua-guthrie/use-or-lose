@@ -1,29 +1,36 @@
 [
   {
     "file": "calendar-menus.png",
-    "title": "Calendar menu · Option A and Option B",
+    "title": "Calendar menu",
     "subtitle": "Open Menu from the upper left. Share the displayed month from the upper right.",
     "screens": [
       {
-        "id": "CALENDAR-MENU-A",
+        "id": "CALENDAR-MENU",
         "title": "Calendar",
         "toolbar": ["menu", "share"],
         "nav": "Calendar",
         "items": [
-          {"type": "menu_panel", "entries": ["Today", "Calendar legend", "Transactions", "Preview month PDF"], "highlight": "Calendar legend", "note": 1},
-          {"type": "card", "text": "As of today · Jan 16, 2026", "body": "Annual 90 h  ·  Sick 20 h"},
-          {"type": "action", "text": "Change date", "emphasis": false},
-          {"type": "row", "text": "Editing day", "value": "Fri, Jan 16"}
-        ]
-      },
-      {
-        "id": "CALENDAR-MENU-B",
-        "title": "Calendar",
-        "toolbar": ["menu", "share"],
-        "nav": "Calendar",
-        "items": [
-          {"type": "menu_panel", "entries": ["Today", "Calendar legend", "Transactions", "Preview month PDF"], "highlight": "Calendar legend", "note": 2},
-          {"type": "card", "text": "As of today · Jan 16, 2026", "body": "Annual 90 h  ·  Sick 20 h", "indicator": "›"},
+          {
+            "type": "menu_panel",
+            "entries": ["Today", "Calendar legend", "Transactions", "Preview month PDF"],
+            "highlight": "Calendar legend",
+            "note": 1
+          },
+          {
+            "type": "balance_card",
+            "text": "As of today · Jan 16, 2026",
+            "balances": [
+              ["Annual", "90 h"],
+              ["Sick", "20 h"],
+              ["Comp", "8 h"],
+              ["Credit", "4 h"],
+              ["Travel comp", "6 h"],
+              ["Time award", "12 h"],
+              ["Restored AL", "10 h"],
+              ["Relig. comp", "2 h"]
+            ],
+            "hint": "View all 10 balances · 2 more"
+          },
           {"type": "row", "text": "January 2026", "dropdown": true}
         ]
       }
@@ -32,26 +39,15 @@
   {
     "file": "calendar-legends.png",
     "title": "On-demand Calendar legend",
-    "subtitle": "Both options explain schedule markers. Option B also explains the entries inside day cells.",
+    "subtitle": "Schedule markers and the leave activity inside day cells.",
     "screens": [
       {
-        "id": "CALENDAR-LEGEND-A",
+        "id": "CALENDAR-LEGEND",
         "title": "Calendar legend",
-        "subtitle": "Option A",
-        "items": [
-          {"type": "row", "text": "Pay-period end", "value": "●  Bold date and dot", "note": 1},
-          {"type": "row", "text": "Payday", "value": "—  Short line"},
-          {"type": "action", "text": "Done"}
-        ]
-      },
-      {
-        "id": "CALENDAR-LEGEND-B",
-        "title": "Calendar legend",
-        "subtitle": "Option B",
         "items": [
           {"type": "row", "text": "Pay-period end", "value": "●  Bold date and dot"},
           {"type": "row", "text": "Payday", "value": "—  Short line"},
-          {"type": "heading", "text": "Leave in a day"},
+          {"type": "heading", "text": "Leave in a day", "note": 1},
           {"type": "row", "text": "A  S  C", "value": "Annual, Sick, Comp", "note": 2},
           {"type": "row", "text": "A −8", "value": "8 h annual used"},
           {"type": "row", "text": "S +4", "value": "4 h sick earned"},

@@ -48,48 +48,21 @@
   },
   {
     "file": "calendar-balances.png",
-    "title": "One balances panel",
-    "subtitle": "The balance date and the day selected for editing have their own controls.",
+    "title": "Pay-period closing balances",
+    "subtitle": "The closing date and its earned and used hours in Balances & date.",
     "screens": [
       {
-        "id": "CALENDAR-MONTH / BALANCES-TODAY",
-        "title": "Calendar",
-        "nav": "Calendar",
-        "toolbar": ["menu", "share"],
-        "items": [
-          {"type": "heading", "text": "Balances"},
-          {"type": "card", "text": "As of today · Jan 16, 2026", "body": "Annual 90 h  ·  Sick 20 h", "note": 1},
-          {"type": "action", "text": "Change date", "emphasis": false, "note": 2},
-          {"type": "calendar", "text": "January 2026", "start": 4, "ends": [24], "paydays": [30], "selected": 16, "show_legend": false, "note": 3},
-          {"type": "row", "text": "Editing day", "value": "Fri, Jan 16"},
-          {"type": "action", "text": "Edit day"}
-        ]
-      },
-      {
-        "id": "BALANCE-DATE-PICKER",
-        "title": "Balance date",
-        "subtitle": "Currently showing January 16, 2026",
-        "items": [
-          {"type": "calendar", "text": "January 2026", "start": 4, "ends": [24], "paydays": [30], "selected": 24, "show_legend": false, "note": 4},
-          {"type": "heading", "text": "Nearby pay-period ends"},
-          {"type": "row", "text": "Period 1 ends", "value": "Sat, Jan 24"},
-          {"type": "row", "text": "Period 2 ends", "value": "Sat, Feb 7"},
-          {"type": "action", "text": "Show January 24", "note": 5},
-          {"type": "action", "text": "Cancel", "emphasis": false}
-        ]
-      },
-      {
         "id": "BALANCES-PERIOD",
-        "title": "Balances",
+        "title": "Balances & date",
         "subtitle": "Projected balance · Saturday, Jan 24, 2026",
         "items": [
-          {"type": "row", "text": "Annual leave", "value": "92 h", "note": 6},
+          {"type": "row", "text": "Annual leave", "value": "92 h", "note": 1},
           {"type": "row", "text": "Sick leave", "value": "24 h"},
-          {"type": "card", "text": "Pay period 1 · Details open", "body": "Jan 11–24 · Pay date Jan 30.", "note": 7},
+          {"type": "card", "text": "Pay period 1 · Details open", "body": "Jan 11–24 · Pay date Jan 30.", "note": 2},
           {"type": "row", "text": "Annual leave", "value": "6 h earned · 14 h used"},
           {"type": "row", "text": "Sick leave", "value": "4 h earned · 0 h used"},
           {"type": "action", "text": "View transactions", "emphasis": false},
-          {"type": "action", "text": "Today", "note": 8}
+          {"type": "action", "text": "Choose date", "note": 3}
         ]
       }
     ]
@@ -101,35 +74,33 @@
     "screens": [
       {
         "id": "BALANCES-DATED",
-        "title": "Balances",
+        "title": "Balances & date",
         "subtitle": "As of Tuesday, January 13, 2026",
         "items": [
           {"type": "row", "text": "Annual leave", "value": "92 h", "note": 1},
           {"type": "row", "text": "Sick leave", "value": "20 h"},
-          {"type": "action", "text": "Change date", "emphasis": false},
-          {"type": "action", "text": "Today", "emphasis": false}
+          {"type": "action", "text": "Choose date", "emphasis": false}
         ]
       },
       {
         "id": "BALANCES-PROJECTED",
-        "title": "Balances",
+        "title": "Balances & date",
         "subtitle": "Projected balance · Thursday, Jan 22, 2026",
         "items": [
           {"type": "row", "text": "Annual leave", "value": "86 h", "note": 2},
           {"type": "row", "text": "Sick leave", "value": "20 h"},
           {"type": "text", "text": "Includes effective scheduled leave and accruals through January 22."},
-          {"type": "action", "text": "Change date", "emphasis": false},
-          {"type": "action", "text": "Today", "emphasis": false}
+          {"type": "action", "text": "Choose date", "emphasis": false}
         ]
       },
       {
         "id": "BALANCES-UNAVAILABLE",
-        "title": "Balances",
+        "title": "Balances & date",
         "subtitle": "Requested date · Thursday, Jan 22, 2026",
         "items": [
           {"type": "card", "text": "Balance unavailable", "body": "FedLeave could not read this date's leave year.", "warning": true, "note": 3},
           {"type": "action", "text": "Retry"},
-          {"type": "action", "text": "Change date", "emphasis": false}
+          {"type": "action", "text": "Choose date", "emphasis": false}
         ]
       }
     ]

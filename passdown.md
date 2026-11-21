@@ -4,7 +4,7 @@
 
 The Android specification draft is complete through milestone 11, with the November 21 [data scope revision](android/specficaiton/passdowns/12-data-scope.md). Start with the [specification index](android/specficaiton/specification.md) and [draft decisions for owner review](android/specficaiton/sections/implementation-milestones.md#draft-decisions-for-owner-review). The first implementation checkpoint after review is **I01**, a minimal Compose project opened and run from Android Studio.
 
-The Calendar main screen decision is pending. Review [Option A and Option B](android/specficaiton/sections/calendar-layout-options.md) before I05. Both show the updated menu, on-demand legend and top-right Share. [Calendar menu and PDF passdown](android/specficaiton/passdowns/14-calendar-menu-and-pdf.md)
+The owner selected the [Calendar main screen](android/specficaiton/sections/calendar-main-screen.md). The balance card previews eight values and opens a scrollable list with date controls. QA evidence for this path is required in I05. [Calendar balances passdown](android/specficaiton/passdowns/16-calendar-balances.md)
 
 Close implementation milestones through the [QA gates and retest loop](android/specficaiton/sections/quality-gates.md). Use the [QA report template](android/qa/reports/template.md) and link the separate AI review.
 

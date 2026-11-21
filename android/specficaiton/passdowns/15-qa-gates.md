@@ -5,4 +5,4 @@ November 21, 2026. Added a mandatory build, test, visual comparison, AI review, 
 - Use the [QA gates](../sections/quality-gates.md) and [QA report template](../../qa/reports/template.md) from every implementation milestone. Match actual captures against each affected annotated screen and state.
 - Give a smaller coding model a [self-contained brief](../sections/quality-gates.md#make-each-milestone-executable-from-a-brief) with file boundaries, exact requirements and failure states, test commands, expected values, and evidence paths.
 - Desktop release verification remains required for a source push to `master`. Android device and visual checks apply to the implementation candidate once it exists.
-- The next spec change expands the Option B balance card and its full balance view.
+- The next spec change expands the selected Calendar balance card and its full balance view.

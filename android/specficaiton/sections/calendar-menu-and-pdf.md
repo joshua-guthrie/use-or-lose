@@ -1,18 +1,18 @@
 # Calendar menu and PDF sharing
 
-Both Calendar layouts use the **Menu** icon at the upper left and the **Share calendar PDF** icon at the upper right. The balances card shows the balance date, and the calendar shows the month. Use the upper-right Share placement on report screens that have a shareable result. Give both icons 48 dp touch targets and spoken labels. [Calendar layout options](calendar-layout-options.md) · [Reports sharing](report-screens.md#month-preview-share-and-print)
+Calendar uses the **Menu** icon at the upper left and the **Share calendar PDF** icon at the upper right. The balances card shows the balance date, and the calendar shows the month. Use the upper-right Share placement on report screens that have a shareable result. Give both icons 48 dp touch targets and spoken labels. [Calendar main screen](calendar-main-screen.md) · [Reports sharing](report-screens.md#month-preview-share-and-print)
 
-## Menu in both layouts
+## Open the Calendar menu
 
-![Menu opened in both Calendar layouts showing Today, Calendar legend, Transactions, and Preview month PDF](../mockups/calendar-menus.png)
+![Calendar menu open showing Today, Calendar legend, Transactions, and Preview month PDF](../mockups/calendar-menus.png)
 
 | Callout | Interaction | Requirements |
 | --- | --- | --- |
-| 1–2 | The Menu icon opens the same commands in Option A and Option B. **Today** resets the calendar month and balance date. **Calendar legend** opens an explanation for the active layout. **Transactions** opens history. **Preview month PDF** opens the displayed month's PDF for inspection or printing. | `CAL-MENU-01`, `CAL-BAL-05`, `CAL-HISTORY-01` |
+| 1 | The Menu icon opens four commands. **Today** resets the calendar month and balance date. **Calendar legend** opens an explanation for the Calendar. **Transactions** opens history. **Preview month PDF** opens the displayed month's PDF for inspection or printing. | `CAL-MENU-01`, `CAL-BAL-05`, `CAL-HISTORY-01` |
 
-![Option A's schedule-marker legend and Option B's schedule and leave activity legend](../mockups/calendar-legends.png)
+![Calendar legend with schedule markers and leave activity](../mockups/calendar-legends.png)
 
-The Calendar grid uses the full space available beneath the balances and month controls. The legend is available from the menu and closes back to the same month and balance date. For Option B, it explains category abbreviations, signed hours, planned entries, and counts for additional entries. Include the codes used in the current grid. TalkBack announces the markers and entry meanings when someone selects a day.
+The Calendar grid uses the full space available beneath the balances and month controls. The legend is available from the menu and closes back to the same month and balance date. It explains category abbreviations, signed hours, planned entries, and counts for additional entries. Include the codes used in the current grid. TalkBack announces the markers and entry meanings when someone selects a day.
 
 ## Share the displayed month
 

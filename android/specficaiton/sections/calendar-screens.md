@@ -1,6 +1,6 @@
 # Phone navigation and Calendar screens
 
-The main Calendar board below shows **Option A**. The owner still needs to choose between this layout and the alternative. Both layouts use the same toolbar and menu. [Compare both layouts](calendar-layout-options.md) · [Calendar menu and PDF](calendar-menu-and-pdf.md)
+The [Calendar main-screen boards](calendar-main-screen.md) show the balance card, full list, date and month selectors, day grid, and full-width day list. [Calendar menu and PDF](calendar-menu-and-pdf.md)
 
 Use three persistent destinations for familiar tasks. **Calendar** opens first and keeps daily work nearby. **Reports** owns analytical views and month previews. **Settings** owns preferences, data maintenance and help. Opening a detailed task or system sheet retains the calling destination. Use the Calendar, Reports and Settings labels alongside any icons. The main screens use a fixed blue Material 3 palette for the specification. Implementation also needs a coordinated dark palette, 48 dp touch targets, Android text scaling, keyboard-safe layouts and TalkBack labels. Numbers on the mockups are specification annotations.
 
@@ -16,15 +16,13 @@ Use three persistent destinations for familiar tasks. **Calendar** opens first a
 | 3–4 | Manual setup presents the selected calendar dates, accrual and initial hours. Keep supported additional balances under one disclosure. Validate the date range and increments before review. Manual mode explains that earlier balances and special earning history stay in their original ledger. | `CAL-YEAR-01`, `YEAR-MAN-01` |
 | 5–7 | Carryover review names the originating task and shows source close, proposed schedule, category quantities and reductions. Lot details and warnings are available before creating. A stale preview reopens review. Cancelling returns to the original task. Manual review uses the same confirmation layout with its own opening amounts and no linked source. | `CAL-YEAR-01`, `YEAR-CARRY-01` |
 
-## Calendar, date picker, and period detail
+## Pay-period closing balances
 
-![Three mockups showing today's Calendar, the balance-date picker with pay-period marks, and projected pay-period detail](../mockups/calendar-balances.png)
+![Closing balance and expanded pay-period activity in Balances & date](../mockups/calendar-balances.png)
 
 | Callout | Interaction and states | Requirements |
 | --- | --- | --- |
-| 1–3 | Calendar opens on Today. The balance card can show more categories without navigating to a different calculation. **Change date** opens the balance picker. The grid's selected day below is for editing. Month navigation and editing preserve the balance date. | `CAL-BAL-01`, `CAL-BAL-02`, `CAL-NAV-01` |
-| 4–5 | Mark pay-period end with bold numerals, a dot and spoken text. A payday has a distinct accessible label. The quick choices below the grid include nearby ends. Confirm sends the selected date, which is resolved against the stored schedule. | `CAL-BAL-02`, `CAL-BAL-03`, `CAL-BAL-07` |
-| 6–8 | In the same panel, show the closing balance and expandable period activity. The third mockup enlarges that panel for review. Keep the cutoffs and payday visible, and open history with the period range preset. **Today** resets the date and active month. It is available from the Calendar menu on the main screen. | `CAL-BAL-03`, `CAL-BAL-04`, `CAL-BAL-05`, `CAL-HISTORY-01` |
+| 1–3 | Show the exact end date and matching balances. Start with period activity collapsed. Expanded activity includes period number, inclusive dates, payday, and earned and used totals by category. **View transactions** opens history with the period range preset. **Choose date** reopens the picker. | `CAL-BAL-02`, `CAL-BAL-03`, `CAL-BAL-04`, `CAL-HISTORY-01` |
 
 ## Other balance states
 
@@ -56,4 +54,4 @@ Use three persistent destinations for familiar tasks. **Calendar** opens first a
 | 3–4 | Show the stored ID, source and full comment in details. Give each available action an accessible label. Generated and dependent records link to the appropriate source or maintenance view. | `CAL-HISTORY-01`, `CAL-TX-01` |
 | 5–6 | Correcting and deleting use separate review confirmations. Either path retains the original list filters on return. | `CAL-TX-01` |
 
-Rebuild these images with `python android/specficaiton/mockups/render.py android/specficaiton/mockups/calendar.json` using Pillow and Lato. The original front-window concept remains available for palette review. [Original Calendar concept](../mockups/calendar-front-window.png)
+Rebuild these images with `python android/specficaiton/mockups/render.py android/specficaiton/mockups/calendar.json` using Pillow and Lato.

@@ -1,62 +1,105 @@
 [
   {
     "file": "calendar-compact-main.png",
-    "title": "Option B · Calendar with leave inside each day",
-    "subtitle": "Tap the balance card to pick a date. Tap a day to add or edit leave.",
+    "title": "Calendar · Dated balances and daily leave",
+    "subtitle": "Tap the balance card for all balances and date controls. Tap a date to add or edit leave.",
     "screens": [
       {
-        "id": "COMPACT-CALENDAR-TODAY",
+        "id": "CALENDAR-MONTH / BALANCES-TODAY",
         "title": "Calendar",
         "nav": "Calendar",
         "toolbar": ["menu", "share"],
         "items": [
-          {"type": "card", "text": "As of today · Jan 16, 2026", "body": "Annual 90 h  ·  Sick 20 h", "indicator": "›", "note": 1},
+          {
+            "type": "balance_card",
+            "text": "As of today · Jan 16, 2026",
+            "balances": [
+              ["Annual", "90 h"],
+              ["Sick", "20 h"],
+              ["Comp", "8 h"],
+              ["Credit", "4 h"],
+              ["Travel comp", "6 h"],
+              ["Time award", "12 h"],
+              ["Restored AL", "10 h"],
+              ["Relig. comp", "2 h"]
+            ],
+            "hint": "View all 10 balances · 2 more",
+            "note": 1
+          },
           {"type": "row", "text": "January 2026", "dropdown": true, "note": 2},
-          {"type": "activity_calendar", "start": 4, "days": 31, "today": 16, "ends": [24], "paydays": [30], "note": 3, "activity": {
-            "13": [{"text": "A −8"}],
-            "16": [{"text": "A −2"}],
-            "22": [{"text": "A −4", "planned": true}],
-            "24": [{"text": "A +6"}, {"text": "S +4"}, {"text": "C +1", "planned": true}],
-            "25": [{"text": "A −3", "planned": true}]
-          }}
+          {
+            "type": "activity_calendar",
+            "start": 4,
+            "days": 31,
+            "today": 16,
+            "ends": [24],
+            "paydays": [30],
+            "note": 3,
+            "activity": {
+              "13": [
+                {"text": "A −8"}
+              ],
+              "16": [
+                {"text": "A −2"}
+              ],
+              "22": [
+                {"text": "A −4", "planned": true}
+              ],
+              "24": [
+                {"text": "A +6"},
+                {"text": "S +4"},
+                {"text": "C +1", "planned": true}
+              ],
+              "25": [
+                {"text": "A −3", "planned": true}
+              ]
+            }
+          }
         ]
       },
       {
-        "id": "COMPACT-BALANCE-PICKER",
+        "id": "BALANCES-ALL",
+        "title": "Balances & date",
+        "subtitle": "As of today · January 16, 2026",
+        "items": [
+          {"type": "action", "text": "Choose date", "note": 4},
+          {"type": "heading", "text": "10 balances"},
+          {"type": "row", "text": "Annual leave", "value": "90 h"},
+          {"type": "row", "text": "Sick leave", "value": "20 h"},
+          {"type": "row", "text": "Compensatory time", "value": "8 h"},
+          {"type": "row", "text": "Credit hours", "value": "4 h"},
+          {"type": "row", "text": "Travel comp", "value": "6 h"},
+          {"type": "row", "text": "Time-off award", "value": "12 h"},
+          {"type": "row", "text": "Restored annual", "value": "10 h"},
+          {"type": "row", "text": "Religious comp", "value": "2 h"},
+          {"type": "row", "text": "Paid parental leave", "value": "60 h", "note": 5},
+          {"type": "row", "text": "FMLA remaining", "value": "120 h"},
+          {"type": "action", "text": "Back to Calendar", "emphasis": false}
+        ]
+      },
+      {
+        "id": "BALANCE-DATE-PICKER",
         "title": "Balance date",
         "subtitle": "Currently showing Jan 16, 2026",
         "items": [
-          {"type": "calendar", "text": "January 2026", "start": 4, "ends": [24], "paydays": [30], "selected": 24, "show_legend": false, "note": 4},
+          {"type": "calendar", "text": "January 2026", "start": 4, "ends": [24], "paydays": [30], "selected": 24, "show_legend": false, "note": 6},
           {"type": "heading", "text": "Nearby pay-period ends"},
-          {"type": "row", "text": "Period 1", "value": "Sat, Jan 24", "note": 5},
+          {"type": "row", "text": "Period 1", "value": "Sat, Jan 24", "note": 7},
           {"type": "row", "text": "Period 2", "value": "Sat, Feb 7"},
           {"type": "action", "text": "Show January 24"},
           {"type": "action", "text": "Cancel", "emphasis": false}
         ]
-      },
-      {
-        "id": "COMPACT-DAY-EDIT",
-        "title": "Edit day",
-        "subtitle": "Friday, Jan 16, 2026",
-        "top_action": "Add entry",
-        "items": [
-          {"type": "heading", "text": "Annual leave"},
-          {"type": "row", "text": "Direction", "value": "Use", "note": 6},
-          {"type": "row", "text": "Hours", "value": "2"},
-          {"type": "row", "text": "Comment", "value": ""},
-          {"type": "action", "text": "Add leave type", "emphasis": false},
-          {"type": "action", "text": "Review changes", "note": 7}
-        ]
       }
-    ]
+    ],
+    "phone_height": 756
   },
   {
     "file": "calendar-compact-month.png",
-    "title": "Option B · Month selector and readable day list",
+    "title": "Calendar · Month selector and readable day list",
     "subtitle": "Change the month independently of the balance date.",
     "screens": [
       {
-        "id": "COMPACT-MONTH-SELECTOR",
+        "id": "CALENDAR-MONTH-SELECTOR",
         "title": "Choose month",
         "items": [
           {"type": "row", "text": "Calendar year", "value": "2026", "dropdown": true, "note": 1},
@@ -70,17 +113,48 @@
         ]
       },
       {
-        "id": "COMPACT-DAY-LIST",
+        "id": "CALENDAR-DAY-LIST",
         "title": "Calendar",
         "nav": "Calendar",
         "toolbar": ["menu", "share"],
         "items": [
-          {"type": "card", "text": "As of today · Jan 16, 2026", "body": "Annual 90 h  ·  Sick 20 h", "indicator": "›"},
+          {
+            "type": "balance_card",
+            "text": "As of today · Jan 16, 2026",
+            "balances": [
+              ["Annual", "90 h"],
+              ["Sick", "20 h"],
+              ["Comp", "8 h"],
+              ["Credit", "4 h"]
+            ],
+            "hint": "View all 10 balances · 6 more"
+          },
           {"type": "row", "text": "January 2026", "dropdown": true},
           {"type": "card", "text": "Tuesday, January 13", "body": "Annual leave · 8 h used · Approved", "indicator": "›", "note": 3},
           {"type": "row", "text": "Wednesday, January 14", "value": "Add leave ›"},
           {"type": "row", "text": "Thursday, January 15", "value": "Add leave ›"},
           {"type": "card", "text": "Friday, January 16 · Today", "body": "Annual leave · 2 h used · Approved", "indicator": "›"}
+        ]
+      }
+    ]
+  },
+  {
+    "file": "calendar-compact-day.png",
+    "title": "Calendar · Open a day directly",
+    "subtitle": "The editor opens on the entire cell’s date.",
+    "screens": [
+      {
+        "id": "CALENDAR-DAY-DETAIL",
+        "title": "Edit day",
+        "subtitle": "Friday, Jan 16, 2026",
+        "top_action": "Add entry",
+        "items": [
+          {"type": "heading", "text": "Annual leave"},
+          {"type": "row", "text": "Direction", "value": "Use", "note": 1},
+          {"type": "row", "text": "Hours", "value": "2"},
+          {"type": "row", "text": "Comment", "value": ""},
+          {"type": "action", "text": "Add leave type", "emphasis": false},
+          {"type": "action", "text": "Review changes", "note": 2}
         ]
       }
     ]

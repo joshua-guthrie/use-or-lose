@@ -6,7 +6,7 @@ November 20, 2026. Milestone 1 of the approved Android specification plan is com
 
 - Pinned published desktop build `0.2.2.dev0+g7041ce9e` to source commit `7041ce9e9921dd4c407595ed3269de1aca43e699` and generated installer commit `80313ff`.
 - Created the [specification index](../specification.md), [parity matrix](../parity.md), [Calendar balance requirements](../sections/calendar-balances.md), and [acceptance plan](../testPlan.md). Calendar requirements `CAL-BAL-01` through `CAL-BAL-07` and `CAL-NAV-01` have matching acceptance cases.
-- Used the [front-window concept](../mockups/calendar-front-window.png) to identify the single balance panel, the separate editing date, and the pay-period markers. The Calendar screen milestone will annotate the picker and remaining states.
+- Used the [Calendar design](../sections/calendar-main-screen.md) to identify the single balance panel, the separate editing date, and the pay-period markers. The Calendar screen milestone will annotate the picker and remaining states.
 - Reviewed the five open Android-related issues and the historical balance and pay-period tickets. Kept the approved requirements for Android sharing, desktop-compatible private JSON, the initial release scope, and app-only interface labels.
 
 ## Verification
