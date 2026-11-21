@@ -13,8 +13,18 @@ Use three persistent destinations for familiar tasks. **Calendar** opens first a
 | Callout | Interaction and states | Requirements |
 | --- | --- | --- |
 | 1–2 | First launch offers restore or a new setup. Return from the system picker or a cancelled setup to this screen with the prior choices visible. | `CAL-YEAR-01`, `DATA-RESTORE-01` |
-| 3–4 | Manual setup presents the selected calendar dates, accrual and initial hours. Keep supported additional balances under one disclosure. Validate the date range and increments before review. Manual mode explains that earlier balances and special earning history stay in their original ledger. | `CAL-YEAR-01`, `YEAR-MAN-01` |
+| 3–4 | The start-of-year form summarizes the chosen schedule and accrual rates and accepts initial hours. Keep supported additional balances under one disclosure. Validate the date range and increments before review. Explain that original earning dates and expiry history require dated records. | `CAL-YEAR-01`, `YEAR-MAN-01` |
 | 5–7 | Carryover review names the originating task and shows source close, proposed schedule, category quantities and reductions. Lot details and warnings are available before creating. A stale preview reopens review. Cancelling returns to the original task. Manual review uses the same confirmation layout with its own opening amounts and no linked source. | `CAL-YEAR-01`, `YEAR-CARRY-01` |
+
+### Choose the balance date at setup
+
+![A choice between start-of-year and Today balances, a dated hours form, and the review before creating the file](../../artwork/mockups/calendar-setup-today.png)
+
+| Callout | Interaction and states | Requirements |
+| --- | --- | --- |
+| 1–3 | Confirm the schedule and accrual rates, then choose the balance date. **Balances at start of leave year** opens the opening amounts form. **Balances as of Today** opens the dated form. When the proposed year excludes Today, explain why only the start-of-year choice applies. | `YEAR-MAN-01`, `YEAR-TODAY-01` |
+| 4 | Accept exact hours using the configured increment, with blank fields treated as zero. Show inline validation and retain the draft after Back from review. | `YEAR-TODAY-01` |
+| 5–6 | Show the entered balances, the earlier range that will have zero balances and the next scheduled accrual if any. If Today is the first day, omit the empty earlier range. **Create leave year** publishes the reviewed file once. Cancellation preserves the original task and files. | `CAL-YEAR-01`, `YEAR-TODAY-01` |
 
 ## Pay-period closing balances
 

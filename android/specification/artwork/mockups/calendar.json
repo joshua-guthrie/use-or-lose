@@ -16,7 +16,7 @@
       },
       {
         "id": "LEAVE-YEAR-MANUAL",
-        "title": "Manual starting balances",
+        "title": "Start-of-year balances",
         "subtitle": "New leave year · 2026",
         "items": [
           {"type": "row", "text": "First pay period starts", "value": "Jan 11, 2026", "note": 3},
@@ -42,6 +42,55 @@
           {"type": "action", "text": "Review lots and warnings", "emphasis": false},
           {"type": "action", "text": "Create leave year", "note": 7},
           {"type": "action", "text": "Back to balance date", "emphasis": false}
+        ]
+      }
+    ]
+  },
+  {
+    "file": "calendar-setup-today.png",
+    "title": "Choose the balance date for a new leave year",
+    "subtitle": "Enter the hours you started with or the hours you have as of Today.",
+    "screens": [
+      {
+        "id": "LEAVE-YEAR-SETUP-METHOD",
+        "title": "Set up leave year",
+        "subtitle": "New leave year · 2026",
+        "items": [
+          {"type": "row", "text": "First pay period starts", "value": "Jan 11, 2026", "note": 1},
+          {"type": "row", "text": "Pay periods", "value": "26"},
+          {"type": "row", "text": "Annual accrual", "value": "6 h / period"},
+          {"type": "row", "text": "Sick accrual", "value": "4 h / period"},
+          {"type": "heading", "text": "Which balances do you have?"},
+          {"type": "action", "text": "Balances at start of leave year", "emphasis": false, "note": 2},
+          {"type": "action", "text": "Balances as of Today", "emphasis": false, "note": 3},
+          {"type": "action", "text": "Cancel", "emphasis": false}
+        ]
+      },
+      {
+        "id": "LEAVE-YEAR-TODAY-INPUT",
+        "title": "Balances as of Today",
+        "subtitle": "Tuesday, February 10, 2026",
+        "items": [
+          {"type": "text", "text": "Enter the hours you have on this date. Blank entries use 0 h."},
+          {"type": "row", "text": "Annual leave", "value": "80 h", "note": 4},
+          {"type": "row", "text": "Sick leave", "value": "24 h"},
+          {"type": "row", "text": "Credit hours", "value": "2.25 h"},
+          {"type": "action", "text": "Other balances", "emphasis": false},
+          {"type": "action", "text": "Review leave year"}
+        ]
+      },
+      {
+        "id": "LEAVE-YEAR-TODAY-REVIEW",
+        "title": "Review 2026 leave year",
+        "subtitle": "January 11, 2026 – January 9, 2027 · 26 periods",
+        "items": [
+          {"type": "card", "text": "Balances as of Feb 10, 2026", "body": "Jan 11 through Feb 9 will start with 0 h and no leave entries.", "note": 5},
+          {"type": "row", "text": "Annual leave", "value": "80 h"},
+          {"type": "row", "text": "Sick leave", "value": "24 h"},
+          {"type": "row", "text": "Credit hours", "value": "2.25 h"},
+          {"type": "card", "text": "Next accrual · Feb 21", "body": "Annual 6 h · Sick 4 h"},
+          {"type": "action", "text": "Create leave year", "note": 6},
+          {"type": "action", "text": "Back to balances", "emphasis": false}
         ]
       }
     ]

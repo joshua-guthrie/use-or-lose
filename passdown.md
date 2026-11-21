@@ -8,6 +8,8 @@ The owner selected the [Calendar main screen](android/specification/chapters/01-
 
 The phone Calendar uses four [date markers](android/specification/chapters/01-calendar/01-04-date-markers.md), with full descriptions in day details and TalkBack. The desktop-equivalent shared PDF keeps its report legend. Tapping Calendar Share generates the PDF and passes it as an attachment to Android’s Sharesheet. Printing is outside Android scope. [PDF attachment checkpoint](android/specification/passdowns/19-pdf-attachment-sharing.md)
 
+During new independent leave-year setup, choose balances at the start of the year or exact balances as of Today. The Today choice starts the preceding days in that year at zero and uses the normal accrual schedule going forward. [Today setup checkpoint](android/specification/passdowns/20-today-balances.md)
+
 Close implementation milestones through the [QA gates and retest loop](android/specification/chapters/05-quality/05-02-quality-gates.md). Use the [QA report template](android/qa/reports/template.md) and link the separate AI review.
 
 [Organization checkpoint](android/specification/passdowns/18-project-organization.md) records the chapter moves, review destinations, and smaller-model implementation briefs.
