@@ -47,6 +47,8 @@ QT_QPA_PLATFORM=offscreen .venv/bin/python -m pytest -q
 
 ## Before calling a build ready
 
+Use the [QA gates](quality-gates.md#required-gates) at each implementation milestone. The build steps below also apply during the release rehearsal.
+
 1. Record Android build and commit, desktop reference, emulator and phone levels and ABIs, fixture IDs and hashes, expected outcomes, and failures. All in-scope [acceptance cases](../testPlan.md) need a result or a documented blocker.
 2. Record cold-start and dated-query timings for the shared-core proof of concept and at least one larger synthetic ledger. Verify progress or cancellation for long loads and that rapid month and filter changes cannot show a stale result.
 3. Inspect the actual screens against the annotated boards on a phone. Check Calendar date labels, charts with a readable table, help content, native pickers, user-initiated file sharing, and recovery after a failed or interrupted restore.

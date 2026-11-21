@@ -2,6 +2,8 @@
 
 These cases define the pass conditions for the [parity matrix](parity.md) and storage release gates. Use synthetic data, a fixed local date, and the [pinned desktop source](specification.md#product-and-reference-build) to compute reference results. Run the phone cases on an emulator first and repeat the system handoffs and accessibility checks on a physical phone when a build is available.
 
+Use the [milestone QA loop](sections/quality-gates.md#run-the-loop-in-every-implementation-milestone) to select cases, record failures and fixes, and close each milestone only after all applicable gates pass.
+
 ## Calendar balance fixture
 
 Set the app's local Today to **January 16, 2026**. Initialize a manual 2026 leave year starting January 11 with 26 pay periods, 100 h annual and 20 h sick opening balances, and 6 h annual accrual per period. The reference store's sick accrual is 4 h. Use the generated schedule without a payday offset override.

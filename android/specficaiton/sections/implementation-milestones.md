@@ -2,6 +2,8 @@
 
 This is the order of work after the owner reviews the specification. Each row targets one five-hour usage window and ends with a verifiable outcome. If a row grows, split it by the first unresolved dependency or by a user flow and finish a coherent subset. Use the measured five-hour balance to judge whether to start another increment. Complete each session's closeout while at least 30% remains. At every increment, record what passed, relevant commits, unknowns, remaining usage, and the exact next step in the root `passdown.md` and a numbered implementation note. Commit the verified increment before starting the next.
 
+Start each milestone or subset with a [self-contained implementation brief](quality-gates.md#make-each-milestone-executable-from-a-brief) suitable for a smaller coding model. Every milestone and separately completed subset must pass the [QA completion gates](quality-gates.md#required-gates). A partial checkpoint or a passdown records work in progress and leaves the milestone open. The final QA and AI code review reports identify the tested candidate and link the evidence before completion.
+
 ## Build in this order
 
 | Milestone | Depends on | Deliver and verify |

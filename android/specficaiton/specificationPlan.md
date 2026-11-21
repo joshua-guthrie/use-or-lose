@@ -22,6 +22,7 @@ Use a short `specification.md` as an index with requirements by topic under `sec
 | On-device data and sharing | Desktop-compatible JSON storage, backup sharing and restore, upgrades, privacy, and recovery. |
 | Testing and Google Play | Beginner setup, automated and manual testing, release checks, publisher account steps, and the production submission plan. |
 | Implementation milestones | Small, testable increments with dependencies, acceptance checks, and a passdown at the end of each usage window. |
+| Quality gates | Iterative functional, visual and code review with reproducible evidence. Each applicable gate passes before milestone completion. |
 
 ## Start with the desktop app as the reference
 

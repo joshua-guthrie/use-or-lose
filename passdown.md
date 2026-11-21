@@ -6,6 +6,8 @@ The Android specification draft is complete through milestone 11, with the Novem
 
 The Calendar main screen decision is pending. Review [Option A and Option B](android/specficaiton/sections/calendar-layout-options.md) before I05. Both show the updated menu, on-demand legend and top-right Share. [Calendar menu and PDF passdown](android/specficaiton/passdowns/14-calendar-menu-and-pdf.md)
 
+Close implementation milestones through the [QA gates and retest loop](android/specficaiton/sections/quality-gates.md). Use the [QA report template](android/qa/reports/template.md) and link the separate AI review.
+
 Specification work finished with 62% of the five-hour window remaining. Milestones 3–11 each have their own local commit.
 
 ## Decisions to carry forward

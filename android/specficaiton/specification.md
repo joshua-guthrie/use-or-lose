@@ -36,6 +36,7 @@ For a visual review, start with the [Calendar mockups](sections/calendar-screens
 | [Shared accounting core and compatibility](sections/core-and-compatibility.md) | Recommended library boundary, bridge proof of concept, and a shared parity fixture contract. |
 | [Device storage, backups, and sharing](sections/device-storage.md) | Private desktop JSON store, compatible archives, restore recovery, temporary sharing, and round-trip release checks. |
 | [Developer setup and testing](sections/developer-setup-and-testing.md) | Android Studio and emulator setup, physical handset and API coverage, tests and release rehearsal. |
+| [Iterative QA and milestone completion](sections/quality-gates.md) | Blocking gates for spec conformance, functional tests, mockup matching, AI code review and retest. |
 | [Google Play publishing](sections/google-play.md) | Account and device verification, signed candidate, store listing, test tracks, and production submission. |
 | [Implementation milestones and release decisions](sections/implementation-milestones.md) | Five-hour implementation checkpoints, owner review decisions, and a final specification checklist. |
 
