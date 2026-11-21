@@ -8,7 +8,7 @@
         "id": "COMPACT-CALENDAR-TODAY",
         "title": "Calendar",
         "nav": "Calendar",
-        "top_action": "Today",
+        "toolbar": ["menu", "share"],
         "items": [
           {"type": "card", "text": "As of today · Jan 16, 2026", "body": "Annual 90 h  ·  Sick 20 h", "indicator": "›", "note": 1},
           {"type": "row", "text": "January 2026", "dropdown": true, "note": 2},
@@ -26,7 +26,7 @@
         "title": "Balance date",
         "subtitle": "Currently showing Jan 16, 2026",
         "items": [
-          {"type": "calendar", "text": "January 2026", "start": 4, "ends": [24], "paydays": [30], "selected": 24, "legend": "●  Pay-period end      —  Payday", "note": 4},
+          {"type": "calendar", "text": "January 2026", "start": 4, "ends": [24], "paydays": [30], "selected": 24, "show_legend": false, "note": 4},
           {"type": "heading", "text": "Nearby pay-period ends"},
           {"type": "row", "text": "Period 1", "value": "Sat, Jan 24", "note": 5},
           {"type": "row", "text": "Period 2", "value": "Sat, Feb 7"},
@@ -73,7 +73,7 @@
         "id": "COMPACT-DAY-LIST",
         "title": "Calendar",
         "nav": "Calendar",
-        "top_action": "Today",
+        "toolbar": ["menu", "share"],
         "items": [
           {"type": "card", "text": "As of today · Jan 16, 2026", "body": "Annual 90 h  ·  Sick 20 h", "indicator": "›"},
           {"type": "row", "text": "January 2026", "dropdown": true},

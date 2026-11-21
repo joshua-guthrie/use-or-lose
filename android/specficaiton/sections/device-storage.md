@@ -41,7 +41,7 @@ The compatible archive carries canonical configuration and supported ledger hist
 
 ## Artifact sharing and lifecycle
 
-Use **Share** for graphs and reports, and **Share backup** for the archive. A format choice precedes the Android Sharesheet when several forms are available. Share the active visible report selection and create a fresh artifact or reuse a verified rendering for the same snapshot and filters.
+Use **Share** for graphs and reports, and **Share backup** for the archive. A format choice precedes the Android Sharesheet when several forms are available. The Calendar toolbar shares the desktop-style PDF for the displayed month directly. Share the active visible report selection and create a fresh artifact or reuse a verified rendering for the same snapshot and filters. [Calendar PDF flow](calendar-menu-and-pdf.md#share-the-displayed-month)
 
 | Payload | MIME type | Preparation and review |
 | --- | --- | --- |

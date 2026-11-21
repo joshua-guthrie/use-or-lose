@@ -1,6 +1,6 @@
 # Report screens and sharing
 
-Reports is a phone destination with a year selector and report list. Keep interactive chart controls beside the result they affect. Open long tables and supporting entries as details. Read aloud the chart title, units, timeframe and selected value. Pair colors with labels or visual marks. System picker, share, and print UIs will vary with the phone.
+Reports is a phone destination with a year selector and report list. Keep interactive chart controls beside the result they affect. Use the upper-right Share icon when the report has a shareable result. Open long tables and supporting entries as details. Read aloud the chart title, units, timeframe and selected value. Pair colors with labels or visual marks. System picker, share, and print UIs will vary with the phone.
 
 [Report requirements](reports-data-and-preferences.md#reports) · [Acceptance cases](../testPlan.md#reports-acceptance)
 
@@ -47,7 +47,7 @@ Reports is a phone destination with a year selector and report list. Keep intera
 
 | Callout | Interaction and states | Requirements |
 | --- | --- | --- |
-| 1–2 | Show a readable month preview with the selected month, leave records and balance context. Keep **Share** and **Print** recognizable. | `REP-MONTH-01` |
+| 1–2 | Show a zoomable preview of the desktop month report and put Share in the upper right. The month report can offer PDF and PNG. The Calendar main-screen shortcut shares the month PDF directly. [Calendar PDF flow](calendar-menu-and-pdf.md#share-the-displayed-month) | `REP-MONTH-01`, `CAL-SHARE-01` |
 | 3–4 | Choose a supported format and hand off the rendered report to Android. Report preparation failure leaves its preview open and offers Retry. Back or cancellation returns to the report and its current filters. | `REP-SHARE-01`, `REP-MONTH-01` |
 | 5 | Print invokes the system service with the current report and applicable layout. A missing printer and cancellation return to the preview. | `REP-MONTH-01`, `REP-SHARE-01` |
 

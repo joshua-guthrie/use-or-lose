@@ -5,7 +5,7 @@ import json
 from functools import lru_cache
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageOps
 
 SURFACE = "#FCFCFF"
 CANVAS = "#E9EEF7"
@@ -20,6 +20,7 @@ PHONE_WIDTH = 366
 PHONE_HEIGHT = 674
 PADDING = 22
 GAP = 24
+MOCKUPS = Path(__file__).resolve().parent
 
 
 @lru_cache
@@ -30,6 +31,7 @@ def get_font(font_dir, size, bold=False):
 
 class Screen:
     def __init__(self, image, font_dir, x, top, screen):
+        self.image = image
         self.draw = ImageDraw.Draw(image)
         self.font_dir = font_dir
         self.x = x
@@ -73,10 +75,13 @@ class Screen:
     def render(self):
         self.box(self.x + 3, self.top + 5, self.right + 3, self.bottom + 5, "#C5D2E6", 24)
         self.box(self.x, self.top, self.right, self.bottom, SURFACE, 24)
-        self.text(self.left, self.cursor, "FedLeave", 13, PRIMARY, bold=True)
-        top_action = self.screen.get("top_action")
-        self.text(self.inner_right, self.cursor, top_action or "9:41", 13, PRIMARY if top_action else MUTED,
-                  bool(top_action), "ra")
+        if toolbar := self.screen.get("toolbar"):
+            self.toolbar(toolbar)
+        else:
+            self.text(self.left, self.cursor, "FedLeave", 13, PRIMARY, bold=True)
+            top_action = self.screen.get("top_action")
+            self.text(self.inner_right, self.cursor, top_action or "9:41", 13, PRIMARY if top_action else MUTED,
+                      bool(top_action), "ra")
         self.cursor += 28
         subtitle = self.screen.get("subtitle")
         self.paragraph({"text": self.screen["title"]}, size=28, bold=True, padding=4)
@@ -102,6 +107,24 @@ class Screen:
                     self.box(center - 50, y + 3, center + 50, y + 33, SELECTED, 14)
                 self.text(center, y + 18, label, 13, PRIMARY if label == nav else MUTED, label == nav, "mm")
         self.text(self.x, self.bottom + 11, self.screen["id"], 12, MUTED, bold=True)
+
+    def toolbar(self, actions):
+        y = self.cursor + 9
+        label_x = self.left
+        if "menu" in actions:
+            label_x += 30
+            x = self.left + 8
+            for offset in (-5, 0, 5):
+                self.draw.line((x - 8, y + offset, x + 8, y + offset), fill=PRIMARY, width=2)
+        self.text(label_x, self.cursor, "FedLeave", 13, PRIMARY, bold=True)
+        if "share" in actions:
+            x = self.inner_right - 9
+            points = ((x - 7, y), (x + 7, y - 7), (x + 7, y + 7))
+            for point in points[1:]:
+                self.draw.line((*points[0], *point), fill=PRIMARY, width=2)
+            for center_x, center_y in points:
+                self.draw.ellipse((center_x - 3, center_y - 3, center_x + 3, center_y + 3), fill=PRIMARY)
+            self.mark(self.screen.get("share_note"), y + 16)
 
     def paragraph(self, item, size, color=INK, bold=False, padding=8):
         y = self.cursor
@@ -151,6 +174,29 @@ class Screen:
         self.mark(item.get("note"), self.cursor + 18)
         self.cursor += 47
 
+    def menu_panel(self, item):
+        top = self.cursor
+        entries = item["entries"]
+        height = len(entries) * 42 + 12
+        self.box(self.left + 3, top + 3, self.inner_right + 3, top + height + 3, LINE, 13)
+        self.box(self.left, top, self.inner_right, top + height, "#FFFFFF", 13)
+        for index, label in enumerate(entries):
+            y = top + 6 + index * 42
+            if label == item.get("highlight"):
+                self.box(self.left + 6, y, self.inner_right - 6, y + 40, SELECTED)
+            self.text(self.left + 15, y + 21, label, 15, INK, True, "lm")
+        self.mark(item.get("note"), top + 28)
+        self.cursor += height + 16
+
+    def document_preview(self, item):
+        with Image.open(MOCKUPS / item["file"]) as source:
+            page = ImageOps.contain(source.convert("RGB"), (self.width - 12, 230), Image.Resampling.LANCZOS)
+        y = self.cursor
+        self.box(self.left, y, self.inner_right, y + page.height + 12, LINE)
+        self.image.paste(page, (self.left + (self.width - page.width) // 2, y + 6))
+        self.mark(item.get("note"), y + 18)
+        self.cursor += page.height + 24
+
     def calendar(self, item):
         y = self.cursor
         self.text(self.left, y, item["text"], 17, bold=True)
@@ -176,12 +222,13 @@ class Screen:
         self.mark(item.get("note"), first_row + 18)
         self.cursor = first_row + 28 * ((item["start"] + item.get("days", 31) - 1) // 7) + 25
         legend = "●  Pay-period end      ▬  Payday" if paydays else "●  Pay-period end"
-        self.paragraph({"text": item.get("legend", legend)}, 12, MUTED, padding=8)
+        if item.get("show_legend", True):
+            self.paragraph({"text": item.get("legend", legend)}, 12, MUTED, padding=8)
 
     def activity_calendar(self, item):
         left = self.x + 8
         column_width = (PHONE_WIDTH - 16) // 7
-        row_height = 60
+        row_height = 72
         first_row = self.cursor + 24
         for column, label in enumerate(("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")):
             x = left + column * column_width + column_width // 2
@@ -208,18 +255,16 @@ class Screen:
 
             entries = activity.get(str(day), [])
             for index, entry in enumerate(entries[:2]):
-                line_y = y + 23 + index * 12
-                self.text(x + 5, line_y, entry["text"], 11, INK, bold=True)
+                line_y = y + 25 + index * 14
+                self.text(x + 5, line_y, entry["text"], 12, INK, bold=True)
                 if entry.get("planned"):
                     self.text(x + column_width - 5, line_y, "P", 10, PRIMARY, bold=True, anchor="ra")
             if len(entries) > 2:
-                self.text(x + 5, y + 47, f"+{len(entries) - 2}", 10, PRIMARY, bold=True)
+                self.text(x + 5, y + 54, f"+{len(entries) - 2}", 10, PRIMARY, bold=True)
 
         row_count = (item["start"] + item["days"] + 6) // 7
         self.mark(item.get("note"), first_row + row_height * 2)
         self.cursor = first_row + row_count * row_height + 9
-        self.paragraph({"text": "A Annual   S Sick   C Comp   ·   Hours"}, 11, MUTED, padding=0)
-        self.paragraph({"text": "P Planned     ● Period end     — Payday"}, 11, MUTED, padding=4)
 
     def chart(self, item):
         y = self.cursor

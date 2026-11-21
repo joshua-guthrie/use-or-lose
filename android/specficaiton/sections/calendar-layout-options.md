@@ -1,11 +1,11 @@
 # Choose the Android Calendar layout
 
-**Decision needed. Choose Option A or Option B for the Android main screen.** The choice is open. Both designs open on the same Today balance at the top, offer a date or pay-period end as the balance cutoff, and keep that cutoff independent of the month or day being edited.
+**Decision needed. Choose Option A or Option B for the Android main screen.** Both designs open on the same Today balance at the top, offer a date or pay-period end as the balance cutoff, and keep that cutoff independent of the month or day being edited. Both put **Menu** at upper left and **Share calendar PDF** at upper right. **Calendar legend** in the menu explains the markers and any leave codes shown. [Menu and PDF mockups](calendar-menu-and-pdf.md)
 
 | | Option A · Separate controls | Option B · Activity inside each day |
 | --- | --- | --- |
 | Change the balance date | Use the labeled **Change date** button below the balance. | Tap the entire balance card. A chevron signals that it opens the date and pay-period picker. |
-| Scan the month | The grid emphasizes dates and pay-period marks. | Day cells also show short, signed amounts. The grid uses more of the available width and height. |
+| Scan the month | The grid emphasizes dates and pay-period marks. | Taller day cells show short, signed amounts. The legend is available on demand, leaving room for more readable entries. |
 | Add or edit leave | Select a day, then use the separate **Edit day** section. | Tap the entire day cell to open the editor. A day with no entries opens the same editor ready to add one. |
 | Change the displayed month | Use the month-navigation controls. | Tap the month and year to open a compact month selector. |
 | Review on a phone | Labeled controls leave more room for readable text. | Daily activity is quicker to scan when the cell text is legible. On very narrow screens or with large text, use the full-width day list. |
@@ -14,7 +14,7 @@
 
 ![Original Calendar, date picker, and pay-period details showing separate Change date and Edit day controls](../mockups/calendar-balances.png)
 
-See the [original Calendar annotations](calendar-screens.md#calendar-date-picker-and-period-detail) for the control labels and positions.
+See the [Calendar annotations](calendar-screens.md#calendar-date-picker-and-period-detail) for the control labels and positions.
 
 ## Option B · Activity inside each day
 
@@ -24,7 +24,7 @@ See the [original Calendar annotations](calendar-screens.md#calendar-date-picker
 | --- | --- |
 | 1 | Tap anywhere on the balance card to open the balance picker. TalkBack announces the date and amounts and labels the card action **Change balance date**. |
 | 2 | Tap the month and year to open the month selector. The month selection only changes the displayed calendar. |
-| 3 | Tap a day cell to edit its leave or add an entry. The day number and pay-period mark stay visible. A minus sign shows hours used, a plus sign shows hours earned, and **P** marks a planned entry. The day announces its date, category, amounts, status and any schedule markers. |
+| 3 | Tap a day cell to edit its leave or add an entry. The day number and pay-period mark stay visible. A minus sign shows hours used, a plus sign shows hours earned, and **P** marks a planned entry. **Menu > Calendar legend** explains the symbols. The day announces its date, category, amounts, status and any schedule markers. |
 | 4–5 | Choose an ordinary date in the picker or a nearby pay-period end. Confirm to update the balance card on the main screen. Back or Cancel preserves the previous result. |
 | 6–7 | The editor opens on the tapped date with full labels and exact hours. **Review changes** uses the existing save review. Saving refreshes the calendar and recalculates the balance at its existing cutoff. |
 

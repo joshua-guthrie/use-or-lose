@@ -7,11 +7,11 @@ Calendar gives the user one **Balances** panel. They can see their position toda
 ![Calendar front-window concept with annotated features described below](../mockups/calendar-front-window.png)
 
 1. **Balances** shows the active date above the figures. In this concept, a short set of categories fits on the front window and **View all balances** opens the complete set for that same date.
-2. **Change date** in the panel opens the balance date picker. The **Today** action at the top restores the current date and month.
-3. The month grid marks pay-period ends with bold numerals and a dot. The legend explains the mark. The date picker will use the same marker and an accessible label.
+2. **Change date** in the panel opens the balance date picker. The concept shows an early placement of **Today**.
+3. The month grid marks pay-period ends with bold numerals and a dot. The date picker uses the same marker and an accessible label.
 4. The selected calendar day above **Edit day** is the date the user is preparing to edit. The date in the Balances heading is the cutoff used for the balance calculation.
 
-This front-window sample uses fictional November data. The detailed annotated phone screens use the fixed January acceptance fixture. [Calendar screen states](calendar-screens.md#calendar-date-picker-and-period-detail)
+This front-window sample uses fictional November data. The current layouts use the fixed January acceptance fixture and put **Today** and the legend in the menu. [Current Calendar layouts](calendar-layout-options.md) · [Calendar menu and PDF](calendar-menu-and-pdf.md)
 
 ## Requirements
 
@@ -21,7 +21,7 @@ This front-window sample uses fictional November data. The detailed annotated ph
 | `CAL-BAL-02` | Open a calendar picker at the panel's current date. Option A uses a **Change date** button. Option B makes the balance card tappable. After confirmation, update the panel's date and figures together. Dismissing the picker preserves both. [Layout decision](calendar-layout-options.md) |
 | `CAL-BAL-03` | Mark a pay-period end from the stored schedule in the month grid and picker. Announce **Pay-period end** in the date's accessible label. Provide nearby period ends as quick choices with the date and period number. A selected end date shows that day's closing balance in the same panel. Period details provide the number, start and end dates, payday, and earned and used hours by category. Review the proposed collapsed disclosure in the screen milestone. |
 | `CAL-BAL-04` | For a date later than today, show **Projected balance** and the exact selected date. Use the calculation for that day, with effective scheduled activity and accrued hours through that date. |
-| `CAL-BAL-05` | **Today** restores the current month, active calendar day, and balance date. A fresh open also starts on today after a previous manual date choice. |
+| `CAL-BAL-05` | **Menu > Today** restores the current month, active calendar day, and balance date. A fresh open also starts on today after a previous manual date choice. |
 | `CAL-BAL-06` | Keep a balance result paired with the date it covers. If a requested date cannot be loaded, show it with an unavailable state and a retry or date-change action. Carry forward applicable warnings and show an unavailable category value as unavailable. A slow older request must never replace the result for the current selection. |
 | `CAL-BAL-07` | Use the stored leave-year start and end dates to resolve the selected day. A January date can belong to the preceding leave year. Prompt from the current task when an intentional date request needs a missing current or future year. [Leave-year setup](ledger-and-leave-years.md#start-or-find-a-leave-year) |
 | `CAL-NAV-01` | Browsing another month or selecting a calendar day for inspection and editing keeps the balance date selected in the panel. Confirming a balance date in the picker or using **Today** changes the balance cutoff. |
@@ -37,7 +37,7 @@ This front-window sample uses fictional November data. The detailed annotated ph
 | Screen or state ID | Key visual or interaction |
 | --- | --- |
 | `CALENDAR-MONTH` | Current month, previous and next actions, selected editing day, and separate markers for pay-period end and payday. |
-| `BALANCES-TODAY` | One panel with today's date, category values, **Change date**, and the **Today** reset action. |
+| `BALANCES-TODAY` | One panel with today's date and category values. The chosen layout opens the picker. The main-screen menu contains **Today**. |
 | `BALANCE-DATE-PICKER` | Date grid with the current selection, ordinary days, marked pay-period ends, nearby period shortcuts, and cancellation. |
 | `BALANCES-DATED` | Selected historical date, balances and warning area, with the same controls as Today. |
 | `BALANCES-PERIOD` | Closing date and the same balance values, plus the collapsed and expanded period activity. |

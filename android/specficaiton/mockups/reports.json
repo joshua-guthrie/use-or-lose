@@ -54,13 +54,13 @@
         "id": "REPORT-SEASONALITY",
         "title": "Seasonality",
         "subtitle": "2026 leave year · Recorded through Jan 16",
+        "toolbar": ["share"],
         "items": [
           {"type": "row", "text": "Analysis", "value": "Leave used by month", "note": 1},
           {"type": "row", "text": "Leave type", "value": "All leave used"},
           {"type": "chart", "text": "Used hours by month", "values": [17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "start_label": "Jan", "end_label": "Dec"},
           {"type": "row", "text": "January", "value": "10 h recorded · 7 h future", "note": 2},
-          {"type": "action", "text": "View entries", "emphasis": false},
-          {"type": "action", "text": "Share"}
+          {"type": "action", "text": "View entries", "emphasis": false}
         ]
       },
       {
@@ -93,6 +93,7 @@
         "id": "REPORT-LIFECYCLE",
         "title": "Overtime, comp and credit",
         "subtitle": "2026 leave year",
+        "toolbar": ["share"],
         "items": [
           {"type": "row", "text": "View", "value": "Monthly comp lifecycle", "note": 5},
           {"type": "chart", "text": "Comp time earned by month", "values": [6, 8, 4, 16], "start_label": "Jan", "end_label": "Apr"},
@@ -111,6 +112,7 @@
         "id": "REPORT-HEATMAP",
         "title": "Calendar heatmap",
         "subtitle": "2026 leave year",
+        "toolbar": ["share"],
         "items": [
           {"type": "row", "text": "Series", "value": "Annual leave used", "note": 1},
           {"type": "row", "text": "View", "value": "Monthly calendars"},
@@ -123,6 +125,7 @@
         "id": "REPORT-CUMULATIVE",
         "title": "Cumulative usage",
         "subtitle": "2026 leave year · All effective scheduled use",
+        "toolbar": ["share"],
         "items": [
           {"type": "row", "text": "Absence categories", "value": "Annual", "note": 3},
           {"type": "chart", "text": "Cumulative annual leave used", "style": "line", "step": true, "values": [0, 8, 10, 14, 17, 17], "positions": [0, 0.006, 0.014, 0.03, 0.039, 1], "start_label": "Jan 11", "end_label": "Jan 9"},
@@ -134,6 +137,7 @@
         "id": "REPORT-BALANCE-CHART",
         "title": "Balance charts",
         "subtitle": "2026 leave year · Period-ending balances",
+        "toolbar": ["share"],
         "items": [
           {"type": "row", "text": "Leave type", "value": "Annual", "note": 4},
           {"type": "chart", "text": "Annual balance in hours", "style": "line", "values": [92, 95, 101, 107], "start_label": "Jan 24", "end_label": "Mar 7"},
@@ -146,6 +150,7 @@
         "id": "REPORT-YEARLY",
         "title": "Yearly comparison",
         "subtitle": "Annual leave balance on the selected date",
+        "toolbar": ["share"],
         "items": [
           {"type": "row", "text": "Leave type", "value": "Annual"},
           {"type": "row", "text": "Compare as of", "value": "Feb 29", "note": 5},
@@ -165,6 +170,7 @@
         "id": "REPORT-HEATMAP-YEAR",
         "title": "Calendar heatmap",
         "subtitle": "2026 leave year",
+        "toolbar": ["share"],
         "items": [
           {"type": "row", "text": "Series", "value": "Annual leave used"},
           {"type": "row", "text": "View", "value": "Year at a glance", "note": 1},
@@ -202,11 +208,11 @@
         "id": "REPORT-MONTH",
         "title": "Month report",
         "subtitle": "January 2026",
+        "toolbar": ["share"],
+        "share_note": 2,
         "items": [
-          {"type": "calendar", "text": "January 2026", "start": 4, "ends": [24], "paydays": [30], "selected": 16, "note": 1},
-          {"type": "row", "text": "Jan 13 · Annual", "value": "8 h used"},
-          {"type": "row", "text": "Today · Annual balance", "value": "90 h"},
-          {"type": "action", "text": "Share", "note": 2},
+          {"type": "document_preview", "file": "calendar-desktop-pdf-reference.png", "note": 1},
+          {"type": "text", "text": "Pinch to zoom or rotate the phone to read the full page."},
           {"type": "action", "text": "Print", "emphasis": false}
         ]
       },

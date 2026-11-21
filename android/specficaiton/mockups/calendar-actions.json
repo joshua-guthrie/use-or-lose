@@ -1,0 +1,95 @@
+[
+  {
+    "file": "calendar-menus.png",
+    "title": "Calendar menu · Option A and Option B",
+    "subtitle": "Open Menu from the upper left. Share the displayed month from the upper right.",
+    "screens": [
+      {
+        "id": "CALENDAR-MENU-A",
+        "title": "Calendar",
+        "toolbar": ["menu", "share"],
+        "nav": "Calendar",
+        "items": [
+          {"type": "menu_panel", "entries": ["Today", "Calendar legend", "Transactions", "Preview month PDF"], "highlight": "Calendar legend", "note": 1},
+          {"type": "card", "text": "As of today · Jan 16, 2026", "body": "Annual 90 h  ·  Sick 20 h"},
+          {"type": "action", "text": "Change date", "emphasis": false},
+          {"type": "row", "text": "Editing day", "value": "Fri, Jan 16"}
+        ]
+      },
+      {
+        "id": "CALENDAR-MENU-B",
+        "title": "Calendar",
+        "toolbar": ["menu", "share"],
+        "nav": "Calendar",
+        "items": [
+          {"type": "menu_panel", "entries": ["Today", "Calendar legend", "Transactions", "Preview month PDF"], "highlight": "Calendar legend", "note": 2},
+          {"type": "card", "text": "As of today · Jan 16, 2026", "body": "Annual 90 h  ·  Sick 20 h", "indicator": "›"},
+          {"type": "row", "text": "January 2026", "dropdown": true}
+        ]
+      }
+    ]
+  },
+  {
+    "file": "calendar-legends.png",
+    "title": "On-demand Calendar legend",
+    "subtitle": "Both options explain schedule markers. Option B also explains the entries inside day cells.",
+    "screens": [
+      {
+        "id": "CALENDAR-LEGEND-A",
+        "title": "Calendar legend",
+        "subtitle": "Option A",
+        "items": [
+          {"type": "row", "text": "Pay-period end", "value": "●  Bold date and dot", "note": 1},
+          {"type": "row", "text": "Payday", "value": "—  Short line"},
+          {"type": "action", "text": "Done"}
+        ]
+      },
+      {
+        "id": "CALENDAR-LEGEND-B",
+        "title": "Calendar legend",
+        "subtitle": "Option B",
+        "items": [
+          {"type": "row", "text": "Pay-period end", "value": "●  Bold date and dot"},
+          {"type": "row", "text": "Payday", "value": "—  Short line"},
+          {"type": "heading", "text": "Leave in a day"},
+          {"type": "row", "text": "A  S  C", "value": "Annual, Sick, Comp", "note": 2},
+          {"type": "row", "text": "A −8", "value": "8 h annual used"},
+          {"type": "row", "text": "S +4", "value": "4 h sick earned"},
+          {"type": "row", "text": "P", "value": "Planned"},
+          {"type": "row", "text": "+1 without a category", "value": "One more entry"},
+          {"type": "action", "text": "Done"}
+        ]
+      }
+    ]
+  },
+  {
+    "file": "calendar-pdf-share.png",
+    "title": "Share the desktop Calendar PDF from Android",
+    "subtitle": "The top-right Share icon opens Android’s Sharesheet for the displayed month.",
+    "screens": [
+      {
+        "id": "CALENDAR-PDF-PREVIEW",
+        "title": "Month PDF",
+        "subtitle": "January 2026 · 1 landscape page",
+        "toolbar": ["share"],
+        "share_note": 2,
+        "items": [
+          {"type": "document_preview", "file": "calendar-desktop-pdf-reference.png", "note": 1},
+          {"type": "text", "text": "Pinch to zoom or rotate the phone to read the full page."},
+          {"type": "action", "text": "Print", "emphasis": false}
+        ]
+      },
+      {
+        "id": "CALENDAR-PDF-SHARE",
+        "title": "Share",
+        "subtitle": "Android Sharesheet · illustrative",
+        "items": [
+          {"type": "card", "text": "fedleave-2026-01.pdf", "body": "PDF document · January 2026", "note": 3},
+          {"type": "row", "text": "Mail", "value": "›"},
+          {"type": "row", "text": "Nearby sharing", "value": "›"},
+          {"type": "action", "text": "Back", "emphasis": false}
+        ]
+      }
+    ]
+  }
+]
