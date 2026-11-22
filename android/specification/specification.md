@@ -19,6 +19,8 @@ Use the pinned source to resolve differences between the older documentation and
 
 For a visual review, start with the [Calendar mockups](chapters/01-calendar/01-03-navigation-and-screens.md), [Reports mockups](chapters/03-reports-data/03-02-report-screens.md), or [Data and preferences mockups](chapters/03-reports-data/03-03-data-and-settings-screens.md).
 
+Before coding, walk through the controls from Calendar to Reports, each analytics view, Settings and Help in the [menu navigation review](chapters/06-delivery/06-02-implementation-milestones.md#review-menu-navigation-before-i01).
+
 **Calendar main screen selected.** Use a tappable balance card, a month selector and daily activity inside the day cells. [View the selected Calendar](chapters/01-calendar/01-01-main-screen.md)
 
 | Chapter | Content |

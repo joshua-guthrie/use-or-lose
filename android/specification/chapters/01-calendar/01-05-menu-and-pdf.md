@@ -8,7 +8,7 @@ Calendar uses the **Menu** icon at the upper left and the **Share calendar PDF**
 
 | Callout | Interaction | Requirements |
 | --- | --- | --- |
-| 1 | The Menu icon opens four commands. **Today** resets the calendar month and balance date. **Transactions** opens history. **Force Balance** opens the effective date picker for a dated adjustment. [Force Balance screens](01-06-force-balance.md) **Preview month PDF** opens the displayed month's PDF for inspection. | `CAL-MENU-01`, `CAL-BAL-05`, `CAL-HISTORY-01`, `CAL-FORCE-01` |
+| 1 | The Menu icon opens four commands. **Today** resets the calendar month and balance date. **Transactions** opens history. **Force Balance** opens the effective date picker for a dated adjustment. [Force Balance screens](01-06-force-balance.md) **Preview month PDF** opens the displayed month's PDF for inspection. | `CAL-MENU-01`, `CAL-MENU-02`, `CAL-BAL-05`, `CAL-HISTORY-01`, `CAL-FORCE-01` |
 
 Anchor a Material 3 dropdown just below the upper-left Menu icon. Show a rounded, elevated surface about 248 dp wide at the reference phone size, with text-only rows left aligned in the order shown. Use at least 48 dp per row. Allow the width to fit localized labels and keep it within the available screen. The dropdown overlays Calendar in place. Tapping outside, pressing Back or reopening Menu dismisses it and restores focus to Menu. Selecting a command closes the dropdown before performing that action. Use the same layout and readable contrast in light and dark mode.
 
@@ -21,7 +21,7 @@ The grid uses the available space below the balances and month controls. Open a 
 
 | Callout | Interaction | Requirements |
 | --- | --- | --- |
-| 1 | **Menu > Preview month PDF** opens the landscape page. The optional preview supports zoom and rotation. | `REP-MONTH-01`, `CAL-MENU-01` |
+| 1 | **Menu > Preview month PDF** opens the landscape page. The optional preview supports zoom and rotation. | `REP-MONTH-01`, `CAL-MENU-02` |
 | 2 | Tap the upper-right Share icon on Calendar or its PDF preview. Generate the desktop-equivalent PDF for the displayed month and open Android's Sharesheet directly. The tap needs no preview, format selection, or destination prompt in FedLeave. | `CAL-SHARE-01` |
 | 3 | Share `fedleave-YYYY-MM.pdf` as an attachment. Android lists installed targets that accept PDFs, such as email or compatible messaging apps. The selected app receives the file for its own compose or transfer flow. Back returns to the launching screen with its month and balance date intact. | `CAL-SHARE-01` |
 

@@ -2,7 +2,7 @@
 
 ## Where to resume
 
-Start with the [Android project directory](android/README.md), [specification index](android/specification/specification.md), and [decisions for owner review](android/specification/chapters/06-delivery/06-02-implementation-milestones.md#draft-decisions-for-owner-review). With owner approval, **I01** starts with a reproducible Compose app opened and run from Android Studio. [Startup brief](android/implementation/briefs/I01-01-start-the-android-project.md)
+Start with the [menu navigation review](android/specification/chapters/06-delivery/06-02-implementation-milestones.md#review-menu-navigation-before-i01). Walk from Calendar through each Reports, Settings and Help route with annotated screens before asking for approval to begin I01. The next specification session also owes the I02–I04 implementation briefs and reference fixtures. [Current checkpoint](android/specification/passdowns/25-milestone-gates-and-navigation-review.md) · [Specification index](android/specification/specification.md) · [I01 startup brief](android/implementation/briefs/I01-01-start-the-android-project.md)
 
 The owner selected the [Calendar main screen](android/specification/chapters/01-calendar/01-01-main-screen.md). The balance card previews eight values and opens a scrollable list with date controls. QA evidence for this path is required in I05. [Calendar balances passdown](android/specification/passdowns/16-calendar-balances.md)
 
