@@ -3,9 +3,12 @@ from pathlib import Path
 
 import pytest
 import typer
+from typer.testing import CliRunner
 
 from fedleave.cli import export_data, import_data
+from fedleave.cli_app import app
 from fedleave.config import init_config
+from fedleave.cross_year import manual_ledger
 
 
 def _init_data_dir(data_dir: Path) -> None:
@@ -104,6 +107,103 @@ def test_import_merge_adds_missing_transactions_and_keeps_current_conflicts(tmp_
     ]
     backups = list((target / "backups").glob("2026.json.*.bak"))
     assert len(backups) == 1
+
+
+def _force_balance_fixture(path: Path, year: int = 2026, start: str = "2026-01-11") -> None:
+    ledger_path = path / "leave_years" / f"{year}.json"
+    ledger_path.parent.mkdir(parents=True, exist_ok=True)
+    ledger = manual_ledger(year, start, 0, {"annual": 20, "sick": 20}, pay_periods=26)
+    ledger_path.write_text(json.dumps(ledger), encoding="utf-8")
+
+
+def _invoke(runner: CliRunner, store: Path, *arguments: str):
+    result = runner.invoke(app, [*arguments, "--data-dir", str(store)])
+    assert result.exit_code == 0, result.output
+    return result
+
+
+def _balances_on_february_first(runner: CliRunner, store: Path) -> dict:
+    result = _invoke(runner, store, "balance", "--year", "2026", "--as-of", "2026-02-01", "--json")
+    return json.loads(result.output)["balances"]
+
+
+def _snapshot_files(store: Path) -> dict[Path, bytes]:
+    return {path.relative_to(store): path.read_bytes() for path in store.rglob("*") if path.is_file()}
+
+
+class _KnownForcedBalanceMergeBug(AssertionError):
+    """The importer reported success for a competing Force Balance record."""
+
+
+@pytest.mark.xfail(strict=True, raises=_KnownForcedBalanceMergeBug, reason="GH-152: Merge must block before writes")
+@pytest.mark.parametrize("distinct_ids", [True, False], ids=["different-ids", "same-id"])
+@pytest.mark.parametrize("legacy", [False, True], ids=["archive", "legacy-year"])
+def test_import_merge_blocks_competing_forced_balances(tmp_path: Path, distinct_ids: bool, legacy: bool):
+    runner = CliRunner()
+    current = tmp_path / "current"
+    incoming = tmp_path / "incoming"
+    archive = tmp_path / "backup.json"
+    for store in (current, incoming):
+        _force_balance_fixture(store)
+
+    if distinct_ids:
+        _invoke(
+            runner, incoming, "add", "--date", "2026-02-01", "--category", "sick",
+            "--used", "1", "--status", "approved",
+        )
+
+    force_args = ("force-balance", "--date", "2026-02-01", "--category", "annual", "--comment", "Synthetic target")
+    _invoke(runner, current, *force_args, "--hours", "5")
+    _invoke(runner, incoming, *force_args, "--hours", "8")
+    assert _balances_on_february_first(runner, current)["annual"] == 5
+    assert _balances_on_february_first(runner, incoming)["annual"] == 8
+
+    if legacy:
+        archive.write_bytes((incoming / "leave_years" / "2026.json").read_bytes())
+    else:
+        # A conflict must abort publication of earlier files in the same archive.
+        _force_balance_fixture(incoming, 2025, "2025-01-12")
+        cache = incoming / "holiday_cache" / "federal_holidays_2026.json"
+        cache.parent.mkdir()
+        cache.write_text("{}", encoding="utf-8")
+        _invoke(runner, incoming, "export-data", "--output", str(archive))
+    original_archive = archive.read_bytes()
+    original_store = _snapshot_files(current)
+
+    result = runner.invoke(app, ["import-data", "--merge", "--input", str(archive), "--data-dir", str(current)])
+    assert archive.read_bytes() == original_archive
+    annual = _balances_on_february_first(runner, current)["annual"]
+    if result.exit_code == 0 and annual == (-7 if distinct_ids else 5) and "Imported " in result.output:
+        raise _KnownForcedBalanceMergeBug(f"Merge reported success with an annual balance of {annual} h")
+
+    assert result.exit_code != 0, result.output
+    assert "Imported " not in result.output
+    assert "FORCED_BALANCE_CONFLICT" in result.output
+    assert "2026-02-01" in result.output and "annual" in result.output.lower()
+    assert annual == 5
+    assert _snapshot_files(current) == original_store
+
+
+def test_import_merge_accepts_forced_balances_for_independent_categories(tmp_path: Path):
+    runner = CliRunner()
+    current = tmp_path / "current"
+    incoming = tmp_path / "incoming"
+    archive = tmp_path / "backup.json"
+    for store in (current, incoming):
+        _force_balance_fixture(store)
+
+    date_args = ("--date", "2026-02-01")
+    _invoke(runner, current, "force-balance", *date_args, "--category", "annual", "--hours", "5", "--comment", "Annual")
+    # Give the imported sick adjustment a different ID from the current annual adjustment.
+    _invoke(runner, incoming, "add", *date_args, "--category", "comp", "--earned", "1", "--status", "approved")
+    _invoke(runner, incoming, "force-balance", *date_args, "--category", "sick", "--hours", "8", "--comment", "Sick")
+    _invoke(runner, incoming, "void", "--id", "20260201-001")
+    _invoke(runner, incoming, "export-data", "--output", str(archive))
+
+    for _ in range(2):
+        _invoke(runner, current, "import-data", "--merge", "--input", str(archive))
+        balances = _balances_on_february_first(runner, current)
+        assert (balances["annual"], balances["sick"]) == (5, 8)
 
 
 def test_import_rejects_merge_and_overwrite_together(tmp_path: Path):
