@@ -30,17 +30,17 @@ def get_font(font_dir, size, bold=False):
 
 
 class Screen:
-    def __init__(self, image, font_dir, x, top, screen, height):
+    def __init__(self, image, font_dir, x, top, screen, width, height):
         self.image = image
         self.draw = ImageDraw.Draw(image)
         self.font_dir = font_dir
         self.x = x
         self.top = top
-        self.right = x + PHONE_WIDTH
+        self.right = x + width
         self.bottom = top + height
         self.left = x + PADDING
         self.inner_right = self.right - PADDING
-        self.width = PHONE_WIDTH - 2 * PADDING
+        self.width = width - 2 * PADDING
         self.cursor = top + 22
         self.screen = screen
 
@@ -64,10 +64,10 @@ class Screen:
     def box(self, x, y, right, bottom, fill, radius=10):
         self.draw.rounded_rectangle((x, y, right, bottom), radius, fill=fill)
 
-    def mark(self, number, y):
+    def mark(self, number, y, x=None):
         if number is None:
             return
-        x = self.right - 14
+        x = self.right - 14 if x is None else x
         label = str(number)
         self.draw.ellipse((x - 11, y - 11, x + 11, y + 11), fill=PRIMARY, outline=SURFACE, width=2)
         self.text(x, y, label, 12, "#FFFFFF", bold=True, anchor="mm")
@@ -84,7 +84,8 @@ class Screen:
                       bool(top_action), "ra")
         self.cursor += 28
         subtitle = self.screen.get("subtitle")
-        self.paragraph({"text": self.screen["title"]}, size=28, bold=True, padding=4)
+        if not self.screen.get("compact_header"):
+            self.paragraph({"text": self.screen["title"]}, size=28, bold=True, padding=4)
         if subtitle:
             self.paragraph({"text": subtitle}, size=14, color=MUTED, padding=12)
         for element in self.screen["items"]:
@@ -111,12 +112,21 @@ class Screen:
     def toolbar(self, actions):
         y = self.cursor + 9
         label_x = self.left
+        if "back" in actions:
+            label_x += 30
+            x = self.left + 8
+            self.draw.line((x + 8, y, x - 7, y), fill=PRIMARY, width=2)
+            self.draw.line((x - 1, y - 6, x - 7, y, x - 1, y + 6), fill=PRIMARY, width=2)
+            self.mark(self.screen.get("back_note"), y + 5, x=self.x + 8)
         if "menu" in actions:
             label_x += 30
             x = self.left + 8
             for offset in (-5, 0, 5):
                 self.draw.line((x - 8, y + offset, x + 8, y + offset), fill=PRIMARY, width=2)
-        self.text(label_x, self.cursor, "FedLeave", 13, PRIMARY, bold=True)
+        if self.screen.get("compact_header"):
+            self.text(label_x, self.cursor - 3, self.screen["title"], 21, bold=True)
+        else:
+            self.text(label_x, self.cursor, "FedLeave", 13, PRIMARY, bold=True)
         if "share" in actions:
             x = self.inner_right - 9
             points = ((x - 7, y), (x + 7, y - 7), (x + 7, y + 7))
@@ -299,19 +309,35 @@ class Screen:
         self.mark(item.get("note"), first_row + row_height * 2)
         self.cursor = first_row + row_count * row_height + 9
 
+    def expand_icon(self, x, y):
+        self.draw.line((x - 7, y - 2, x - 7, y - 7, x - 2, y - 7), fill=PRIMARY, width=2)
+        self.draw.line((x + 2, y + 7, x + 7, y + 7, x + 7, y + 2), fill=PRIMARY, width=2)
+
     def chart(self, item):
         y = self.cursor
-        self.box(self.left, y, self.inner_right, y + 118, "#F0F4FC", 12)
+        height = item.get("height", 118)
+        self.box(self.left, y, self.inner_right, y + height, "#F0F4FC", 12)
         self.text(self.left + 12, y + 9, item["text"], 13, bold=True)
-        start, end, base = self.left + 28, self.inner_right - 18, y + 90
-        for offset in (0, 25, 50):
-            self.draw.line((start, base - offset, end, base - offset), fill=LINE, width=1)
+        if item.get("expandable"):
+            self.expand_icon(self.inner_right - 20, y + 17)
+        start, end, base = self.left + 28, self.inner_right - 18, y + height - 28
+        plot_height = height - 61
         values = item["values"]
-        scale = max(values) or 1
+        ticks = item.get("ticks")
+        scale = max(ticks or values) or 1
+        if ticks:
+            start = self.left + 44
+            for tick in ticks:
+                tick_y = base - tick * plot_height / scale
+                self.draw.line((start, tick_y, end, tick_y), fill=LINE, width=1)
+                self.text(start - 8, tick_y, str(tick), 11, MUTED, anchor="rm")
+        else:
+            for offset in (0, plot_height * 25 / 57, plot_height * 50 / 57):
+                self.draw.line((start, base - offset, end, base - offset), fill=LINE, width=1)
         if item.get("style") == "line":
-            positions = item.get("positions", [index / (len(values) - 1) for index in range(len(values))])
+            positions = item.get("positions", [index / max(1, len(values) - 1) for index in range(len(values))])
             points = [
-                (start + (end - start) * position, base - value * 57 / scale)
+                (start + (end - start) * position, base - value * plot_height / scale)
                 for position, value in zip(positions, values, strict=True)
             ]
             if item.get("step"):
@@ -323,27 +349,47 @@ class Screen:
             step = (end - start) / len(values)
             for index, value in enumerate(values):
                 x = start + index * step + 5
-                self.box(x, base - value * 57 / scale, x + step - 10, base, PRIMARY, 4)
-        self.text(start, y + 96, item.get("start_label", ""), 11, MUTED)
-        self.text(end, y + 96, item.get("end_label", ""), 11, MUTED, anchor="ra")
+                selected = index == item.get("selected")
+                self.box(x, base - value * plot_height / scale, x + step - 10, base,
+                         INK if selected else PRIMARY, 4)
+            for index, label in enumerate(item.get("labels", [])):
+                self.text(start + (index + 0.5) * step, base + 12, label, 11, MUTED, anchor="mm")
+        self.text(start, base + 6, item.get("start_label", ""), 11, MUTED)
+        self.text(end, base + 6, item.get("end_label", ""), 11, MUTED, anchor="ra")
         self.mark(item.get("note"), y + 18)
-        self.cursor += 129
+        self.cursor += height + 11
 
     def heatmap(self, item):
         y = self.cursor
         rows = item["rows"]
         columns = len(rows[0])
-        step = min(24, (self.width - 26) // columns)
-        height = min(13, step)
-        legend_y = y + 43 + len(rows) * (height + 2)
+        dates = item.get("dates")
+        step = (self.width - 26) // columns
+        height, grid_y = (23, y + 55) if dates else (min(13, step), y + 37)
+        if dates is None:
+            step = min(24, step)
+        legend_y = grid_y + 6 + len(rows) * (height + 2)
         self.box(self.left, y, self.inner_right, legend_y + 25, "#F0F4FC", 12)
         self.text(self.left + 12, y + 10, item["text"], 13, bold=True)
+        if item.get("expandable"):
+            self.expand_icon(self.inner_right - 20, y + 17)
         colors = ("#E1E8F2", "#BDD1F6", "#789FDE", PRIMARY)
+        if dates:
+            for index, label in enumerate(("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")):
+                self.text(self.left + 12 + (index + 0.5) * step, grid_y - 12, label, 12, MUTED, anchor="mm")
         for row_index, row in enumerate(rows):
             for column, value in enumerate(row):
                 x = self.left + 12 + column * step
-                cell_y = y + 37 + row_index * (height + 2)
+                cell_y = grid_y + row_index * (height + 2)
+                day = dates[row_index][column] if dates else None
+                if dates and day is None:
+                    continue
                 self.box(x, cell_y, x + step - 2, cell_y + height, colors[value], 2)
+                if [row_index, column] == item.get("selected"):
+                    self.draw.rounded_rectangle((x, cell_y, x + step - 2, cell_y + height), 2, outline=INK, width=2)
+                if day is not None:
+                    self.text(x + step // 2, cell_y + height // 2, str(day), 11,
+                              "#FFFFFF" if value == 3 else INK, anchor="mm")
         self.text(self.left + 12, legend_y, "0 h    ·    up to 8 h", 11, MUTED)
         self.mark(item.get("note"), y + 16)
         self.cursor = legend_y + 37
@@ -351,7 +397,8 @@ class Screen:
 
 def render_board(board, font_dir, destination):
     screens = board["screens"]
-    width = len(screens) * PHONE_WIDTH + (len(screens) + 1) * GAP
+    phone_width = board.get("phone_width", PHONE_WIDTH)
+    width = len(screens) * phone_width + (len(screens) + 1) * GAP
     height = board.get("phone_height", PHONE_HEIGHT)
     image = Image.new("RGB", (width, height + 118), CANVAS)
     draw = ImageDraw.Draw(image)
@@ -361,8 +408,8 @@ def render_board(board, font_dir, destination):
     if len(ids) != len(set(ids)):
         raise ValueError(f"Duplicate screen in {board['file']}")
     for index, screen in enumerate(screens):
-        x = GAP + index * (PHONE_WIDTH + GAP)
-        Screen(image, font_dir, x, 82, screen, height).render()
+        x = GAP + index * (phone_width + GAP)
+        Screen(image, font_dir, x, 82, screen, phone_width, height).render()
     image.save(destination / board["file"], optimize=True)
 
 

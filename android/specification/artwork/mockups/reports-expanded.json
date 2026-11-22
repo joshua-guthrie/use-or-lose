@@ -1,0 +1,66 @@
+[
+  {
+    "file": "reports-chart-expand-entry.png",
+    "title": "Open a chart from Reports",
+    "subtitle": "Tap any part of the chart to open its full-screen view.",
+    "phone_height": 726,
+    "screens": [
+      {
+        "id": "REPORT-CHART-EXPAND-ENTRY",
+        "title": "Seasonality",
+        "subtitle": "2026 leave year · Recorded through Jun 30",
+        "nav": "Reports",
+        "toolbar": ["share"],
+        "items": [
+          {"type": "row", "text": "Analysis", "value": "Leave used by month", "dropdown": true},
+          {"type": "row", "text": "Leave type", "value": "Annual leave", "dropdown": true},
+          {"type": "chart", "text": "Recorded annual leave used (h)", "height": 177, "ticks": [0, 4, 8, 12, 16], "values": [10, 8, 0, 16, 6, 12], "labels": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"], "expandable": true, "note": 1},
+          {"type": "row", "text": "January – June", "value": "52 h"},
+          {"type": "action", "text": "View exact values", "emphasis": false, "note": 2}
+        ]
+      }
+    ]
+  },
+  {
+    "file": "reports-chart-fullscreen.png",
+    "title": "Chart expanded in landscape",
+    "subtitle": "Turned 90° from portrait. The Back arrow returns to the report.",
+    "phone_width": 726,
+    "phone_height": 366,
+    "screens": [
+      {
+        "id": "REPORT-CHART-FULLSCREEN",
+        "title": "Seasonality",
+        "subtitle": "2026 leave year · Annual leave used · Recorded through Jun 30",
+        "toolbar": ["back"],
+        "compact_header": true,
+        "back_note": 1,
+        "items": [
+          {"type": "chart", "text": "Recorded hours by month", "height": 213, "ticks": [0, 4, 8, 12, 16], "values": [10, 8, 0, 16, 6, 12], "labels": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"], "selected": 5, "note": 2},
+          {"type": "row", "text": "June · 12 h used", "value": "View entries ›", "note": 3}
+        ]
+      }
+    ]
+  },
+  {
+    "file": "reports-heatmap-fullscreen.png",
+    "title": "Heatmap expanded in landscape",
+    "subtitle": "The chart opens at the same month and leave type as the report.",
+    "phone_width": 726,
+    "phone_height": 366,
+    "screens": [
+      {
+        "id": "REPORT-HEATMAP-FULLSCREEN",
+        "title": "Calendar Heatmap",
+        "subtitle": "January 2026 · Annual leave used",
+        "toolbar": ["back"],
+        "compact_header": true,
+        "back_note": 1,
+        "items": [
+          {"type": "heatmap", "text": "January 2026", "rows": [[0,0,0,0,0,0,0],[0,0,0,0,0,0,0],[0,0,3,0,0,1,0],[0,0,0,0,2,0,0],[1,0,0,0,0,0,0]], "selected": [2,2], "dates": [[null,null,null,null,1,2,3],[4,5,6,7,8,9,10],[11,12,13,14,15,16,17],[18,19,20,21,22,23,24],[25,26,27,28,29,30,31]], "note": 2},
+          {"type": "row", "text": "Tuesday, January 13 · 8 h used", "value": "View entries ›", "note": 3}
+        ]
+      }
+    ]
+  }
+]
