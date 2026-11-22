@@ -148,8 +148,17 @@ def test_import_merge_blocks_competing_forced_balances(tmp_path: Path, distinct_
 
     if distinct_ids:
         _invoke(
-            runner, incoming, "add", "--date", "2026-02-01", "--category", "sick",
-            "--used", "1", "--status", "approved",
+            runner,
+            incoming,
+            "add",
+            "--date",
+            "2026-02-01",
+            "--category",
+            "sick",
+            "--used",
+            "1",
+            "--status",
+            "approved",
         )
 
     force_args = ("force-balance", "--date", "2026-02-01", "--category", "annual", "--comment", "Synthetic target")
