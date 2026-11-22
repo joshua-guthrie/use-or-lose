@@ -44,15 +44,15 @@
                 {"text": "A −2"}
               ],
               "22": [
-                {"text": "A −4", "planned": true}
+                {"text": "A −4"}
               ],
               "24": [
                 {"text": "A +6"},
                 {"text": "S +4"},
-                {"text": "C +1", "planned": true}
+                {"text": "C +1"}
               ],
               "25": [
-                {"text": "A −3", "planned": true}
+                {"text": "A −3"}
               ]
             }
           }
@@ -131,10 +131,10 @@
             "hint": "View all 10 balances · 6 more"
           },
           {"type": "row", "text": "January 2026", "dropdown": true},
-          {"type": "row", "text": "Wednesday, January 21", "value": "Add leave ›"},
-          {"type": "card", "text": "Thursday, January 22", "body": "Annual leave · 4 h used · Planned", "indicator": "›"},
-          {"type": "row", "text": "Friday, January 23", "value": "Add leave ›"},
-          {"type": "card", "text": "Saturday, January 24", "body": "Pay-period end, period 1. Annual 6 h earned. Sick 4 h earned. Comp 1 h planned.", "indicator": "›", "note": 3}
+          {"type": "row", "text": "Wednesday, January 21", "value": "No entries ›"},
+          {"type": "card", "text": "Thursday, January 22", "body": "Annual leave · 4 h used", "indicator": "›"},
+          {"type": "row", "text": "Friday, January 23", "value": "No entries ›"},
+          {"type": "card", "text": "Saturday, January 24", "body": "Pay-period end, period 1. Annual 6 h earned. Sick 4 h earned. Comp 1 h earned.", "indicator": "›", "note": 3}
         ]
       },
       {
@@ -158,21 +158,31 @@
   },
   {
     "file": "calendar-compact-day.png",
-    "title": "Calendar · Open a day directly",
-    "subtitle": "The editor opens on the entire cell’s date.",
+    "title": "Calendar · Tap a date to open Edit day",
+    "subtitle": "Tapping January 16 opens this screen for Friday, January 16.",
     "screens": [
       {
         "id": "CALENDAR-DAY-DETAIL",
         "title": "Edit day",
         "subtitle": "Friday, Jan 16, 2026",
-        "top_action": "Add entry",
+        "toolbar": ["back"],
         "items": [
-          {"type": "heading", "text": "Annual leave"},
-          {"type": "row", "text": "Direction", "value": "Use", "note": 1},
+          {"type": "heading", "text": "Entries", "note": 1},
+          {"type": "row", "text": "Edit group", "value": "Annual leave · Use", "dropdown": true},
           {"type": "row", "text": "Hours", "value": "2"},
           {"type": "row", "text": "Comment", "value": ""},
-          {"type": "action", "text": "Add leave type", "emphasis": false},
-          {"type": "action", "text": "Review changes", "note": 2}
+          {"type": "action", "text": "Review changes", "note": 2},
+          {"type": "action", "text": "Add entry", "emphasis": false}
+        ]
+      },
+      {
+        "id": "CALENDAR-DAY-EMPTY",
+        "title": "Edit day",
+        "subtitle": "Wednesday, Jan 21, 2026",
+        "toolbar": ["back"],
+        "items": [
+          {"type": "text", "text": "No leave entries for this date."},
+          {"type": "action", "text": "Add entry", "note": 3}
         ]
       }
     ]

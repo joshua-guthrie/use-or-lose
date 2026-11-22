@@ -2,7 +2,7 @@
   {
     "file": "reports-home.png",
     "title": "Find a report and choose its year",
-    "subtitle": "Show recorded and future hours with clear dates and report-loading states.",
+    "subtitle": "Choose a leave year and open any report from this list.",
     "screens": [
       {
         "id": "REPORTS-HOME",
@@ -25,7 +25,7 @@
         "title": "Summary",
         "subtitle": "2026 leave year · Jan 11, 2026 – Jan 9, 2027",
         "items": [
-          {"type": "card", "text": "Annual leave used", "body": "10 h recorded through Jan 16 · 7 h future scheduled · 17 h full year.", "note": 3},
+          {"type": "card", "text": "Annual leave used", "body": "10 h through Jan 16 · 17 h for the leave year.", "note": 3},
           {"type": "row", "text": "Physical absence", "value": "17 h"},
           {"type": "row", "text": "Overtime worked", "value": "0 h"},
           {"type": "row", "text": "Comp time earned", "value": "0 h"},
@@ -53,8 +53,8 @@
       {
         "id": "REPORT-SEASONALITY",
         "title": "Seasonality",
-        "subtitle": "2026 leave year · Recorded through Jan 16",
-        "toolbar": ["share"],
+        "subtitle": "2026 leave year",
+        "toolbar": ["back", "share"],
         "items": [
           {"type": "row", "text": "Analysis", "value": "Leave used by month", "note": 1},
           {"type": "row", "text": "Leave type", "value": "All leave used"},
@@ -81,11 +81,11 @@
         "title": "Supporting entries",
         "subtitle": "All leave used by month · January 2026",
         "items": [
-          {"type": "card", "text": "January · 17 h used", "body": "10 h recorded through Jan 16 · 7 h future scheduled.", "note": 4},
-          {"type": "row", "text": "Jan 13 · Approved", "value": "8 h"},
-          {"type": "row", "text": "Jan 16 · Approved", "value": "2 h"},
-          {"type": "row", "text": "Jan 22 · Planned", "value": "4 h"},
-          {"type": "row", "text": "Jan 25 · Planned", "value": "3 h"},
+          {"type": "card", "text": "January · 17 h used", "body": "Four entries in the selected month.", "note": 4},
+          {"type": "row", "text": "Jan 13", "value": "8 h"},
+          {"type": "row", "text": "Jan 16", "value": "2 h"},
+          {"type": "row", "text": "Jan 22", "value": "4 h"},
+          {"type": "row", "text": "Jan 25", "value": "3 h"},
           {"type": "action", "text": "Back to report", "emphasis": false}
         ]
       },
@@ -93,7 +93,7 @@
         "id": "REPORT-LIFECYCLE",
         "title": "Overtime, comp and credit",
         "subtitle": "2026 leave year",
-        "toolbar": ["share"],
+        "toolbar": ["back", "share"],
         "items": [
           {"type": "row", "text": "View", "value": "Monthly comp lifecycle", "note": 5},
           {"type": "chart", "expandable": true, "text": "Comp time earned by month", "values": [6, 8, 4, 16], "start_label": "Jan", "end_label": "Apr"},
@@ -112,20 +112,20 @@
         "id": "REPORT-HEATMAP",
         "title": "Calendar heatmap",
         "subtitle": "2026 leave year",
-        "toolbar": ["share"],
+        "toolbar": ["back", "share"],
         "items": [
           {"type": "row", "text": "Series", "value": "Annual leave used", "note": 1},
           {"type": "row", "text": "View", "value": "Monthly calendars"},
           {"type": "heatmap", "expandable": true, "text": "January 2026", "rows": [[0,0,0,0,0,0,0],[0,0,0,0,0,0,0],[0,0,3,0,0,1,0],[0,0,0,0,2,0,0],[1,0,0,0,0,0,0]], "note": 2},
-          {"type": "row", "text": "Jan 13 · Approved", "value": "8 h"},
+          {"type": "row", "text": "Jan 13", "value": "8 h"},
           {"type": "action", "text": "View entries", "emphasis": false}
         ]
       },
       {
         "id": "REPORT-CUMULATIVE",
         "title": "Cumulative usage",
-        "subtitle": "2026 leave year · All effective scheduled use",
-        "toolbar": ["share"],
+        "subtitle": "2026 leave year · Annual leave",
+        "toolbar": ["back", "share"],
         "items": [
           {"type": "row", "text": "Absence categories", "value": "Annual", "note": 3},
           {"type": "chart", "expandable": true, "text": "Cumulative annual leave used", "style": "line", "step": true, "values": [0, 8, 10, 14, 17, 17], "positions": [0, 0.006, 0.014, 0.03, 0.039, 1], "start_label": "Jan 11", "end_label": "Jan 9"},
@@ -137,7 +137,7 @@
         "id": "REPORT-BALANCE-CHART",
         "title": "Balance charts",
         "subtitle": "2026 leave year · Period-ending balances",
-        "toolbar": ["share"],
+        "toolbar": ["back", "share"],
         "items": [
           {"type": "row", "text": "Leave type", "value": "Annual", "note": 4},
           {"type": "chart", "expandable": true, "text": "Annual balance in hours", "style": "line", "values": [92, 95, 101, 107], "start_label": "Jan 24", "end_label": "Mar 7"},
@@ -150,7 +150,7 @@
         "id": "REPORT-YEARLY",
         "title": "Yearly comparison",
         "subtitle": "Annual leave balance on the selected date",
-        "toolbar": ["share"],
+        "toolbar": ["back", "share"],
         "items": [
           {"type": "row", "text": "Leave type", "value": "Annual"},
           {"type": "row", "text": "Compare as of", "value": "Feb 29", "note": 5},
@@ -171,7 +171,7 @@
         "id": "REPORT-HEATMAP-YEAR",
         "title": "Calendar Heatmap",
         "subtitle": "2026 leave year · Jan 11, 2026–Jan 9, 2027",
-        "toolbar": ["share"],
+        "toolbar": ["back", "share"],
         "items": [
           {"type": "row", "text": "Series", "value": "Annual leave used", "dropdown": true},
           {"type": "row", "text": "View", "value": "Leave year", "dropdown": true, "note": 1},
@@ -184,7 +184,7 @@
         "title": "Calendar heatmap",
         "subtitle": "2027 leave year",
         "items": [
-          {"type": "card", "text": "No leave activity yet", "body": "Recorded annual leave used is 0 h.", "note": 3},
+          {"type": "card", "text": "No leave activity yet", "body": "Annual leave used is 0 h.", "note": 3},
           {"type": "row", "text": "View", "value": "Leave year", "dropdown": true},
           {"type": "heatmap", "expandable": true, "text": "January 2027", "dates": [[null, null, null, null, null, null, null], [null, null, null, null, null, null, null], [10, 11, 12, 13, 14, 15, 16], [17, 18, 19, 20, 21, 22, 23], [24, 25, 26, 27, 28, 29, 30], [31, null, null, null, null, null, null]], "rows": [[0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0]]}
         ]
@@ -202,18 +202,22 @@
   },
   {
     "file": "reports-share.png",
-    "title": "Preview and share a report",
-    "subtitle": "The preview and its active date selection travel with the shared artifact.",
+    "title": "View and share a month report",
+    "subtitle": "Choose a month and share the resulting PDF or PNG.",
     "screens": [
       {
         "id": "REPORT-MONTH",
         "title": "Month report",
         "subtitle": "January 2026",
-        "toolbar": ["share"],
+        "toolbar": ["back", "share"],
         "share_note": 2,
         "items": [
-          {"type": "document_preview", "file": "calendar-desktop-pdf-reference.png", "note": 1},
-          {"type": "text", "text": "Pinch to zoom or rotate the phone to read the full page."}
+          {"type": "row", "text": "Month", "value": "January 2026", "dropdown": true, "note": 1},
+          {"type": "card", "text": "Period 1 · Jan 11–24", "body": "Payday Jan 30. Annual 6 h earned, 14 h used, 92 h at close. Sick 4 h earned, 24 h at close.", "indicator": "›"},
+          {"type": "card", "text": "Period 2 · Jan 25–Feb 7", "body": "Payday Feb 13. View the full period and closing balances.", "indicator": "›"},
+          {"type": "heading", "text": "Balance as of Jan 16"},
+          {"type": "row", "text": "Annual leave", "value": "90 h"},
+          {"type": "row", "text": "Sick leave", "value": "20 h"}
         ]
       },
       {

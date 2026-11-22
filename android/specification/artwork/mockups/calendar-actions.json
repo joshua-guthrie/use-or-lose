@@ -85,8 +85,7 @@
               ],
               "22": [
                 {
-                  "text": "A −4",
-                  "planned": true
+                  "text": "A −4"
                 }
               ],
               "24": [
@@ -97,14 +96,12 @@
                   "text": "S +4"
                 },
                 {
-                  "text": "C +1",
-                  "planned": true
+                  "text": "C +1"
                 }
               ],
               "25": [
                 {
-                  "text": "A −3",
-                  "planned": true
+                  "text": "A −3"
                 }
               ]
             }
@@ -114,8 +111,7 @@
           "entries": [
             "Today",
             "Transactions",
-            "Force Balance",
-            "Preview month PDF"
+            "Force Balance"
           ],
           "note": 1
         }
@@ -129,28 +125,144 @@
     "subtitle": "The top-right Share icon opens Android’s Sharesheet for the displayed month.",
     "screens": [
       {
-        "id": "CALENDAR-PDF-PREVIEW",
-        "title": "Month PDF",
-        "subtitle": "January 2026 · 1 landscape page",
-        "toolbar": ["share"],
-        "share_note": 2,
+        "id": "CALENDAR-PDF-SHARE-ENTRY",
+        "title": "Calendar",
+        "toolbar": [
+          "menu",
+          "share"
+        ],
+        "nav": "Calendar",
         "items": [
-          {"type": "document_preview", "file": "calendar-desktop-pdf-reference.png", "note": 1},
-          {"type": "text", "text": "Pinch to zoom or rotate the phone to read the full page."}
-        ]
+          {
+            "type": "balance_card",
+            "text": "As of today · Jan 16, 2026",
+            "balances": [
+              [
+                "Annual",
+                "90 h"
+              ],
+              [
+                "Sick",
+                "20 h"
+              ],
+              [
+                "Comp",
+                "8 h"
+              ],
+              [
+                "Credit",
+                "4 h"
+              ],
+              [
+                "Travel comp",
+                "6 h"
+              ],
+              [
+                "Time award",
+                "12 h"
+              ],
+              [
+                "Restored AL",
+                "10 h"
+              ],
+              [
+                "Relig. comp",
+                "2 h"
+              ]
+            ],
+            "hint": "View all 10 balances · 2 more"
+          },
+          {
+            "type": "row",
+            "text": "January 2026",
+            "dropdown": true
+          },
+          {
+            "type": "activity_calendar",
+            "start": 4,
+            "days": 31,
+            "today": 16,
+            "holidays": [
+              1,
+              19
+            ],
+            "ends": [
+              24
+            ],
+            "paydays": [
+              30
+            ],
+            "activity": {
+              "13": [
+                {
+                  "text": "A −8"
+                }
+              ],
+              "16": [
+                {
+                  "text": "A −2"
+                }
+              ],
+              "22": [
+                {
+                  "text": "A −4"
+                }
+              ],
+              "24": [
+                {
+                  "text": "A +6"
+                },
+                {
+                  "text": "S +4"
+                },
+                {
+                  "text": "C +1"
+                }
+              ],
+              "25": [
+                {
+                  "text": "A −3"
+                }
+              ]
+            }
+          }
+        ],
+        "share_note": 1
       },
       {
         "id": "CALENDAR-PDF-SHARE",
         "title": "Share",
         "subtitle": "Android Sharesheet · illustrative",
         "items": [
-          {"type": "card", "text": "fedleave-2026-01.pdf", "body": "PDF document · January 2026", "note": 3},
-          {"type": "row", "text": "Email", "value": "›"},
-          {"type": "row", "text": "Messaging", "value": "›"},
-          {"type": "row", "text": "Nearby sharing", "value": "›"},
-          {"type": "action", "text": "Back", "emphasis": false}
+          {
+            "type": "card",
+            "text": "fedleave-2026-01.pdf",
+            "body": "PDF document · January 2026",
+            "note": 2
+          },
+          {
+            "type": "row",
+            "text": "Email",
+            "value": "›"
+          },
+          {
+            "type": "row",
+            "text": "Messaging",
+            "value": "›"
+          },
+          {
+            "type": "row",
+            "text": "Nearby sharing",
+            "value": "›"
+          },
+          {
+            "type": "action",
+            "text": "Back",
+            "emphasis": false
+          }
         ]
       }
-    ]
+    ],
+    "phone_height": 756
   }
 ]

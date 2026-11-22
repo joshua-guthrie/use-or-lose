@@ -2,7 +2,7 @@
 
 ## Where to resume
 
-Start with the [menu navigation review](android/specification/chapters/06-delivery/06-02-implementation-milestones.md#review-menu-navigation-before-i01). Walk from Calendar through each Reports, Settings and Help route with annotated screens before asking for approval to begin I01. The next specification session also owes the I02–I04 implementation briefs and reference fixtures. [Current checkpoint](android/specification/passdowns/25-milestone-gates-and-navigation-review.md) · [Specification index](android/specification/specification.md) · [I01 startup brief](android/implementation/briefs/I01-01-start-the-android-project.md)
+Start with the [menu structure and tap paths](android/specification/chapters/01-calendar/01-07-menu-structure.md). Review this draft with the owner before approval to begin I01. The next specification session also owes the I02–I04 implementation briefs and reference fixtures. [Current checkpoint](android/specification/passdowns/27-menu-structure-and-dated-entries.md) · [Specification index](android/specification/specification.md) · [I01 startup brief](android/implementation/briefs/I01-01-start-the-android-project.md)
 
 The owner approved scoping **Edit Day** to one selected group, with individual correction for incompatible rows. The updated rule, mockup and acceptance case are ready for the I08 brief. Android Restore Merge depends on the shared planner in GitHub #152. The desktop CLI regressions mark the four known failure cases as strict expected failures until the fix lands. [Decision and regression checkpoint](android/specification/passdowns/26-edit-day-and-merge-regression.md) · [Shared import issue](https://github.com/joshua-guthrie/fedleave/issues/152)
 

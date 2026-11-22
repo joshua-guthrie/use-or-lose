@@ -50,7 +50,7 @@ Default each existing user capability to a **phone workflow** or **Android equiv
 
 Break the first inventory into groups that can be finished independently.
 
-- **Calendar and ledger.** Today, month and day navigation, pay days and pay periods, balances, daily entries and free-text comments, transaction history, planned leave, corrections and voids, and force balance.
+- **Calendar and ledger.** Today, month and day navigation, pay days and pay periods, balances, daily entries and free-text comments, transaction history, dated leave entries, corrections and voids, and force balance.
 - **Leave-year rules.** Manual starting balances, carryover and reconciliation, accrual schedules and changes, caps, expirations and use-or-lose, lot allocation, all supported leave categories, and paid parental leave and FMLA.
 - **Reports.** Analytics sections and their filters, source transaction drill-downs, yearly charts and comparisons, and month report graphics. Record the desktop What-if Planner as deferred for the first Android release.
 - **Backups, sharing, and settings.** Compatible FedLeave backup and restore, locally generated or restored holiday dates, report and backup sharing, presentation preferences, help, and about. Check which report formats the desktop actually makes available. Android's inbound file workflow is limited to restoring FedLeave backups.

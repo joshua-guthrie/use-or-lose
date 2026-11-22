@@ -1,0 +1,31 @@
+[
+  {
+    "file": "settings-navigation.png",
+    "title": "Where Settings takes you",
+    "subtitle": "From Calendar, tap Settings and open either of these groups.",
+    "screens": [
+      {
+        "id": "SETTINGS-ACCOUNTING-NAVIGATION",
+        "title": "Accounting and leave years",
+        "toolbar": ["back"],
+        "items": [
+          {"type": "row", "text": "Leave years", "value": "›", "note": 1},
+          {"type": "row", "text": "Accounting settings", "value": "›"},
+          {"type": "row", "text": "Leave-year maintenance", "value": "›"},
+          {"type": "row", "text": "Expiring leave", "value": "›"},
+          {"type": "row", "text": "Paid parental leave", "value": "›"},
+          {"type": "row", "text": "FMLA tracking", "value": "›"}
+        ]
+      },
+      {
+        "id": "SETTINGS-HOLIDAYS-NAVIGATION",
+        "title": "Holidays and reminders",
+        "toolbar": ["back"],
+        "items": [
+          {"type": "row", "text": "Holidays", "value": "›", "note": 2},
+          {"type": "row", "text": "Expiration reminders", "value": "›"}
+        ]
+      }
+    ]
+  }
+]

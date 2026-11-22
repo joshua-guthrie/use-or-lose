@@ -2,7 +2,7 @@
 
 The [Calendar main-screen boards](01-01-main-screen.md) show the balance card, full list, date and month selectors, day grid, and full-width day list. [Calendar menu and PDF](01-05-menu-and-pdf.md) · [Date markers](01-04-date-markers.md)
 
-Use three persistent destinations for familiar tasks. **Calendar** opens first and keeps daily work nearby. **Reports** owns analytical views and month previews. **Settings** owns preferences, data maintenance and help. Opening a detailed task or system sheet retains the calling destination. Use the Calendar, Reports and Settings labels alongside any icons. The main screens use a fixed blue Material 3 palette for the specification. Implementation also needs a coordinated dark palette, 48 dp touch targets, Android text scaling, keyboard-safe layouts and TalkBack labels. Numbers on the mockups are specification annotations.
+Use three destinations on the bottom bar. **Calendar** opens first. **Calendar → Reports → select a report** opens any analytics view. **Settings** owns preferences, data maintenance and Help. Opening a detailed task or system sheet retains the calling destination. Use the Calendar, Reports and Settings labels alongside any icons. The main screens use a fixed blue Material 3 palette for the specification. Implementation also needs a coordinated dark palette, 48 dp touch targets, Android text scaling, keyboard-safe layouts and TalkBack labels. Numbers on the mockups are specification annotations. [Complete menu structure](01-07-menu-structure.md)
 
 [Calendar behavior](01-02-balances.md) · [Ledger and leave-year behavior](../02-ledger/02-01-ledger-and-leave-years.md) · [Acceptance plan](../../verification/acceptance-tests.md#calendar-acceptance-cases)
 
@@ -46,13 +46,13 @@ Use three persistent destinations for familiar tasks. **Calendar** opens first a
 
 ## Add and review leave
 
-![Three mockups showing the day editor, review of replaced entries, and adding an individual planned entry](../../artwork/mockups/calendar-edit.png)
+![Three mockups showing the day editor, review of replaced entries, and adding an individual entry](../../artwork/mockups/calendar-edit.png)
 
 | Callout | Interaction and states | Requirements |
 | --- | --- | --- |
-| 1–2 | Choose one group of editable entries by leave type, direction and status. Prefill its total and comment and show the configured increment. **View current entries** expands the selected IDs. If their comments or sources differ, open the individual correction path. Use **Add entry** for new records. Use native numeric entry and keep form controls visible above the keyboard. | `CAL-DAY-01`, `PARENT-01` |
-| 3–4 | Review the selected group's current and proposed hours, its comment, and the exact IDs to be replaced. Show any distinct statuses as separate entries. Back keeps the draft. Show a stale review, invalid amount or save failure inline and keep the draft editable. | `CAL-DAY-01` |
-| 5–6 | For a new individual record, choose date, category, direction, hours and status. Label future dates and display status in history. Overlapping PPL and FMLA usage has a [dedicated confirmation](../03-reports-data/03-03-data-and-settings-screens.md#ppl-windows-and-fmla-tracking). | `CAL-DAY-02`, `PARENT-02` |
+| 1–2 | Choose one group of editable entries by leave type and direction. Prefill its total and comment and show the configured increment. **View current entries** expands the selected IDs. If a total cannot preserve the original metadata, open the individual correction path. Use native numeric entry and keep form controls visible above the keyboard. | `CAL-DAY-01`, `PARENT-01` |
+| 3–4 | Review the selected group's current and proposed hours, its comment, and the exact IDs to be replaced. Back keeps the draft. Show a stale review, invalid amount or save failure inline and keep the draft editable. | `CAL-DAY-01` |
+| 5–6 | **Add entry** uses the selected date and accepts leave type, direction, hours and comment. The same form works on past and future dates. Overlapping PPL and FMLA usage has a [dedicated confirmation](../03-reports-data/03-03-data-and-settings-screens.md#ppl-windows-and-fmla-tracking). | `CAL-DAY-02`, `PARENT-02` |
 
 ## History and corrections
 
@@ -61,7 +61,7 @@ Use three persistent destinations for familiar tasks. **Calendar** opens first a
 | Callout | Interaction and states | Requirements |
 | --- | --- | --- |
 | 1–2 | Date-range controls include both boundary dates. Preserve date or sorting selection on Back. Report empty ranges, invalid inputs and unavailable ledgers separately. | `CAL-HISTORY-01` |
-| 3–4 | Show the stored ID, source and full comment in details. Give each available action an accessible label. Generated and dependent records link to the appropriate source or maintenance view. | `CAL-HISTORY-01`, `CAL-TX-01` |
+| 3–4 | Show the stored ID, source and full comment in details. Identify cancelled, denied or voided entries when viewing history. Give each available action an accessible label. Generated and dependent records link to the appropriate source or maintenance view. | `CAL-HISTORY-01`, `CAL-TX-01` |
 | 5–6 | Correcting and deleting use separate review confirmations. Either path retains the original list filters on return. | `CAL-TX-01` |
 
 Rebuild these images with `python android/specification/artwork/mockups/render.py android/specification/artwork/mockups/calendar.json` using Pillow and Lato.

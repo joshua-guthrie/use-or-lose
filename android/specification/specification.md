@@ -19,13 +19,13 @@ Use the pinned source to resolve differences between the older documentation and
 
 For a visual review, start with the [Calendar mockups](chapters/01-calendar/01-03-navigation-and-screens.md), [Reports mockups](chapters/03-reports-data/03-02-report-screens.md), or [Data and preferences mockups](chapters/03-reports-data/03-03-data-and-settings-screens.md).
 
-Before coding, walk through the controls from Calendar to Reports, each analytics view, Settings and Help in the [menu navigation review](chapters/06-delivery/06-02-implementation-milestones.md#review-menu-navigation-before-i01).
+**Menu review.** From Calendar, tap **Reports** in the bottom bar to reach every analytics view. Tap **Settings** for preferences and Help. The [dedicated menu structure chapter](chapters/01-calendar/01-07-menu-structure.md) shows the complete lists, exact tap paths, and where Back returns.
 
 **Calendar main screen selected.** Use a tappable balance card, a month selector and daily activity inside the day cells. [View the selected Calendar](chapters/01-calendar/01-01-main-screen.md)
 
 | Chapter | Content |
 | --- | --- |
-| 01. Calendar | [01.01 Main screen](chapters/01-calendar/01-01-main-screen.md) · [01.02 Balances](chapters/01-calendar/01-02-balances.md) · [01.03 Navigation and screen states](chapters/01-calendar/01-03-navigation-and-screens.md) · [01.04 Date markers](chapters/01-calendar/01-04-date-markers.md) · [01.05 Menu and PDF](chapters/01-calendar/01-05-menu-and-pdf.md) · [01.06 Force Balance](chapters/01-calendar/01-06-force-balance.md) |
+| 01. Calendar and navigation | [01.01 Main screen](chapters/01-calendar/01-01-main-screen.md) · [01.02 Balances](chapters/01-calendar/01-02-balances.md) · [01.03 Navigation and screen states](chapters/01-calendar/01-03-navigation-and-screens.md) · [01.04 Date markers](chapters/01-calendar/01-04-date-markers.md) · [01.05 Calendar menu and PDF sharing](chapters/01-calendar/01-05-menu-and-pdf.md) · [01.06 Force Balance](chapters/01-calendar/01-06-force-balance.md) · [01.07 Menu structure and tap paths](chapters/01-calendar/01-07-menu-structure.md) |
 | 02. Ledger | [02.01 Ledger and leave years](chapters/02-ledger/02-01-ledger-and-leave-years.md) |
 | 03. Reports, data, and preferences | [03.01 Behavior and requirements](chapters/03-reports-data/03-01-reports-data-and-preferences.md) · [03.02 Report screens](chapters/03-reports-data/03-02-report-screens.md) · [03.03 Data and settings screens](chapters/03-reports-data/03-03-data-and-settings-screens.md) |
 | 04. Architecture | [04.01 Shared core and compatibility](chapters/04-architecture/04-01-core-and-compatibility.md) · [04.02 Device storage, backups, and sharing](chapters/04-architecture/04-02-device-storage.md) |
@@ -40,3 +40,4 @@ Use the [feature parity matrix](verification/feature-parity.md) to trace a deskt
 - Use Kotlin and Compose with Material 3 as the starting stack. Scope the first release using the [GitHub issue decisions](planning/specification-plan.md#github-issues-reflected-in-this-draft). The What-if Planner is deferred. Android's interface and help use app language, and MCP and AI are outside the Android scope.
 - Keep the phone's working datastore in private, desktop-compatible JSON. A user opens the system file picker to restore a compatible FedLeave backup. Use the Sharesheet for backups and reports. Calendar Share automatically generates the desktop-equivalent month PDF and hands it off as an attachment. Printing is outside Android scope.
 - Use one Calendar balance panel for today, any selected date, and a pay-period closing date. Show future balances as projections. The [Calendar section](chapters/01-calendar/01-02-balances.md) defines the first slice and the decisions that still need review.
+- Present effective leave entries the same way on every date. Use the date, leave type, direction and hours in Calendar, forms, transaction history, report tables, charts, shared graphics and TalkBack. Retain compatible stored statuses for accounting and interoperability. [Dated entry rules](chapters/02-ledger/02-01-ledger-and-leave-years.md#edit-and-review-leave)

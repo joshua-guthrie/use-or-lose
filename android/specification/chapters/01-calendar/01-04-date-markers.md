@@ -17,7 +17,7 @@ Respect **Show Holidays**, **Show Paydays**, and **Show Pay Period Ends** in the
 
 ## Legend in Help
 
-Under **Settings → Help → Calendar date markers**, show the same four glyphs with their meanings. Keep the labels available offline and readable by TalkBack. The legend belongs in Help. Day details still name the events for the selected date. [Bundled help copy](../../help/calendar-date-markers.md) · [Help mockup](../../artwork/mockups/settings-calendar-markers-help.png)
+Under **Settings → Help and about → Calendar date markers**, show the same four glyphs with their meanings. Keep the labels available offline and readable by TalkBack. **Edit day** names the events for the selected date. [Bundled help copy](../../help/calendar-date-markers.md) · [Help mockup](../../artwork/mockups/settings-calendar-markers-help.png)
 
 ## Placement and overlapping markers
 

@@ -11,7 +11,7 @@
         {"type": "row", "text": "Data and backups", "value": "›"},
         {"type": "row", "text": "Help and about", "value": "›"}
       ]},
-      {"id": "DATA-HOME", "title": "Data and backups", "items": [
+      {"id": "DATA-HOME", "title": "Data and backups", "toolbar": ["back"], "items": [
         {"type": "card", "text": "On this device", "body": "2 leave years · 2026–2027. FedLeave keeps working files private to this app.", "note": 2},
         {"type": "action", "text": "Share backup", "note": 3},
         {"type": "action", "text": "Restore backup", "emphasis": false},
@@ -93,7 +93,7 @@
         {"type": "card", "text": "2027", "body": "Jan 10, 2027 – Jan 8, 2028"},
         {"type": "action", "text": "Set up another year", "emphasis": false}
       ]},
-      {"id": "PREF-CALENDAR", "title": "Calendar preferences", "items": [
+      {"id": "PREF-CALENDAR", "title": "Calendar preferences", "toolbar": ["back"], "items": [
         {"type": "row", "text": "Start of week", "value": "Sunday", "note": 2},
         {"type": "row", "text": "Days from period end to payday", "value": "6"},
         {"type": "row", "text": "Automatic accruals", "value": "Hidden"},
@@ -102,12 +102,12 @@
         {"type": "row", "text": "Pay-period end marks", "value": "On"},
         {"type": "action", "text": "Save display settings"}
       ]},
-      {"id": "PREF-HOLIDAYS", "title": "Holidays", "subtitle": "2026 · Cached federal holidays", "items": [
+      {"id": "PREF-HOLIDAYS", "title": "Holidays", "subtitle": "2026 · Cached federal holidays", "toolbar": ["back"], "items": [
         {"type": "row", "text": "Jan 1", "value": "New Year’s Day", "note": 3},
         {"type": "row", "text": "Jan 19", "value": "MLK Jr. Day"},
         {"type": "action", "text": "Regenerate offline", "emphasis": false}
       ]},
-      {"id": "PREF-REMINDERS", "title": "Expiration reminders", "items": [
+      {"id": "PREF-REMINDERS", "title": "Expiration reminders", "toolbar": ["back"], "items": [
         {"type": "row", "text": "Pay periods before expiry", "value": "1, 3, 6, 12", "note": 4},
         {"type": "text", "text": "FedLeave shows a reminder in the app when tracked leave is due soon."},
         {"type": "action", "text": "Save thresholds"}
@@ -119,21 +119,20 @@
     "title": "Review accounting settings and find help",
     "subtitle": "Show the data the app uses and explain which settings affect calculations.",
     "screens": [
-      {"id": "PREF-ACCOUNTING", "title": "Accounting settings", "items": [
+      {"id": "PREF-ACCOUNTING", "title": "Accounting settings", "toolbar": ["back"], "items": [
         {"type": "row", "text": "Workdays", "value": "Mon–Fri", "note": 1},
         {"type": "row", "text": "Scheduled work", "value": "40 h/week"},
         {"type": "row", "text": "Time increment", "value": "0.25 h"},
         {"type": "row", "text": "Annual carryover limit", "value": "240 h"},
         {"type": "action", "text": "Review work tour", "emphasis": false},
-        {"type": "action", "text": "Review FMLA history", "emphasis": false},
-        {"type": "row", "text": "Leave-year maintenance", "value": "›"}
+        {"type": "action", "text": "Review FMLA history", "emphasis": false}
       ]},
       {"id": "FMLA-HISTORY-REVIEW", "title": "Review FMLA history", "items": [
         {"type": "row", "text": "History complete from", "value": "Jun 1, 2026", "note": 2},
         {"type": "text", "text": "Choose the earliest date from which your relevant FMLA records and work schedules are complete."},
         {"type": "action", "text": "Confirm verified date"}
       ]},
-      {"id": "HELP-HOME", "title": "Help", "items": [
+      {"id": "HELP-HOME", "title": "Help", "toolbar": ["back"], "items": [
         {"type": "row", "text": "Set up a leave year", "value": "›", "note": 3},
         {"type": "row", "text": "Record or correct leave", "value": "›"},
         {"type": "row", "text": "Share or restore a backup", "value": "›"},
@@ -141,7 +140,7 @@
         {"type": "row", "text": "Calendar date markers", "value": "›"},
         {"type": "row", "text": "About FedLeave", "value": "›"}
       ]},
-      {"id": "HELP-ABOUT", "title": "About FedLeave", "items": [
+      {"id": "HELP-ABOUT", "title": "About FedLeave", "toolbar": ["back"], "items": [
         {"type": "row", "text": "App version", "value": "1.0 draft", "note": 4},
         {"type": "text", "text": "Calendar and reporting for your leave records."},
         {"type": "action", "text": "Open project website", "emphasis": false}
@@ -189,7 +188,8 @@
       {"id": "BALANCE-MAINTENANCE", "title": "Leave-year maintenance", "items": [
         {"type": "row", "text": "Correct opening balance", "value": "›"},
         {"type": "row", "text": "Force Balance", "value": "›", "note": 2},
-        {"type": "row", "text": "Change accrual", "value": "›"}
+        {"type": "row", "text": "Change accrual", "value": "›"},
+        {"type": "row", "text": "Annual use or lose", "value": "›"}
       ]},
       {"id": "ACCRUAL-CHANGE", "title": "Change accrual", "subtitle": "Annual leave · 2026", "items": [
         {"type": "row", "text": "Leave type", "value": "Annual"},
@@ -202,7 +202,7 @@
         {"type": "row", "text": "Projected balance", "value": "272 h", "note": 4},
         {"type": "row", "text": "Carryover limit", "value": "240 h"},
         {"type": "row", "text": "Project to carry", "value": "240 h"},
-        {"type": "card", "text": "32 h may be lost", "body": "Includes effective scheduled leave through the closing date."}
+        {"type": "card", "text": "32 h may be lost", "body": "Includes dated leave through the closing date."}
       ]}
     ]
   },

@@ -2,7 +2,7 @@
 
 Settings groups week and display preferences, leave-year maintenance, holiday and reminder controls, data and backups, and help. Routes from Calendar or Reports open the relevant detail and return to the calling task. Show record changes before approving them. Device-owned pickers and Sharesheets are illustrative in the mockups.
 
-[Data and preference requirements](03-01-reports-data-and-preferences.md#data-and-maintenance) · [Ledger requirements](../02-ledger/02-01-ledger-and-leave-years.md) · [Acceptance cases](../../verification/acceptance-tests.md#data-and-preferences-acceptance)
+[Exact Settings and Help paths](../01-calendar/01-07-menu-structure.md#settings-and-help) · [Data and preference requirements](03-01-reports-data-and-preferences.md#data-and-maintenance) · [Ledger requirements](../02-ledger/02-01-ledger-and-leave-years.md) · [Acceptance cases](../../verification/acceptance-tests.md#data-and-preferences-acceptance)
 
 ## Backups and system file picker
 
@@ -67,7 +67,7 @@ The example shows two separate annual leave entries on January 13. Entry `202601
 | 3 | **Pay-period end** identifies the last day of a pay period. |
 | 4 | **Leave-year end** identifies the last day of the leave year. |
 
-Open this page from **Settings → Help → Calendar date markers**. Show the glyphs beside the text and read the full descriptions in TalkBack. Back returns to Help. [Bundled legend copy](../../help/calendar-date-markers.md) · [Exact marker artwork](../01-calendar/01-04-date-markers.md#marker-artwork-at-calendar-size)
+Open this page from **Settings → Help and about → Calendar date markers**. Show the glyphs beside the text and read the full descriptions in TalkBack. Back returns to Help. [Bundled legend copy](../../help/calendar-date-markers.md) · [Exact marker artwork](../01-calendar/01-04-date-markers.md#marker-artwork-at-calendar-size)
 
 ## Data check, carryover and repair
 
@@ -104,7 +104,7 @@ Open this page from **Settings → Help → Calendar date markers**. Show the gl
 
 | Callout | Interaction and states | Requirements |
 | --- | --- | --- |
-| 1 | Each grant and use is dated. Show the remaining allowance across active windows and the original deadlines. Expand to review scheduled, protected and lost hours. The [day editor](../01-calendar/01-03-navigation-and-screens.md#add-and-review-leave) records the grants and usage. | `PARENT-01` |
+| 1 | Each grant and use is dated. Show the remaining allowance across active windows and the original deadlines. Expand to review totals, protected hours and lost hours by date range. The [day editor](../01-calendar/01-03-navigation-and-screens.md#add-and-review-leave) records the grants and usage. | `PARENT-01` |
 | 2–3 | Ask separately about additional manual FMLA. Show derived and additional hours, confirmed or provisional date context, and availability or an explanation when records are incomplete. | `PARENT-02` |
 
 Rebuild the images with `python android/specification/artwork/mockups/render.py android/specification/artwork/mockups/settings.json`.

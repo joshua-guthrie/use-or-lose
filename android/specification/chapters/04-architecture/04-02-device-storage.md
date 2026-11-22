@@ -41,7 +41,7 @@ The compatible archive carries canonical configuration and supported ledger hist
 
 ## Artifact sharing and lifecycle
 
-Use **Share** for graphs and reports, and **Share backup** for the archive. Reports may offer a format choice when several forms are available. The Calendar toolbar and its optional PDF preview generate and share the desktop-equivalent PDF directly. Use the active selection for each share. Reports with a format choice can reuse a verified rendering for the same snapshot and filters. [Calendar PDF flow](../01-calendar/01-05-menu-and-pdf.md#share-the-displayed-month)
+Use **Share** for graphs and reports, and **Share backup** for the archive. Reports may offer a format choice when several forms are available. The Calendar toolbar generates and shares the desktop-equivalent PDF directly. Use the active selection for each share. Reports with a format choice can reuse a verified rendering for the same snapshot and filters. [Calendar PDF flow](../01-calendar/01-05-menu-and-pdf.md#share-the-displayed-month)
 
 | Payload | MIME type | Preparation and review |
 | --- | --- | --- |

@@ -6,7 +6,7 @@ from datetime import date, timedelta
 from functools import lru_cache
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFont, ImageOps
+from PIL import Image, ImageDraw, ImageFont
 
 SURFACE = "#FCFCFF"
 CANVAS = "#E9EEF7"
@@ -247,15 +247,6 @@ class Screen:
             self.text(self.left + 15, center_y, label, 15, INK, True, "lm")
         self.mark(item.get("note"), top + 29, x=right + 15)
 
-    def document_preview(self, item):
-        with Image.open(MOCKUPS / item["file"]) as source:
-            page = ImageOps.contain(source.convert("RGB"), (self.width - 12, 230), Image.Resampling.LANCZOS)
-        y = self.cursor
-        self.box(self.left, y, self.inner_right, y + page.height + 12, LINE)
-        self.image.paste(page, (self.left + (self.width - page.width) // 2, y + 6))
-        self.mark(item.get("note"), y + 18)
-        self.cursor += page.height + 24
-
     def day_markers(self, item, day, x, y, color=PRIMARY):
         visible = [key for key in DAY_MARKER_FILES if day in item.get(key, ())]
         for index, key in enumerate(visible):
@@ -311,8 +302,6 @@ class Screen:
             for index, entry in enumerate(entries[:2]):
                 line_y = y + 25 + index * 14
                 self.text(x + 5, line_y, entry["text"], 12, INK, bold=True)
-                if entry.get("planned"):
-                    self.text(x + column_width - 5, line_y, "P", 10, PRIMARY, bold=True, anchor="ra")
             if len(entries) > 2:
                 self.text(x + 5, y + 54, f"+{len(entries) - 2}", 10, PRIMARY, bold=True)
 
@@ -339,9 +328,6 @@ class Screen:
         scale = max(scale_values, default=0) or 1
         if ticks:
             start = self.left + 44
-        if (cutoff := item.get("shade_after")) is not None:
-            cutoff_x = start + (end - start) * cutoff
-            self.draw.rectangle((cutoff_x, base - plot_height, end, base), fill="#E2E8F3")
         if ticks:
             for tick in ticks:
                 tick_y = base - tick * plot_height / scale
@@ -367,7 +353,7 @@ class Screen:
         else:
             step = (end - start) / len(values)
             for index, value in enumerate(values):
-                if value is None:
+                if value is None or value == 0:
                     continue
                 x = start + index * step + 5
                 selected = index == item.get("selected")

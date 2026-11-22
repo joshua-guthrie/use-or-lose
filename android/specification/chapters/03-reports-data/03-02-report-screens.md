@@ -1,6 +1,6 @@
 # Chapter 03.02 · Report screens and sharing
 
-Reports is a phone destination with a year selector and report list. Keep interactive chart controls beside the result they affect. Use the upper-right Share icon when the report has a shareable result. Open long tables and supporting entries as details. Read aloud the chart title, units, timeframe and selected value. Pair colors with labels or visual marks. System picker and Sharesheet UIs vary by phone.
+From Calendar, tap **Reports** in the bottom bar and choose a view from the report list. This is the entry point for every analytics screen. Keep interactive chart controls beside the result they affect. Use the upper-right Share icon when the report has a shareable result. Open long tables and supporting entries as details. Read aloud the chart title, units, timeframe and selected value. Pair colors with labels or visual marks. System picker and Sharesheet UIs vary by phone. [Menu structure and all report paths](../01-calendar/01-07-menu-structure.md#reports-and-analytics)
 
 [Report requirements](03-01-reports-data-and-preferences.md#reports) · [Acceptance cases](../../verification/acceptance-tests.md#reports-acceptance)
 
@@ -11,7 +11,7 @@ Reports is a phone destination with a year selector and report list. Keep intera
 | Callout | Interaction and states | Requirements |
 | --- | --- | --- |
 | 1–2 | Choose a valid leave year, see its date range in each report, and open a report without changing Calendar's balance date. The phone list is scrollable at large text size. | `REP-SUM-01`, `PREF-YEAR-01` |
-| 3–4 | Show recorded, scheduled, and full-year results where applicable. Link data-quality warnings to details. Refresh uses current local data. Show unreadability or incomplete history without inventing a numeric zero. | `REP-SUM-01` |
+| 3–4 | Show totals by date range, such as **Through Jan 16** and **Leave-year total**. Link data-quality warnings to details. Refresh uses current local data. Show unreadability or incomplete history without inventing a numeric zero. | `REP-SUM-01` |
 
 ## Activity breakdowns and supporting entries
 
@@ -19,8 +19,8 @@ Reports is a phone destination with a year selector and report list. Keep intera
 
 | Callout | Interaction and states | Requirements |
 | --- | --- | --- |
-| 1–3 | Analysis and Leave type drive the chart, exact table, and shared result. Filter sheets list supported category and activity choices. Disabled Leave type remains visible for overtime and net accumulation. Chart and row values identify recorded and scheduled amounts. | `REP-SEA-01`, `REP-SHARE-01` |
-| 4 | Open **View entries** with date, source, status and hours matching the selected report row or cell. Back retains the original report filters and scroll position. | `REP-SEA-01`, `REP-HEAT-01`, `REP-LIFE-01`, `REP-CUM-01` |
+| 1–3 | Analysis and Leave type drive the chart, exact table, and shared result. Filter sheets list supported category and activity choices. Disabled Leave type remains visible for overtime and net accumulation. Plot one total per group for the selected measure. | `REP-SEA-01`, `REP-SHARE-01` |
+| 4 | Open **View entries** with date, source and hours matching the selected report row or cell. Use the same layout for every effective entry. Back retains the original report filters and scroll position. | `REP-SEA-01`, `REP-HEAT-01`, `REP-LIFE-01`, `REP-CUM-01` |
 | 5–6 | Use this selector layout for the seven lifecycle views. Keep tables handy for the summary, lots, allocation and expiration performance. Empty or incomplete queries keep the view label and either explain the empty set or show unavailable values. | `REP-LIFE-01` |
 
 ## Heatmap, usage, and balance charts
@@ -87,31 +87,31 @@ Rebuild the expanded chart boards with `python android/specification/artwork/moc
 
 ## Analytics with one, six, or eleven months
 
-![Three Seasonality screens showing one, six, and eleven months of recorded activity on the same monthly axis](../../artwork/mockups/reports-seasonality-history.png)
+![Three Seasonality screens with entries through January, June and November on the same full-year axis](../../artwork/mockups/reports-seasonality-history.png)
 
-![Three Cumulative Usage screens showing the same three reporting cutoffs](../../artwork/mockups/reports-cumulative-history.png)
+![Three Cumulative Usage screens using the same three sets of dated entries](../../artwork/mockups/reports-cumulative-history.png)
 
-| Callout on each board | Reporting cutoff | Expected recorded annual leave used |
+| Callout on each board | Last month with entries | Expected leave-year annual leave used |
 | --- | --- | ---: |
 | 1 | January 31, 2026 | 10 h |
 | 2 | June 30, 2026 | 52 h |
 | 3 | November 30, 2026 | 94 h |
 
-Use the same synthetic leave year, selected category and chart scales in the three examples. The first and last month labels are January 2026 and January 2027. Show the year on accessible month labels and on exact values. Each example is a separate case with a different local reporting date. The app still uses its existing leave-year and category selectors. [Synthetic transactions and acceptance](../../verification/acceptance-tests.md#analytics-history-fixture)
+Use the same synthetic leave year, selected category and chart scales in the three examples. The first and last month labels are January 2026 and January 2027. Show the year on accessible month labels and on exact values. Each example contains entries through a different month. The app uses its existing leave-year and category selectors. [Synthetic transactions and acceptance](../../verification/acceptance-tests.md#analytics-history-fixture)
 
-- **Seasonality.** Keep the calendar-month positions of the selected leave year. Show an actual recorded zero where an elapsed month has no matching usage, as in March. Shade months after the cutoff and leave their recorded bars empty. Identify the shaded area in visible and spoken text. Include any effective future scheduled values with their distinct series and status.
-- **Cumulative Usage.** Keep the horizontal axis on the stored leave-year bounds. Stop the recorded line at the actual cutoff and label its last value. In these fixtures there is no future activity. When future scheduled entries exist, distinguish their cumulative portion and its exact data from the recorded line. Preserve the source report's full-year calculation and values.
-- Use the same cutoff, values, units, and recorded/scheduled distinction in the portrait and expanded charts, the exact table, and the relevant shared artifact. An unavailable dataset uses the existing report warning or unavailable state. Apply the [full-screen chart behavior](#full-screen-charts) to all examples.
+- **Seasonality.** Keep the calendar-month positions of the selected leave year. Plot effective usage in each month with one series and one style. A month with no usage has a zero-height bar and an exact value of zero.
+- **Cumulative Usage.** Keep the horizontal axis on the stored leave-year bounds. Increase the same running line on each effective entry date and keep it level through dates with zero use.
+- Use the same dates, values, units and formatting in the portrait and expanded charts, the exact table, and the shared artifact. An unavailable dataset uses the report warning or unavailable state. Apply the [full-screen chart behavior](#full-screen-charts) to all examples.
 
 Rebuild the examples with `python android/specification/artwork/mockups/render.py android/specification/artwork/mockups/reports-history.json`.
 
-## Month preview and Share
+## Month report and Share
 
-![Month report preview, format chooser, and Android Sharesheet](../../artwork/mockups/reports-share.png)
+![Month report with month selector and read-only results, format chooser, and Android Sharesheet](../../artwork/mockups/reports-share.png)
 
 | Callout | Interaction and states | Requirements |
 | --- | --- | --- |
-| 1–2 | Show a zoomable preview of the desktop month report and put Share in the upper right. The month report can offer PDF and PNG. The Calendar main-screen shortcut shares the month PDF directly. [Calendar PDF flow](../01-calendar/01-05-menu-and-pdf.md#share-the-displayed-month) | `REP-MONTH-01`, `CAL-SHARE-01` |
-| 3–4 | Choose a supported format and hand off the rendered report to Android. Report preparation failure leaves its preview open and offers Retry. Back or cancellation returns to the report and its current filters. | `REP-SHARE-01`, `REP-MONTH-01` |
+| 1–2 | Open **Calendar → Reports → Month report**. Pick a calendar month that intersects the selected leave year. The report shows matching pay periods, payday dates, period amounts and closing balances, and the reference report's dated balance summary. Tap a period for its exact data. Upper-right **Share** opens the format choice. [Calendar direct PDF Share](../01-calendar/01-05-menu-and-pdf.md#share-the-displayed-month) | `REP-MONTH-01`, `CAL-SHARE-01` |
+| 3–4 | Choose PDF or PNG and hand the rendered artifact for the selected month to Android. On failure keep the report open with Retry. Back or cancellation returns to the report with its month and year selected. | `REP-SHARE-01`, `REP-MONTH-01` |
 
 Rebuild the images with `python android/specification/artwork/mockups/render.py android/specification/artwork/mockups/reports.json`. The chart examples are fictional records and fixed-date specification fixtures.

@@ -138,7 +138,7 @@
         "items": [
           {"type": "row", "text": "Annual leave", "value": "86 h", "note": 2},
           {"type": "row", "text": "Sick leave", "value": "20 h"},
-          {"type": "text", "text": "Includes effective scheduled leave and accruals through January 22."},
+          {"type": "text", "text": "Includes dated leave and accruals through January 22."},
           {"type": "action", "text": "Choose date", "emphasis": false}
         ]
       },
@@ -165,7 +165,7 @@
         "subtitle": "Friday, Jan 16, 2026",
         "top_action": "Add entry",
         "items": [
-          {"type": "row", "text": "Edit group", "value": "Annual · Use · Approved ▾", "note": 1},
+          {"type": "row", "text": "Edit group", "value": "Annual leave · Use", "dropdown": true, "note": 1},
           {"type": "row", "text": "Hours · 0.25 h increments", "value": "3.5"},
           {"type": "row", "text": "Comment", "value": "Appointment"},
           {"type": "action", "text": "View the 2 current entries", "emphasis": false, "note": 2},
@@ -178,7 +178,7 @@
         "title": "Review day changes",
         "subtitle": "Friday, Jan 16, 2026",
         "items": [
-          {"type": "card", "text": "Annual · Use · Approved", "body": "Replace 20260116-001 and 20260116-002. Approved annual use: 3 h → 3.5 h.", "note": 3},
+          {"type": "card", "text": "Annual leave · Use", "body": "Replace 20260116-001 and 20260116-002. Annual use: 3 h → 3.5 h.", "note": 3},
           {"type": "row", "text": "Comment", "value": "Appointment"},
           {"type": "text", "text": "An unchanged sick leave entry stays at 1 h."},
           {"type": "action", "text": "Save changes", "note": 4},
@@ -190,12 +190,11 @@
         "title": "Add entry",
         "subtitle": "Thursday, Jan 22, 2026",
         "items": [
-          {"type": "row", "text": "Leave type", "value": "Annual"},
+          {"type": "row", "text": "Leave type", "value": "Annual leave"},
           {"type": "row", "text": "Direction", "value": "Use"},
-          {"type": "row", "text": "Hours", "value": "1 h"},
-          {"type": "row", "text": "Status", "value": "Planned", "note": 5},
+          {"type": "row", "text": "Hours", "value": "1 h", "note": 5},
           {"type": "row", "text": "Comment", "value": "Follow-up"},
-          {"type": "action", "text": "Add planned entry", "note": 6}
+          {"type": "action", "text": "Add entry", "note": 6}
         ]
       }
     ]
@@ -212,8 +211,8 @@
         "items": [
           {"type": "row", "text": "Date range", "value": "Jan 13 – Jan 24", "note": 1},
           {"type": "row", "text": "Sort by", "value": "Date"},
-          {"type": "card", "text": "Jan 13 · Annual leave", "body": "8 h used · Approved", "note": 2},
-          {"type": "card", "text": "Jan 16 · Annual leave", "body": "2 h used · Approved"},
+          {"type": "card", "text": "Jan 13 · Annual leave", "body": "8 h used", "note": 2},
+          {"type": "card", "text": "Jan 16 · Annual leave", "body": "2 h used"},
           {"type": "card", "text": "Jan 24 · Annual leave", "body": "6 h earned · Automatic accrual"}
         ]
       },
@@ -223,7 +222,6 @@
         "subtitle": "Jan 16, 2026 · Annual leave",
         "items": [
           {"type": "row", "text": "Activity", "value": "2 h used"},
-          {"type": "row", "text": "Status", "value": "Approved"},
           {"type": "row", "text": "Source", "value": "Manual"},
           {"type": "row", "text": "Record ID", "value": "20260116-001", "note": 3},
           {"type": "text", "text": "Appointment"},
