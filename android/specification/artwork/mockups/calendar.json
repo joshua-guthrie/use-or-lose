@@ -157,7 +157,7 @@
   {
     "file": "calendar-edit.png",
     "title": "Edit a day or add one entry",
-    "subtitle": "The day total and an individual entry have separate review paths.",
+    "subtitle": "Choose one group to edit or add an individual entry.",
     "screens": [
       {
         "id": "DAY-EDIT",
@@ -165,13 +165,11 @@
         "subtitle": "Friday, Jan 16, 2026",
         "top_action": "Add entry",
         "items": [
-          {"type": "heading", "text": "Annual leave"},
-          {"type": "row", "text": "Direction", "value": "Use", "note": 1},
+          {"type": "row", "text": "Edit group", "value": "Annual · Use · Approved ▾", "note": 1},
           {"type": "row", "text": "Hours · 0.25 h increments", "value": "3.5"},
           {"type": "row", "text": "Comment", "value": "Appointment"},
           {"type": "action", "text": "View the 2 current entries", "emphasis": false, "note": 2},
           {"type": "row", "text": "Sick leave", "value": "1 h used"},
-          {"type": "action", "text": "Add leave type", "emphasis": false},
           {"type": "action", "text": "Review changes"}
         ]
       },
@@ -180,7 +178,7 @@
         "title": "Review day changes",
         "subtitle": "Friday, Jan 16, 2026",
         "items": [
-          {"type": "card", "text": "Annual leave", "body": "Replace 2 entries totaling 3 h used with 3.5 h used.", "note": 3},
+          {"type": "card", "text": "Annual · Use · Approved", "body": "Replace 20260116-001 and 20260116-002. Approved annual use: 3 h → 3.5 h.", "note": 3},
           {"type": "row", "text": "Comment", "value": "Appointment"},
           {"type": "text", "text": "An unchanged sick leave entry stays at 1 h."},
           {"type": "action", "text": "Save changes", "note": 4},

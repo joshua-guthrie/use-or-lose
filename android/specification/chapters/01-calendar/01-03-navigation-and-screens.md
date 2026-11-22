@@ -50,8 +50,8 @@ Use three persistent destinations for familiar tasks. **Calendar** opens first a
 
 | Callout | Interaction and states | Requirements |
 | --- | --- | --- |
-| 1–2 | Prefill the day, direction, valid increments and existing comments. Offer Add leave type. Display individual entries when a total represents multiple records. Use native numeric entry and keep form controls visible above the keyboard. | `CAL-DAY-01`, `PARENT-01` |
-| 3–4 | Review changed categories and comments and identify the records being replaced. Back keeps the draft. Show mismatched amount, conflict or save failure inline and keep the copy of the draft editable. | `CAL-DAY-01` |
+| 1–2 | Choose one group of editable entries by leave type, direction and status. Prefill its total and comment and show the configured increment. **View current entries** expands the selected IDs. If their comments or sources differ, open the individual correction path. Use **Add entry** for new records. Use native numeric entry and keep form controls visible above the keyboard. | `CAL-DAY-01`, `PARENT-01` |
+| 3–4 | Review the selected group's current and proposed hours, its comment, and the exact IDs to be replaced. Show any distinct statuses as separate entries. Back keeps the draft. Show a stale review, invalid amount or save failure inline and keep the draft editable. | `CAL-DAY-01` |
 | 5–6 | For a new individual record, choose date, category, direction, hours and status. Label future dates and display status in history. Overlapping PPL and FMLA usage has a [dedicated confirmation](../03-reports-data/03-03-data-and-settings-screens.md#ppl-windows-and-fmla-tracking). | `CAL-DAY-02`, `PARENT-02` |
 
 ## History and corrections
