@@ -12,6 +12,7 @@ Paths below start at the repository root. Add implementation and evidence direct
 | `android/specification/chapters/NN-topic/NN-NN-subject.md` | Authoritative requirements, annotated screen guides, architecture and delivery chapters. Name each Markdown file with its subsection number. |
 | `android/specification/planning/` | How to write and maintain the specification, including the five-hour writing and handoff routine. |
 | `android/specification/artwork/mockups/` | Editable JSON manifests, renderer, annotated PNGs and reference material. Keep source and generated boards together and regenerate both in the change that revises a screen. |
+| `android/specification/help/` | Reviewed help text to bundle with the phone app. Use the same names and artwork as the governing chapters. |
 | `android/specification/verification/` | Cross-chapter feature parity and acceptance cases with fixtures and exact outcomes. |
 | `android/specification/passdowns/` | Numbered specification-writing notes in date order. The repository-root `passdown.md` is the current entry point and points at the latest relevant note. |
 | `android/implementation/briefs/` | One versioned execution brief per bounded task. Use `I05-01-calendar-state.md` as the filename pattern. A brief links the approved spec and binds it to exact files, tests and examples. |

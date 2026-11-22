@@ -56,6 +56,19 @@ The example shows two separate annual leave entries on January 13. Entry `202601
 | 1–2 | Show accounting rules in use. Review changes that influence balances and verify a history start before displaying remaining FMLA hours as known. | `PREF-RULE-01`, `PARENT-02` |
 | 3–4 | Group bundled help by user task, with a leave abbreviation list. About gives version and an external project link. | `HELP-01` |
 
+### Calendar date markers in Help
+
+![Offline Help legend showing the four actual-size Calendar symbols beside their names and descriptions](../../artwork/mockups/settings-calendar-markers-help.png)
+
+| Callout | Meaning |
+| --- | --- |
+| 1 | **Holiday** identifies the applicable holiday date. |
+| 2 | **Payday** identifies the scheduled payday. |
+| 3 | **Pay-period end** identifies the last day of a pay period. |
+| 4 | **Leave-year end** identifies the last day of the leave year. |
+
+Open this page from **Settings → Help → Calendar date markers**. Show the glyphs beside the text and read the full descriptions in TalkBack. Back returns to Help. [Bundled legend copy](../../help/calendar-date-markers.md) · [Exact marker artwork](../01-calendar/01-04-date-markers.md#marker-artwork-at-calendar-size)
+
 ## Data check, carryover and repair
 
 ![Data health, carryover review, duplicate opening repair, and recovery](../../artwork/mockups/settings-health.png)

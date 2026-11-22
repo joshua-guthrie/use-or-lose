@@ -1,0 +1,21 @@
+[
+  {
+    "file": "settings-calendar-markers-help.png",
+    "title": "Help · Calendar date markers",
+    "subtitle": "Find the legend under Settings → Help.",
+    "screens": [
+      {
+        "id": "HELP-CALENDAR-MARKERS",
+        "title": "Calendar date markers",
+        "toolbar": ["back"],
+        "items": [
+          {"type": "row", "marker": "holidays", "text": "Holiday", "value": "Observed holiday", "note": 1},
+          {"type": "row", "marker": "paydays", "text": "Payday", "value": "Scheduled pay date", "note": 2},
+          {"type": "row", "marker": "ends", "text": "Pay-period end", "value": "Last day of the pay period", "note": 3},
+          {"type": "row", "marker": "year_ends", "text": "Leave-year end", "value": "Last day of the leave year", "note": 4},
+          {"type": "text", "text": "A date can have several markers. Open the day to read the event names."}
+        ]
+      }
+    ]
+  }
+]

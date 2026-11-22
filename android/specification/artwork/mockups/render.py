@@ -22,12 +22,38 @@ PHONE_HEIGHT = 674
 PADDING = 22
 GAP = 24
 MOCKUPS = Path(__file__).resolve().parent
+DAY_MARKER_FILES = {
+    "holidays": "holiday",
+    "paydays": "payday",
+    "ends": "pay-period-end",
+    "year_ends": "leave-year-end",
+}
 
 
 @lru_cache
 def get_font(font_dir, size, bold=False):
     name = "Lato-Bold.ttf" if bold else "Lato-Regular.ttf"
     return ImageFont.truetype(str(font_dir / name), size)
+
+
+def draw_day_marker(draw, key, x, y, color):
+    if key == "holidays":
+        draw.polygon(
+            ((x + 4, y), (x + 5, y + 3), (x + 8, y + 3), (x + 6, y + 5), (x + 7, y + 8),
+             (x + 4, y + 6), (x + 1, y + 8), (x + 2, y + 5), (x, y + 3), (x + 3, y + 3)),
+            fill=color,
+        )
+    elif key == "paydays":
+        draw.ellipse((x, y, x + 8, y + 8), outline=color)
+        draw.line((x + 4, y + 2, x + 4, y + 6), fill=color)
+    elif key == "ends":
+        draw.line((x + 1, y, x + 1, y + 8), fill=color)
+        draw.polygon(((x + 2, y), (x + 8, y + 2), (x + 2, y + 5)), fill=color)
+    elif key == "year_ends":
+        draw.rectangle((x, y + 1, x + 8, y + 8), outline=color)
+        draw.line((x + 2, y, x + 2, y + 2), fill=color)
+        draw.line((x + 6, y, x + 6, y + 2), fill=color)
+        draw.line((x + 2, y + 5, x + 4, y + 7, x + 6, y + 4), fill=color)
 
 
 class Screen:
@@ -152,7 +178,11 @@ class Screen:
         label, value = item["text"], item.get("value", "")
         value_end = self.inner_right - 10
         self.box(self.left, self.cursor, self.inner_right, self.cursor + 35, "#F0F4FC", 8)
-        self.text(self.left + 10, self.cursor + 17, label, 15, INK, True, "lm")
+        label_x = self.left + 10
+        if marker := item.get("marker"):
+            draw_day_marker(self.draw, marker, label_x, self.cursor + 13, PRIMARY)
+            label_x += 18
+        self.text(label_x, self.cursor + 17, label, 15, INK, True, "lm")
         if item.get("dropdown"):
             x, y = value_end - 5, self.cursor + 17
             self.draw.line((x - 4, y - 2, x, y + 2, x + 4, y - 2), fill=PRIMARY, width=2)
@@ -227,30 +257,10 @@ class Screen:
         self.cursor += page.height + 24
 
     def day_markers(self, item, day, x, y, color=PRIMARY):
-        keys = ("holidays", "paydays", "ends", "year_ends")
-        visible = [key for key in keys if day in item.get(key, ())]
+        visible = [key for key in DAY_MARKER_FILES if day in item.get(key, ())]
         for index, key in enumerate(visible):
             row, column = divmod(index, 2)
-            self.day_marker(key, x + column * 11, y + row * 11, color)
-
-    def day_marker(self, key, x, y, color):
-        if key == "holidays":
-            self.draw.polygon(
-                ((x + 4, y), (x + 5, y + 3), (x + 8, y + 3), (x + 6, y + 5), (x + 7, y + 8),
-                 (x + 4, y + 6), (x + 1, y + 8), (x + 2, y + 5), (x, y + 3), (x + 3, y + 3)),
-                fill=color,
-            )
-        elif key == "paydays":
-            self.draw.ellipse((x, y, x + 8, y + 8), outline=color)
-            self.draw.line((x + 4, y + 2, x + 4, y + 6), fill=color)
-        elif key == "ends":
-            self.draw.line((x + 1, y, x + 1, y + 8), fill=color)
-            self.draw.polygon(((x + 2, y), (x + 8, y + 2), (x + 2, y + 5)), fill=color)
-        elif key == "year_ends":
-            self.draw.rectangle((x, y + 1, x + 8, y + 8), outline=color)
-            self.draw.line((x + 2, y, x + 2, y + 2), fill=color)
-            self.draw.line((x + 6, y, x + 6, y + 2), fill=color)
-            self.draw.line((x + 2, y + 5, x + 4, y + 7, x + 6, y + 4), fill=color)
+            draw_day_marker(self.draw, key, x + column * 11, y + row * 11, color)
 
     def calendar(self, item):
         y = self.cursor
@@ -465,10 +475,19 @@ def render_board(board, font_dir, destination):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("source", type=Path, nargs="+")
+    parser.add_argument("source", type=Path, nargs="*")
     parser.add_argument("--font-dir", type=Path, default=Path("/usr/share/fonts/truetype/lato"))
     parser.add_argument("--output", type=Path, default=Path(__file__).resolve().parent)
+    parser.add_argument("--marker-output", type=Path, help="Render the 9 px date-marker reference glyphs.")
     args = parser.parse_args()
+    if not args.source and args.marker_output is None:
+        parser.error("provide a mockup manifest or --marker-output")
+    if args.marker_output is not None:
+        args.marker_output.mkdir(parents=True, exist_ok=True)
+        for key, name in DAY_MARKER_FILES.items():
+            icon = Image.new("RGBA", (9, 9))
+            draw_day_marker(ImageDraw.Draw(icon), key, 0, 0, PRIMARY)
+            icon.save(args.marker_output / f"{name}.png", optimize=True)
     args.output.mkdir(parents=True, exist_ok=True)
     for source in args.source:
         for board in json.loads(source.read_text(encoding="utf-8")):

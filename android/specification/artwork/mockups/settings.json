@@ -138,6 +138,7 @@
         {"type": "row", "text": "Record or correct leave", "value": "›"},
         {"type": "row", "text": "Share or restore a backup", "value": "›"},
         {"type": "row", "text": "Leave abbreviations", "value": "›"},
+        {"type": "row", "text": "Calendar date markers", "value": "›"},
         {"type": "row", "text": "About FedLeave", "value": "›"}
       ]},
       {"id": "HELP-ABOUT", "title": "About FedLeave", "items": [
