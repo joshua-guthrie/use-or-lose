@@ -163,20 +163,20 @@
   },
   {
     "file": "reports-heatmap-states.png",
-    "title": "Heatmap alternate and empty states",
-    "subtitle": "A selected date has an exact value in either chart layout.",
+    "title": "Leave-year Heatmap, empty and loading states",
+    "phone_height": 714,
+    "subtitle": "Scroll through the months in portrait. Tap the chart to see the entire year at once.",
     "screens": [
       {
         "id": "REPORT-HEATMAP-YEAR",
-        "title": "Calendar heatmap",
-        "subtitle": "2026 leave year",
+        "title": "Calendar Heatmap",
+        "subtitle": "2026 leave year · Jan 11, 2026–Jan 9, 2027",
         "toolbar": ["share"],
         "items": [
-          {"type": "row", "text": "Series", "value": "Annual leave used"},
-          {"type": "row", "text": "View", "value": "Year at a glance", "note": 1},
-          {"type": "heatmap", "expandable": true, "text": "Jan–Apr · weeks 1–16", "rows": [[0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]], "note": 2},
-          {"type": "row", "text": "Jan 13 · Approved", "value": "8 h"},
-          {"type": "action", "text": "View entries", "emphasis": false}
+          {"type": "row", "text": "Series", "value": "Annual leave used", "dropdown": true},
+          {"type": "row", "text": "View", "value": "Leave year", "dropdown": true, "note": 1},
+          {"type": "heatmap", "expandable": true, "text": "January 2026", "dates": [[null, null, null, null, null, null, null], [null, null, null, null, null, null, null], [11, 12, 13, 14, 15, 16, 17], [18, 19, 20, 21, 22, 23, 24], [25, 26, 27, 28, 29, 30, 31]], "rows": [[0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 3, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0]], "note": 2},
+          {"type": "heatmap", "expandable": true, "text": "February 2026", "dates": [[1, 2, 3, 4, 5, 6, 7], [8, 9, 10, 11, 12, 13, 14], [15, 16, 17, 18, 19, 20, 21], [22, 23, 24, 25, 26, 27, 28]], "rows": [[0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 3, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0]]}
         ]
       },
       {
@@ -184,8 +184,9 @@
         "title": "Calendar heatmap",
         "subtitle": "2027 leave year",
         "items": [
-          {"type": "card", "text": "No leave activity yet", "body": "This year has no activity to show in a heatmap.", "note": 3},
-          {"type": "action", "text": "Choose another year", "emphasis": false}
+          {"type": "card", "text": "No leave activity yet", "body": "Recorded annual leave used is 0 h.", "note": 3},
+          {"type": "row", "text": "View", "value": "Leave year", "dropdown": true},
+          {"type": "heatmap", "expandable": true, "text": "January 2027", "dates": [[null, null, null, null, null, null, null], [null, null, null, null, null, null, null], [10, 11, 12, 13, 14, 15, 16], [17, 18, 19, 20, 21, 22, 23], [24, 25, 26, 27, 28, 29, 30], [31, null, null, null, null, null, null]], "rows": [[0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0]]}
         ]
       },
       {

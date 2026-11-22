@@ -14,7 +14,7 @@
         "items": [
           {"type": "row", "text": "Analysis", "value": "Leave used by month", "dropdown": true},
           {"type": "row", "text": "Leave type", "value": "Annual leave", "dropdown": true},
-          {"type": "chart", "text": "Recorded annual leave used (h)", "height": 177, "ticks": [0, 4, 8, 12, 16], "values": [10, 8, 0, 16, 6, 12], "labels": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"], "expandable": true, "note": 1},
+          {"type": "chart", "text": "Recorded annual leave used (h)", "height": 177, "ticks": [0, 4, 8, 12, 16], "values": [10, 8, 0, 16, 6, 12, null, null, null, null, null, null, null], "labels": ["Jan", "", "Mar", "", "May", "", "Jul", "", "Sep", "", "Nov", "", "Jan"], "shade_after": 0.461538, "expandable": true, "note": 1},
           {"type": "row", "text": "January – June", "value": "52 h"},
           {"type": "action", "text": "View exact values", "emphasis": false, "note": 2}
         ]
@@ -36,7 +36,7 @@
         "compact_header": true,
         "back_note": 1,
         "items": [
-          {"type": "chart", "text": "Recorded hours by month", "height": 213, "ticks": [0, 4, 8, 12, 16], "values": [10, 8, 0, 16, 6, 12], "labels": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"], "selected": 5, "note": 2},
+          {"type": "chart", "text": "Recorded hours by month", "height": 213, "ticks": [0, 4, 8, 12, 16], "values": [10, 8, 0, 16, 6, 12, null, null, null, null, null, null, null], "labels": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan"], "shade_after": 0.461538, "selected": 5, "note": 2},
           {"type": "row", "text": "June · 12 h used", "value": "View entries ›", "note": 3}
         ]
       }

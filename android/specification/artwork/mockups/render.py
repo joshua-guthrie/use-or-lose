@@ -2,6 +2,7 @@
 
 import argparse
 import json
+from datetime import date, timedelta
 from functools import lru_cache
 from pathlib import Path
 
@@ -324,9 +325,14 @@ class Screen:
         plot_height = height - 61
         values = item["values"]
         ticks = item.get("ticks")
-        scale = max(ticks or values) or 1
+        scale_values = ticks or [value for value in values if value is not None]
+        scale = max(scale_values, default=0) or 1
         if ticks:
             start = self.left + 44
+        if (cutoff := item.get("shade_after")) is not None:
+            cutoff_x = start + (end - start) * cutoff
+            self.draw.rectangle((cutoff_x, base - plot_height, end, base), fill="#E2E8F3")
+        if ticks:
             for tick in ticks:
                 tick_y = base - tick * plot_height / scale
                 self.draw.line((start, tick_y, end, tick_y), fill=LINE, width=1)
@@ -345,9 +351,14 @@ class Screen:
                     (current[0], previous[1]), current,
                 )]]
             self.draw.line(points, fill=PRIMARY, width=3, joint="curve")
+            if item.get("mark_endpoint"):
+                x, value_y = points[-1]
+                self.draw.ellipse((x - 4, value_y - 4, x + 4, value_y + 4), fill=PRIMARY, outline=SURFACE)
         else:
             step = (end - start) / len(values)
             for index, value in enumerate(values):
+                if value is None:
+                    continue
                 x = start + index * step + 5
                 selected = index == item.get("selected")
                 self.box(x, base - value * plot_height / scale, x + step - 10, base,
@@ -393,6 +404,45 @@ class Screen:
         self.text(self.left + 12, legend_y, "0 h    ·    up to 8 h", 11, MUTED)
         self.mark(item.get("note"), y + 16)
         self.cursor = legend_y + 37
+
+
+    def year_heatmap(self, item):
+        start, end = date.fromisoformat(item["start"]), date.fromisoformat(item["end"])
+        first_weekday = item.get("first_weekday", 6)
+        first_week = start - timedelta(days=(start.weekday() - first_weekday) % 7)
+        weeks = (end - first_week).days // 7 + 1
+        y = self.cursor
+        grid_left, grid_right, grid_top = self.left + 40, self.inner_right - 12, y + 45
+        week_width = (grid_right - grid_left) / weeks
+        row_height = 24
+        legend_y = grid_top + 7 * row_height + 9
+        colors = ("#E1E8F2", "#BDD1F6", "#789FDE", PRIMARY)
+        self.box(self.left, y, self.inner_right, legend_y + 22, "#F0F4FC", 12)
+        self.text(self.left + 12, y + 9, item["text"], 13, bold=True)
+        weekdays = ("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+        for row in range(7):
+            label = weekdays[(first_weekday + row) % 7]
+            self.text(grid_left - 8, grid_top + row * row_height + 11, label, 11, MUTED, anchor="rm")
+        for offset in range((end - start).days + 1):
+            day = start + timedelta(days=offset)
+            week, row = divmod((day - first_week).days, 7)
+            x = grid_left + week * week_width
+            cell_y = grid_top + row * row_height
+            if day == start or day.day == 1:
+                month = day.strftime("%b")
+                if day.month == 1:
+                    month = day.strftime("%b ’%y")
+                label_x = min(x + 2, grid_right - 38)
+                self.text(label_x, grid_top - 13, month, 10, MUTED, anchor="lm")
+            level = item["activity"].get(day.isoformat(), 0)
+            self.box(x, cell_y, x + week_width - 1, cell_y + row_height - 2, colors[level], 2)
+            if day.isoformat() == item["selected"]:
+                self.draw.rounded_rectangle(
+                    (x, cell_y, x + week_width - 1, cell_y + row_height - 2), 2, outline=INK, width=2,
+                )
+        self.text(self.left + 12, legend_y, "0 h    ·    up to 8 h", 11, MUTED)
+        self.mark(item.get("note"), y + 17)
+        self.cursor = legend_y + 31
 
 
 def render_board(board, font_dir, destination):

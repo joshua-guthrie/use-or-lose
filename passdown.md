@@ -12,6 +12,8 @@ During new independent leave-year setup, choose balances at the start of the yea
 
 Analytics charts open a [full-screen landscape view](android/specification/chapters/03-reports-data/03-02-report-screens.md#full-screen-charts) when tapped. Back restores the previous report and its state. [Expanded chart checkpoint](android/specification/passdowns/21-full-screen-charts.md)
 
+The [Analytics history mockups](android/specification/chapters/03-reports-data/03-02-report-screens.md#analytics-with-one-six-or-eleven-months) show one, six, and eleven months in Seasonality and Cumulative Usage. The [full-year Heatmap](android/specification/chapters/03-reports-data/03-02-report-screens.md#entire-leave-year-in-the-heatmap) shows every date at once in landscape and all months in a scrollable portrait view. [History checkpoint](android/specification/passdowns/22-analytics-history-mockups.md)
+
 Close implementation milestones through the [QA gates and retest loop](android/specification/chapters/05-quality/05-02-quality-gates.md). Use the [QA report template](android/qa/reports/template.md) and link the separate AI review.
 
 [Organization checkpoint](android/specification/passdowns/18-project-organization.md) records the chapter moves, review destinations, and smaller-model implementation briefs.

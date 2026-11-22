@@ -1,0 +1,24 @@
+[
+  {
+    "file": "reports-heatmap-year-landscape.png",
+    "title": "All days of a leave year in landscape",
+    "subtitle": "Each column is a week. Each row is a day of the week.",
+    "phone_width": 756,
+    "phone_height": 436,
+    "screens": [
+      {
+        "id": "REPORT-HEATMAP-YEAR-FULLSCREEN",
+        "title": "Calendar Heatmap",
+        "subtitle": "2026 leave year · Annual leave used",
+        "toolbar": ["back"],
+        "compact_header": true,
+        "back_note": 1,
+        "items": [
+          {"type": "year_heatmap", "text": "Jan 11, 2026 – Jan 9, 2027", "start": "2026-01-11", "end": "2027-01-09", "selected": "2027-01-09", "activity": {"2026-01-13": 3, "2026-01-20": 1, "2026-02-13": 3, "2026-04-13": 3, "2026-04-20": 3, "2026-05-13": 2, "2026-06-13": 3, "2026-06-20": 2, "2026-07-13": 2, "2026-08-13": 3, "2026-08-20": 1, "2026-09-13": 3, "2026-10-13": 3, "2026-10-20": 2, "2026-11-13": 2, "2026-12-13": 3, "2027-01-09": 1}, "note": 2},
+          {"type": "row", "text": "Jan 9, 2027 · 2 h used", "value": "Choose date ›", "note": 3},
+          {"type": "row", "text": "View entries", "value": "›"}
+        ]
+      }
+    ]
+  }
+]

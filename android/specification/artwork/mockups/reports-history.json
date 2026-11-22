@@ -1,0 +1,102 @@
+[
+  {
+    "file": "reports-seasonality-history.png",
+    "title": "Seasonality · One, six, and eleven months",
+    "subtitle": "The same sample starts with January. Shading marks months after each reporting cutoff.",
+    "screens": [
+      {
+        "id": "REPORT-SEASONALITY-01-MONTHS",
+        "title": "Seasonality",
+        "toolbar": ["share"],
+        "subtitle": "2026 leave year · Recorded through Jan 31",
+        "items": [
+          {"type": "row", "text": "Analysis", "value": "Leave used by month", "dropdown": true},
+          {"type": "row", "text": "Leave type", "value": "Annual leave", "dropdown": true},
+          {"type": "chart", "text": "Recorded annual leave used (h)", "height": 190, "ticks": [0, 4, 8, 12, 16], "labels": ["Jan", "", "Mar", "", "May", "", "Jul", "", "Sep", "", "Nov", "", "Jan"], "values": [10, null, null, null, null, null, null, null, null, null, null, null, null], "shade_after": 0.076923, "expandable": true, "note": 1},
+          {"type": "text", "text": "Jan 2026–Jan 2027. Shaded months are after the cutoff."},
+          {"type": "row", "text": "Recorded through Jan 31", "value": "10 h"},
+          {"type": "action", "text": "View exact values", "emphasis": false}
+        ]
+      },
+      {
+        "id": "REPORT-SEASONALITY-06-MONTHS",
+        "title": "Seasonality",
+        "toolbar": ["share"],
+        "subtitle": "2026 leave year · Recorded through Jun 30",
+        "items": [
+          {"type": "row", "text": "Analysis", "value": "Leave used by month", "dropdown": true},
+          {"type": "row", "text": "Leave type", "value": "Annual leave", "dropdown": true},
+          {"type": "chart", "text": "Recorded annual leave used (h)", "height": 190, "ticks": [0, 4, 8, 12, 16], "labels": ["Jan", "", "Mar", "", "May", "", "Jul", "", "Sep", "", "Nov", "", "Jan"], "values": [10, 8, 0, 16, 6, 12, null, null, null, null, null, null, null], "shade_after": 0.461538, "expandable": true, "note": 2},
+          {"type": "text", "text": "Jan 2026–Jan 2027. Shaded months are after the cutoff."},
+          {"type": "row", "text": "Recorded through Jun 30", "value": "52 h"},
+          {"type": "row", "text": "March · Recorded", "value": "0 h"},
+          {"type": "action", "text": "View exact values", "emphasis": false}
+        ]
+      },
+      {
+        "id": "REPORT-SEASONALITY-11-MONTHS",
+        "title": "Seasonality",
+        "toolbar": ["share"],
+        "subtitle": "2026 leave year · Recorded through Nov 30",
+        "items": [
+          {"type": "row", "text": "Analysis", "value": "Leave used by month", "dropdown": true},
+          {"type": "row", "text": "Leave type", "value": "Annual leave", "dropdown": true},
+          {"type": "chart", "text": "Recorded annual leave used (h)", "height": 190, "ticks": [0, 4, 8, 12, 16], "labels": ["Jan", "", "Mar", "", "May", "", "Jul", "", "Sep", "", "Nov", "", "Jan"], "values": [10, 8, 0, 16, 6, 12, 4, 10, 8, 14, 6, null, null], "shade_after": 0.846154, "expandable": true, "note": 3},
+          {"type": "text", "text": "Jan 2026–Jan 2027. Shaded months are after the cutoff."},
+          {"type": "row", "text": "Recorded through Nov 30", "value": "94 h"},
+          {"type": "row", "text": "March · Recorded", "value": "0 h"},
+          {"type": "action", "text": "View exact values", "emphasis": false}
+        ]
+      }
+    ]
+  },
+  {
+    "file": "reports-cumulative-history.png",
+    "title": "Cumulative usage · One, six, and eleven months",
+    "subtitle": "The leave-year axis stays fixed. The recorded line ends at each reporting cutoff.",
+    "screens": [
+      {
+        "id": "REPORT-CUMULATIVE-01-MONTHS",
+        "title": "Cumulative usage",
+        "toolbar": ["share"],
+        "subtitle": "2026 leave year · Recorded through Jan 31",
+        "items": [
+          {"type": "row", "text": "Absence categories", "value": "Annual leave", "dropdown": true},
+          {"type": "chart", "text": "Cumulative recorded annual leave used (h)", "height": 190, "ticks": [0, 25, 50, 75, 100], "style": "line", "step": true, "values": [0, 8, 10, 10], "positions": [0.0, 0.00551, 0.024793, 0.055096], "shade_after": 0.055096, "mark_endpoint": true, "start_label": "Jan 11, 2026", "end_label": "Jan 9, 2027", "expandable": true, "note": 1},
+          {"type": "text", "text": "Shaded dates are after the cutoff."},
+          {"type": "row", "text": "Recorded through Jan 31", "value": "10 h"},
+          {"type": "row", "text": "Scheduled after cutoff", "value": "0 h"},
+          {"type": "action", "text": "View daily values", "emphasis": false}
+        ]
+      },
+      {
+        "id": "REPORT-CUMULATIVE-06-MONTHS",
+        "title": "Cumulative usage",
+        "toolbar": ["share"],
+        "subtitle": "2026 leave year · Recorded through Jun 30",
+        "items": [
+          {"type": "row", "text": "Absence categories", "value": "Annual leave", "dropdown": true},
+          {"type": "chart", "text": "Cumulative recorded annual leave used (h)", "height": 190, "ticks": [0, 25, 50, 75, 100], "style": "line", "step": true, "values": [0, 8, 10, 18, 26, 34, 40, 48, 52, 52], "positions": [0.0, 0.00551, 0.024793, 0.090909, 0.253444, 0.272727, 0.336088, 0.421488, 0.440771, 0.46832], "shade_after": 0.46832, "mark_endpoint": true, "start_label": "Jan 11, 2026", "end_label": "Jan 9, 2027", "expandable": true, "note": 2},
+          {"type": "text", "text": "Shaded dates are after the cutoff."},
+          {"type": "row", "text": "Recorded through Jun 30", "value": "52 h"},
+          {"type": "row", "text": "Scheduled after cutoff", "value": "0 h"},
+          {"type": "action", "text": "View daily values", "emphasis": false}
+        ]
+      },
+      {
+        "id": "REPORT-CUMULATIVE-11-MONTHS",
+        "title": "Cumulative usage",
+        "toolbar": ["share"],
+        "subtitle": "2026 leave year · Recorded through Nov 30",
+        "items": [
+          {"type": "row", "text": "Absence categories", "value": "Annual leave", "dropdown": true},
+          {"type": "chart", "text": "Cumulative recorded annual leave used (h)", "height": 190, "ticks": [0, 25, 50, 75, 100], "style": "line", "step": true, "values": [0, 8, 10, 18, 26, 34, 40, 48, 52, 56, 64, 66, 74, 82, 88, 94, 94], "positions": [0.0, 0.00551, 0.024793, 0.090909, 0.253444, 0.272727, 0.336088, 0.421488, 0.440771, 0.504132, 0.589532, 0.608815, 0.674931, 0.757576, 0.77686, 0.842975, 0.889807], "shade_after": 0.889807, "mark_endpoint": true, "start_label": "Jan 11, 2026", "end_label": "Jan 9, 2027", "expandable": true, "note": 3},
+          {"type": "text", "text": "Shaded dates are after the cutoff."},
+          {"type": "row", "text": "Recorded through Nov 30", "value": "94 h"},
+          {"type": "row", "text": "Scheduled after cutoff", "value": "0 h"},
+          {"type": "action", "text": "View daily values", "emphasis": false}
+        ]
+      }
+    ]
+  }
+]
