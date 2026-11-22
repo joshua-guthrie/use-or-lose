@@ -2,38 +2,126 @@
   {
     "file": "calendar-menus.png",
     "title": "Calendar menu",
-    "subtitle": "Open Menu from the upper left. Share the displayed month from the upper right.",
+    "subtitle": "Open Menu at the upper left.",
     "screens": [
       {
         "id": "CALENDAR-MENU",
         "title": "Calendar",
-        "toolbar": ["menu", "share"],
+        "toolbar": [
+          "menu",
+          "share"
+        ],
         "nav": "Calendar",
         "items": [
-          {
-            "type": "menu_panel",
-            "entries": ["Today", "Transactions", "Preview month PDF"],
-            "note": 1
-          },
           {
             "type": "balance_card",
             "text": "As of today · Jan 16, 2026",
             "balances": [
-              ["Annual", "90 h"],
-              ["Sick", "20 h"],
-              ["Comp", "8 h"],
-              ["Credit", "4 h"],
-              ["Travel comp", "6 h"],
-              ["Time award", "12 h"],
-              ["Restored AL", "10 h"],
-              ["Relig. comp", "2 h"]
+              [
+                "Annual",
+                "90 h"
+              ],
+              [
+                "Sick",
+                "20 h"
+              ],
+              [
+                "Comp",
+                "8 h"
+              ],
+              [
+                "Credit",
+                "4 h"
+              ],
+              [
+                "Travel comp",
+                "6 h"
+              ],
+              [
+                "Time award",
+                "12 h"
+              ],
+              [
+                "Restored AL",
+                "10 h"
+              ],
+              [
+                "Relig. comp",
+                "2 h"
+              ]
             ],
             "hint": "View all 10 balances · 2 more"
           },
-          {"type": "row", "text": "January 2026", "dropdown": true}
-        ]
+          {
+            "type": "row",
+            "text": "January 2026",
+            "dropdown": true
+          },
+          {
+            "type": "activity_calendar",
+            "start": 4,
+            "days": 31,
+            "today": 16,
+            "holidays": [
+              1,
+              19
+            ],
+            "ends": [
+              24
+            ],
+            "paydays": [
+              30
+            ],
+            "activity": {
+              "13": [
+                {
+                  "text": "A −8"
+                }
+              ],
+              "16": [
+                {
+                  "text": "A −2"
+                }
+              ],
+              "22": [
+                {
+                  "text": "A −4",
+                  "planned": true
+                }
+              ],
+              "24": [
+                {
+                  "text": "A +6"
+                },
+                {
+                  "text": "S +4"
+                },
+                {
+                  "text": "C +1",
+                  "planned": true
+                }
+              ],
+              "25": [
+                {
+                  "text": "A −3",
+                  "planned": true
+                }
+              ]
+            }
+          }
+        ],
+        "dropdown_menu": {
+          "entries": [
+            "Today",
+            "Transactions",
+            "Force Balance",
+            "Preview month PDF"
+          ],
+          "note": 1
+        }
       }
-    ]
+    ],
+    "phone_height": 756
   },
   {
     "file": "calendar-pdf-share.png",

@@ -125,7 +125,8 @@
         {"type": "row", "text": "Time increment", "value": "0.25 h"},
         {"type": "row", "text": "Annual carryover limit", "value": "240 h"},
         {"type": "action", "text": "Review work tour", "emphasis": false},
-        {"type": "action", "text": "Review FMLA history", "emphasis": false}
+        {"type": "action", "text": "Review FMLA history", "emphasis": false},
+        {"type": "row", "text": "Leave-year maintenance", "value": "›"}
       ]},
       {"id": "FMLA-HISTORY-REVIEW", "title": "Review FMLA history", "items": [
         {"type": "row", "text": "History complete from", "value": "Jun 1, 2026", "note": 2},
@@ -184,12 +185,10 @@
         {"type": "row", "text": "Reason", "value": "Verified baseline"},
         {"type": "action", "text": "Save revised opening"}
       ]},
-      {"id": "BALANCE-ADJUST", "title": "Adjust balance", "subtitle": "Annual leave · Feb 1, 2026", "items": [
-        {"type": "row", "text": "Recorded balance", "value": "20 h"},
-        {"type": "row", "text": "Verified target", "value": "5 h", "note": 2},
-        {"type": "row", "text": "Change on Feb 1", "value": "15 h decrease"},
-        {"type": "row", "text": "Reason", "value": "Payroll correction"},
-        {"type": "action", "text": "Apply adjustment"}
+      {"id": "BALANCE-MAINTENANCE", "title": "Leave-year maintenance", "items": [
+        {"type": "row", "text": "Correct opening balance", "value": "›"},
+        {"type": "row", "text": "Force Balance", "value": "›", "note": 2},
+        {"type": "row", "text": "Change accrual", "value": "›"}
       ]},
       {"id": "ACCRUAL-CHANGE", "title": "Change accrual", "subtitle": "Annual leave · 2026", "items": [
         {"type": "row", "text": "Leave type", "value": "Annual"},

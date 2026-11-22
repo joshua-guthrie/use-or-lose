@@ -24,12 +24,19 @@ Settings groups week and display preferences, leave-year maintenance, holiday an
 
 ## Manual payroll review
 
+This workflow is for correcting or marking one existing ledger entry as verified after you compare it with a timecard or pay statement you have open elsewhere. You read the payroll record yourself and type the verified hours. The app uses only the entries already saved in FedLeave. It does not import statements, find payroll discrepancies automatically, or reconcile an entire pay period.
+
 ![Choose a stored transaction and review the manually entered change](../../artwork/mockups/settings-reconcile.png)
 
-| Callout | Interaction and states | Requirements |
-| --- | --- | --- |
-| 1 | Open **Reconcile entry** from a transaction or day. If several entries match, choose the exact entry. | `DATA-PAYROLL-01` |
-| 2–3 | Enter the revised hours and reason, then review the selected record before saving. Cancel returns to the caller without a write. | `DATA-PAYROLL-01` |
+The example shows two separate annual leave entries on January 13. Entry `20260113-001` records 2 h and entry `20260113-002` records 1 h. If your payroll record says the first entry should be 3 h, select `20260113-001`, enter **3 h** and give the reason. The review shows **2 h → 3 h** on that one record. After confirmation, that ID records 3 h and is marked reconciled, with your explanation. The second entry stays at 1 h. Total annual leave used that day changes from 3 h to 4 h, which reduces the dated annual balance by another hour.
+
+| Callout | What the screen shows |
+| --- | --- |
+| 1 | Open **Reconcile entry** from a transaction or day. When several entries share the selected date, leave type and direction, the list shows their individual IDs and recorded hours. Choose the one you can identify in your own records. |
+| 2 | Enter the exact verified hours and reason. The review shows the chosen date, leave type, record ID and a before-and-after comparison. |
+| 3 | **Save reconciliation** updates the selected row in place and marks it reconciled. The save keeps the record ID and the other entries. Cancel returns to the caller without changing the ledger. |
+
+**Decision for review.** Keep **Reconcile entry** as a dedicated action if payroll verification is a recurring task and the reconciled status helps you distinguish entries you checked. If the useful part is changing the hours on a known entry, **Correct entry** already covers that job. Use **Force Balance** when you trust the total on a date and want one adjustment while keeping the original entries. [Ordinary correction](../02-ledger/02-01-ledger-and-leave-years.md#edit-and-review-leave) · [Force Balance](../01-calendar/01-06-force-balance.md) · [Desktop reconciliation behavior](../../../../src/fedleave/commands/transactions.py#L456)
 
 ## Calendar, holidays, and reminders
 
@@ -60,12 +67,13 @@ Settings groups week and display preferences, leave-year maintenance, holiday an
 
 ## Opening balance, balance adjustment, and accrual
 
-![Starting balance correction, verified balance adjustment, accrual change, and projected annual use-or-lose](../../artwork/mockups/settings-adjustments.png)
+![Starting balance correction, the maintenance shortcut for Force Balance, accrual change, and projected annual use-or-lose](../../artwork/mockups/settings-adjustments.png)
 
 | Callout | Interaction and states | Requirements |
 | --- | --- | --- |
 | 1 | Compare old and revised opening in an independent year. A linked year routes to source or carryover review. | `YEAR-OPEN-01` |
-| 2–3 | Select the date and input the intended adjustment or accrual rate. The accrual editor accepts annual or sick. Review the effective date, applicable hours, and reason. Keep draft on failure and show the new calculation after save. | `CAL-FORCE-01`, `YEAR-ACC-01` |
+| 2 | **Force Balance** opens the same dated form and review as the Calendar menu. [Force Balance screens](../01-calendar/01-06-force-balance.md) | `CAL-FORCE-01` |
+| 3 | Choose an effective date and annual or sick accrual rate. Review the effective date, applicable hours, and reason. Keep the draft on failure. | `YEAR-ACC-01` |
 | 4 | Read the dedicated use-or-lose calculation with its forecast close, carryover cap and excess. It does not alter the data. | `YEAR-CAP-01` |
 
 ## Expiration and approved deadlines

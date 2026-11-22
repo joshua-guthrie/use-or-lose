@@ -23,7 +23,7 @@ For a visual review, start with the [Calendar mockups](chapters/01-calendar/01-0
 
 | Chapter | Content |
 | --- | --- |
-| 01. Calendar | [01.01 Main screen](chapters/01-calendar/01-01-main-screen.md) · [01.02 Balances](chapters/01-calendar/01-02-balances.md) · [01.03 Navigation and screen states](chapters/01-calendar/01-03-navigation-and-screens.md) · [01.04 Date markers](chapters/01-calendar/01-04-date-markers.md) · [01.05 Menu and PDF](chapters/01-calendar/01-05-menu-and-pdf.md) |
+| 01. Calendar | [01.01 Main screen](chapters/01-calendar/01-01-main-screen.md) · [01.02 Balances](chapters/01-calendar/01-02-balances.md) · [01.03 Navigation and screen states](chapters/01-calendar/01-03-navigation-and-screens.md) · [01.04 Date markers](chapters/01-calendar/01-04-date-markers.md) · [01.05 Menu and PDF](chapters/01-calendar/01-05-menu-and-pdf.md) · [01.06 Force Balance](chapters/01-calendar/01-06-force-balance.md) |
 | 02. Ledger | [02.01 Ledger and leave years](chapters/02-ledger/02-01-ledger-and-leave-years.md) |
 | 03. Reports, data, and preferences | [03.01 Behavior and requirements](chapters/03-reports-data/03-01-reports-data-and-preferences.md) · [03.02 Report screens](chapters/03-reports-data/03-02-report-screens.md) · [03.03 Data and settings screens](chapters/03-reports-data/03-03-data-and-settings-screens.md) |
 | 04. Architecture | [04.01 Shared core and compatibility](chapters/04-architecture/04-01-core-and-compatibility.md) · [04.02 Device storage, backups, and sharing](chapters/04-architecture/04-02-device-storage.md) |

@@ -1,0 +1,71 @@
+[
+  {
+    "file": "calendar-force-balance-form.png",
+    "title": "Force Balance · Choose the date and enter the target",
+    "subtitle": "Open Force Balance from the main Calendar menu.",
+    "phone_height": 714,
+    "screens": [
+      {
+        "id": "FORCE-BALANCE-DATE",
+        "title": "Select effective date",
+        "subtitle": "Android Material date picker · illustrative",
+        "items": [
+          {"type": "heading", "text": "Sunday, February 1, 2026"},
+          {"type": "calendar", "text": "February 2026", "start": 0, "days": 28, "selected": 1, "note": 1},
+          {"type": "row", "text": "Enter date", "value": "›"},
+          {"type": "action", "text": "OK"},
+          {"type": "action", "text": "Cancel", "emphasis": false}
+        ]
+      },
+      {
+        "id": "FORCE-BALANCE-FORM",
+        "title": "Force Balance",
+        "toolbar": ["back"],
+        "items": [
+          {"type": "row", "text": "Effective date", "value": "Feb 1, 2026", "dropdown": true, "note": 2},
+          {"type": "row", "text": "Leave type", "value": "Annual leave", "dropdown": true, "note": 3},
+          {"type": "row", "text": "Current balance", "value": "20 h"},
+          {"type": "row", "text": "Target balance", "value": "5 h", "note": 4},
+          {"type": "row", "text": "Reason", "value": "Payroll correction"},
+          {"type": "action", "text": "Review adjustment"},
+          {"type": "action", "text": "Cancel", "emphasis": false}
+        ]
+      }
+    ]
+  },
+  {
+    "file": "calendar-force-balance-review.png",
+    "title": "Force Balance · Choose a leave type and review",
+    "subtitle": "The review shows how the selected balance changes on the effective date.",
+    "screens": [
+      {
+        "id": "FORCE-BALANCE-TYPES",
+        "title": "Choose leave type",
+        "subtitle": "Effective date · Feb 1, 2026",
+        "items": [
+          {"type": "row", "text": "Annual leave", "value": "Selected", "note": 1},
+          {"type": "row", "text": "Sick leave", "value": "›"},
+          {"type": "row", "text": "Credit hours", "value": "›"},
+          {"type": "row", "text": "Compensatory time", "value": "›"},
+          {"type": "row", "text": "Travel comp", "value": "›"},
+          {"type": "row", "text": "Restored annual", "value": "›"},
+          {"type": "row", "text": "Time-off award", "value": "›"},
+          {"type": "row", "text": "Religious comp", "value": "›"},
+          {"type": "action", "text": "Cancel", "emphasis": false}
+        ]
+      },
+      {
+        "id": "FORCE-BALANCE-REVIEW",
+        "title": "Review adjustment",
+        "subtitle": "Annual leave · Feb 1, 2026",
+        "items": [
+          {"type": "card", "text": "20 h → 5 h annual leave", "body": "Record a 15 h decrease on Feb 1.", "note": 2},
+          {"type": "text", "text": "Existing leave entries stay in history. Balances from Feb 1 forward can change."},
+          {"type": "row", "text": "Reason", "value": "Payroll correction"},
+          {"type": "action", "text": "Apply adjustment", "note": 3},
+          {"type": "action", "text": "Back to adjustment", "emphasis": false}
+        ]
+      }
+    ]
+  }
+]

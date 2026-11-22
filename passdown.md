@@ -14,6 +14,8 @@ Analytics charts open a [full-screen landscape view](android/specification/chapt
 
 The [Analytics history mockups](android/specification/chapters/03-reports-data/03-02-report-screens.md#analytics-with-one-six-or-eleven-months) show one, six, and eleven months in Seasonality and Cumulative Usage. The [full-year Heatmap](android/specification/chapters/03-reports-data/03-02-report-screens.md#entire-leave-year-in-the-heatmap) shows every date at once in landscape and all months in a scrollable portrait view. [History checkpoint](android/specification/passdowns/22-analytics-history-mockups.md)
 
+The Calendar menu offers [Force Balance](android/specification/chapters/01-calendar/01-06-force-balance.md). I10 adds the date, leave type, target and adjustment review to the shared maintenance workflow. [Force Balance checkpoint](android/specification/passdowns/23-force-balance-menu.md)
+
 Close implementation milestones through the [QA gates and retest loop](android/specification/chapters/05-quality/05-02-quality-gates.md). Use the [QA report template](android/qa/reports/template.md) and link the separate AI review.
 
 [Organization checkpoint](android/specification/passdowns/18-project-organization.md) records the chapter moves, review destinations, and smaller-model implementation briefs.

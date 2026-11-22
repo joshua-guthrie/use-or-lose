@@ -4,11 +4,14 @@ Calendar uses the **Menu** icon at the upper left and the **Share calendar PDF**
 
 ## Open the Calendar menu
 
-![Calendar menu open showing Today, Transactions, and Preview month PDF](../../artwork/mockups/calendar-menus.png)
+![Calendar menu open showing Today, Transactions, Force Balance, and Preview month PDF](../../artwork/mockups/calendar-menus.png)
 
 | Callout | Interaction | Requirements |
 | --- | --- | --- |
-| 1 | The Menu icon opens three commands. **Today** resets the calendar month and balance date. **Transactions** opens history. **Preview month PDF** opens the displayed month's PDF for inspection. | `CAL-MENU-01`, `CAL-BAL-05`, `CAL-HISTORY-01` |
+| 1 | The Menu icon opens four commands. **Today** resets the calendar month and balance date. **Transactions** opens history. **Force Balance** opens the effective date picker for a dated adjustment. [Force Balance screens](01-06-force-balance.md) **Preview month PDF** opens the displayed month's PDF for inspection. | `CAL-MENU-01`, `CAL-BAL-05`, `CAL-HISTORY-01`, `CAL-FORCE-01` |
+
+Anchor a Material 3 dropdown just below the upper-left Menu icon. Show a rounded, elevated surface about 248 dp wide at the reference phone size, with text-only rows left aligned in the order shown. Use at least 48 dp per row. Allow the width to fit localized labels and keep it within the available screen. The dropdown overlays Calendar in place. Tapping outside, pressing Back or reopening Menu dismisses it and restores focus to Menu. Selecting a command closes the dropdown before performing that action. Use the same layout and readable contrast in light and dark mode.
+
 
 The grid uses the available space below the balances and month controls. Open a day to read the schedule events and leave entries. [Date markers](01-04-date-markers.md)
 

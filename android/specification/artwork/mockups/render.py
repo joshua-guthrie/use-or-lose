@@ -108,6 +108,8 @@ class Screen:
                 if label == nav:
                     self.box(center - 50, y + 3, center + 50, y + 33, SELECTED, 14)
                 self.text(center, y + 18, label, 13, PRIMARY if label == nav else MUTED, label == nav, "mm")
+        if menu := self.screen.get("dropdown_menu"):
+            self.menu_panel(menu)
         self.text(self.x, self.bottom + 11, self.screen["id"], 12, MUTED, bold=True)
 
     def toolbar(self, actions):
@@ -204,18 +206,16 @@ class Screen:
         self.cursor += 47
 
     def menu_panel(self, item):
-        top = self.cursor
-        entries = item["entries"]
-        height = len(entries) * 42 + 12
-        self.box(self.left + 3, top + 3, self.inner_right + 3, top + height + 3, LINE, 13)
-        self.box(self.left, top, self.inner_right, top + height, "#FFFFFF", 13)
-        for index, label in enumerate(entries):
-            y = top + 6 + index * 42
-            if label == item.get("highlight"):
-                self.box(self.left + 6, y, self.inner_right - 6, y + 40, SELECTED)
-            self.text(self.left + 15, y + 21, label, 15, INK, True, "lm")
-        self.mark(item.get("note"), top + 28)
-        self.cursor += height + 16
+        top = self.top + 49
+        right = self.left + min(248, self.width)
+        row_height = 48
+        height = len(item["entries"]) * row_height + 12
+        self.box(self.left + 3, top + 4, right + 3, top + height + 4, "#C5D2E6", 13)
+        self.box(self.left, top, right, top + height, "#FFFFFF", 13)
+        for index, label in enumerate(item["entries"]):
+            center_y = top + 6 + (index + 0.5) * row_height
+            self.text(self.left + 15, center_y, label, 15, INK, True, "lm")
+        self.mark(item.get("note"), top + 29, x=right + 15)
 
     def document_preview(self, item):
         with Image.open(MOCKUPS / item["file"]) as source:
