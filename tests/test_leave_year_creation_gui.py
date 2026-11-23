@@ -256,3 +256,171 @@ def test_reconciliation_GUI_reviews_full_chain_before_apply(qtbot, monkeypatch):
     window.reconcile_carryover()
     assert backend.calls[-1] == (2027, {"preview": False, "expected_fingerprint": "reviewed-chain"})
     dialog.reject()
+
+
+def _fixed_date(monkeypatch, value):
+    from datetime import date
+
+    class Clock(date):
+        @classmethod
+        def today(cls):
+            return value
+
+    monkeypatch.setattr("fedleave_gui.main_window.date", Clock)
+
+
+def _calendar_with_real_backend(qtbot, tmp_path):
+    from fedleave_gui.settings import GuiSettings
+
+    executable = Path(sysconfig.get_path("scripts")) / ("fedleave.exe" if os.name == "nt" else "fedleave")
+    window = MainWindow(GuiSettings(data_dir=str(tmp_path), fedleave_path=str(executable)))
+    qtbot.addWidget(window)
+    return window
+
+
+def test_early_january_uses_the_existing_containing_ledger_without_prompt(qtbot, monkeypatch, tmp_path):
+    from datetime import date
+
+    store(tmp_path, balances={"annual": 20})
+    _fixed_date(monkeypatch, date(2027, 1, 9))
+    window = _calendar_with_real_backend(qtbot, tmp_path)
+    before = tree(tmp_path)
+
+    def unexpected_prompt(*args):
+        raise AssertionError("A covered date must not prompt for leave-year creation")
+
+    monkeypatch.setattr(QMessageBox, "question", unexpected_prompt)
+    window.start_initial_load()
+    assert (window.year, window.month, window.display_ledger_year) == (2027, 1, 2026)
+    assert window.balance_snapshot["as_of"] == "2027-01-09"
+    assert window.balance_snapshot["balances"]["annual"] == 20
+    assert any(row["end"] == "2027-01-09" for row in window.month_json["pay_periods"])
+    assert tree(tmp_path) == before
+
+
+def test_startup_offers_adjacent_year_and_only_creates_after_review(qtbot, monkeypatch, tmp_path):
+    from datetime import date
+
+    store(tmp_path, balances={"annual": 20})
+    _fixed_date(monkeypatch, date(2027, 1, 10))
+    window = _calendar_with_real_backend(qtbot, tmp_path)
+    previous = (tmp_path / "leave_years/2026.json").read_bytes()
+    prompts = []
+
+    def question(_parent, title, text, *_args):
+        prompts.append((title, text))
+        assert not (tmp_path / "leave_years/2027.json").exists()
+        return QMessageBox.Yes
+
+    def review(dialog):
+        qtbot.waitUntil(lambda: dialog._pending is None, timeout=5000)
+        assert dialog.year.value() == 2027 and not dialog.year.isEnabled()
+        assert dialog.mode.currentData() == "carryover" and dialog.previous.currentData() == 2026
+        dialog.preview_creation()
+        qtbot.waitUntil(lambda: dialog.preview_payload is not None, timeout=5000)
+        dialog.accept()
+        return QDialog.Accepted
+
+    monkeypatch.setattr(QMessageBox, "question", question)
+    monkeypatch.setattr(StartYearDialog, "exec", review)
+    window.start_initial_load()
+
+    assert [title for title, _ in prompts] == ["Create a Leave Year", "Create Leave Year"]
+    assert "2027-01-10" in prompts[1][1]
+    assert (window.year, window.month, window.display_ledger_year) == (2027, 1, 2027)
+    assert window.balance_snapshot["as_of"] == "2027-01-10"
+    assert window.balance_snapshot["balances"]["annual"] == 20
+    assert {row["end"] for row in window.month_json["pay_periods"]} >= {"2027-01-09", "2027-01-23"}
+    assert (tmp_path / "leave_years/2026.json").read_bytes() == previous
+    assert sorted(path.name for path in (tmp_path / "leave_years").glob("*.json")) == ["2026.json", "2027.json"]
+
+
+def test_passive_browse_does_not_create_and_cancelled_future_edit_keeps_context(qtbot, monkeypatch, tmp_path):
+    from datetime import date
+
+    store(tmp_path)
+    _fixed_date(monkeypatch, date(2026, 12, 15))
+    window = _calendar_with_real_backend(qtbot, tmp_path)
+    before = tree(tmp_path)
+    prompts = []
+    monkeypatch.setattr(QMessageBox, "question", lambda _parent, title, *_args: prompts.append(title) or QMessageBox.No)
+    window.refresh()
+    window.next_month()
+    window.next_month()
+    assert (window.year, window.month) == (2027, 2)
+    assert window.display_ledger_year is None
+    assert not prompts
+
+    year, month, cutoff = window.year, window.month, window.balance_as_of
+    row = next(row for row in window.month_json["days"] if row["date"] == "2027-02-01")
+    window.edit_day(row)
+    assert prompts == ["Create a Leave Year"]
+    assert (window.year, window.month, window.balance_as_of) == (year, month, cutoff)
+    assert tree(tmp_path) == before
+
+
+def test_unreadable_proposed_year_is_never_replaced(qtbot, monkeypatch, tmp_path):
+    from datetime import date
+
+    store(tmp_path)
+    broken = tmp_path / "leave_years/2027.json"
+    broken.write_bytes(b"incomplete")
+    _fixed_date(monkeypatch, date(2027, 1, 10))
+    window = _calendar_with_real_backend(qtbot, tmp_path)
+    messages = []
+    monkeypatch.setattr(QMessageBox, "warning", lambda _parent, _title, message: messages.append(message))
+    window.start_initial_load()
+    assert messages and "2027 cannot be created" in messages[0]
+    assert broken.read_bytes() == b"incomplete"
+    assert window.balance_snapshot is None
+
+
+def test_confirmed_future_year_resumes_the_original_calendar_edit(qtbot, monkeypatch, tmp_path):
+    from datetime import date
+
+    store(tmp_path, balances={"annual": 20})
+    _fixed_date(monkeypatch, date(2026, 12, 15))
+    window = _calendar_with_real_backend(qtbot, tmp_path)
+    window.year, window.month = 2027, 2
+    window.refresh()
+    row = next(row for row in window.month_json["days"] if row["date"] == "2027-02-01")
+
+    def review(dialog):
+        qtbot.waitUntil(lambda: dialog._pending is None, timeout=5000)
+        dialog.preview_creation()
+        qtbot.waitUntil(lambda: dialog.preview_payload is not None, timeout=5000)
+        dialog.accept()
+        return QDialog.Accepted
+
+    class Edit:
+        def __init__(self, day, _parent):
+            assert day["date"] == "2027-02-01"
+            assert window.backend.leave_years()["years"][-1]["leave_year"] == 2027
+
+        def exec(self):
+            return QDialog.Accepted
+
+        def values(self):
+            return {"annual": -3}
+
+        def comments(self):
+            return {"annual": "Synthetic test leave"}
+
+    class Review:
+        def __init__(self, *_args):
+            pass
+
+        def exec(self):
+            return QDialog.Accepted
+
+    monkeypatch.setattr(QMessageBox, "question", lambda *_args: QMessageBox.Yes)
+    monkeypatch.setattr(StartYearDialog, "exec", review)
+    monkeypatch.setattr("fedleave_gui.main_window.DayEditDialog", Edit)
+    monkeypatch.setattr("fedleave_gui.main_window.SaveDayPreviewDialog", Review)
+    window.edit_day(row)
+
+    assert (window.year, window.month, window.balance_as_of) == (2027, 2, date(2026, 12, 15))
+    entries = next(item["entries"] for item in window.month_json["days"] if item["date"] == row["date"])
+    assert [(entry["category"], entry["hours"], entry["description"]) for entry in entries] == [
+        ("annual", 3, "Synthetic test leave")
+    ]

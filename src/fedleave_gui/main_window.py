@@ -49,6 +49,7 @@ from PySide6.QtWidgets import (
 
 from fedleave.config import get_default_data_dir
 from fedleave.exporting import export_file, render_print_job
+from fedleave.importing import MERGE_CONFLICT_CODES
 from fedleave.payperiods import calculate_pay_date
 from fedleave.project_info import OFFICIAL_PROJECT_URL
 from fedleave_month_report_graphic.report import BASE_WIDTH as MONTH_REPORT_WIDTH
@@ -658,7 +659,14 @@ MANUAL_YEAR_WARNING = (
 class StartYearDialog(QDialog):
     """Choose a creation mode and review a preview produced by the selected CLI."""
 
-    def __init__(self, parent: QWidget | None = None, backend: FedleaveBackend | None = None) -> None:
+    def __init__(
+        self,
+        parent: QWidget | None = None,
+        backend: FedleaveBackend | None = None,
+        *,
+        proposed_year: int | None = None,
+        predecessor: dict[str, Any] | None = None,
+    ) -> None:
         super().__init__(parent)
         self.backend = backend or getattr(parent, "backend", None)
         self.preview_payload: dict | None = None
@@ -666,6 +674,9 @@ class StartYearDialog(QDialog):
         self._closed = False
         self._executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="year-preview")
         self._pending = None
+        self.suggested_predecessor = (
+            predecessor["leave_year"] if predecessor and predecessor.get("carryover_eligible") else None
+        )
         self.setWindowTitle("Start New Leave Year")
         today = date.today()
         layout = QVBoxLayout(self)
@@ -677,8 +688,13 @@ class StartYearDialog(QDialog):
         self.previous.addItem("No Previous Leave Year", None)
         self.year = QSpinBox()
         self.year.setRange(1900, 9998)
-        self.year.setValue(today.year)
-        self.start = QLineEdit(f"{today.year}-01-01")
+        self.year.setValue(proposed_year or today.year)
+        self.year.setEnabled(proposed_year is None)
+        self.start = QLineEdit(
+            (date.fromisoformat(predecessor["end_date"]) + timedelta(days=1)).isoformat()
+            if predecessor
+            else f"{self.year.value()}-01-01"
+        )
         self.periods = QComboBox()
         self.periods.addItem("Derive from leave-year schedule", None)
         self.periods.addItem("26 pay periods (agency schedule)", 26)
@@ -745,7 +761,10 @@ class StartYearDialog(QDialog):
         ]
         for widget in self._manual_inputs:
             widget.valueChanged.connect(self._invalidate)
-        self._mode_changed()
+        if self.suggested_predecessor is not None:
+            self.mode.setCurrentIndex(1)
+        else:
+            self._mode_changed()
 
     def _hours(self, value: float = 0.0) -> QDoubleSpinBox:
         spinner = QDoubleSpinBox()
@@ -820,6 +839,10 @@ class StartYearDialog(QDialog):
                 )
                 if not eligible:
                     self.previous.model().item(self.previous.count() - 1).setEnabled(False)
+            if self.suggested_predecessor is not None:
+                index = self.previous.findData(self.suggested_predecessor)
+                if index > 0 and self.previous.model().item(index).isEnabled():
+                    self.previous.setCurrentIndex(index)
             self.preview_text.setPlainText("Select the previous year and request a preview.")
         else:
             self.preview_payload = payload
@@ -1340,6 +1363,21 @@ def _visible_categories(source: FedleaveBackend | dict[str, Any]) -> set[str]:
     return set(_leave_year_metadata(source)["visible_categories"])
 
 
+def _valid_year_ranges(metadata: dict[str, Any]) -> list[tuple[date, date, dict[str, Any]]]:
+    return [
+        (date.fromisoformat(row["start_date"]), date.fromisoformat(row["end_date"]), row)
+        for row in metadata["years"]
+        if row["valid"]
+    ]
+
+
+def _year_for_date(target: date, metadata: dict[str, Any]) -> int | None:
+    matches = [row["leave_year"] for start, end, row in _valid_year_ranges(metadata) if start <= target <= end]
+    if len(matches) > 1:
+        raise BackendError(f"More than one leave year contains {target.isoformat()}. Check the stored schedules.")
+    return next(iter(matches), None)
+
+
 class MainWindow(QMainWindow):
     """Coordinate the calendar UI, CLI backend, companions, and user settings.
 
@@ -1360,6 +1398,7 @@ class MainWindow(QMainWindow):
         self.month_json: dict[str, Any] | None = None
         self.use_or_lose_json: dict[str, Any] | None = None
         self.balance_snapshot: dict[str, Any] | None = None
+        self.display_ledger_year: int | None = None
         self.yearly_comparison_menu: Any | None = None
         self.leave_chart_actions: dict[str, QAction] = {}
         self.yearly_comparison_actions: dict[str, QAction] = {}
@@ -1372,7 +1411,7 @@ class MainWindow(QMainWindow):
     def start_initial_load(self) -> None:
         """Load an existing leave year or guide a first-time user through setup."""
         try:
-            years = _available_leave_years(self.backend)
+            metadata = self.backend.leave_years()
         except BackendMissingError:
             QMessageBox.critical(
                 self,
@@ -1382,25 +1421,19 @@ class MainWindow(QMainWindow):
             self.preferences()
             return
         except BackendError as exc:
+            if "RECOVERY_REQUIRED" in str(exc) and "import-data --recover" in str(exc):
+                self._offer_import_recovery()
+                return
             QMessageBox.warning(self, "Backend Error", str(exc))
             return
-        if years:
-            if self.year not in years:
-                self.year = max(years)
-            self.refresh()
-            return
-
-        if (
-            QMessageBox.question(
-                self,
-                "Create a Leave Year",
-                "No leave year is available. Would you like to create one now?",
-                QMessageBox.Yes | QMessageBox.No,
-                QMessageBox.Yes,
-            )
-            == QMessageBox.Yes
-        ):
-            self.new_leave_year()
+        if not self._ensure_leave_year(self.today, metadata):
+            earlier = [(end, row) for _, end, row in _valid_year_ranges(metadata) if end < self.today]
+            if earlier:
+                end, _ = max(earlier, key=lambda pair: pair[0])
+                self.year, self.month = end.year, end.month
+            elif not metadata["years"]:
+                return
+        self.refresh()
 
     def start_background_checks(self) -> None:
         """Start low-frequency network and expiration reminders after the window is shown."""
@@ -1599,33 +1632,39 @@ class MainWindow(QMainWindow):
             return
         self.balance_button.setText(f"Leave Balances as of {_balance_date_label(self.balance_as_of)}")
 
-    def _refresh_balance_snapshot(self) -> None:
-        if not self.month_json:
-            self.balance_snapshot = None
-            self._update_balance_button_text()
-            return
-
-        if self.balance_as_of == date.today():
-            snapshot = self.month_json.get("balance_as_of_today")
-            if isinstance(snapshot, dict):
-                self.balance_snapshot = snapshot
-                self._update_balance_button_text()
-                return
-
-        try:
-            self.balance_snapshot = self.backend.balance(self.year, as_of=self.balance_as_of.isoformat())
-        except BackendError:
-            snapshot = self.month_json.get("balance_as_of_today")
-            self.balance_snapshot = snapshot if isinstance(snapshot, dict) else None
+    def _refresh_balance_snapshot(self, metadata: dict[str, Any]) -> None:
+        self.balance_snapshot = None
         self._update_balance_button_text()
+        try:
+            year = _year_for_date(self.balance_as_of, metadata)
+            if year is not None:
+                snapshot = (self.month_json or {}).get("balance_as_of_today")
+                if (
+                    year == self.display_ledger_year
+                    and isinstance(snapshot, dict)
+                    and snapshot.get("as_of") == self.balance_as_of.isoformat()
+                ):
+                    self.balance_snapshot = snapshot
+                else:
+                    self.balance_snapshot = self.backend.balance(year, as_of=self.balance_as_of.isoformat())
+                if year != self.display_ledger_year:
+                    try:
+                        forecast = self.backend.use_or_lose(year)
+                    except BackendError:
+                        forecast = {}
+                    self.balance_snapshot = {**self.balance_snapshot, "balance_year_forecast": forecast}
+        except BackendError:
+            self.balance_snapshot = None
 
     def select_balance_date(self) -> None:
         dialog = SelectDateDialog("Leave Balances as Of", self)
         if dialog.exec() != QDialog.Accepted:
             return
-        self.balance_as_of = dialog.selected_date()
-        self._refresh_balance_snapshot()
-        self._render_balances()
+        selected = dialog.selected_date()
+        if self._ensure_leave_year(selected) is None:
+            return
+        self.balance_as_of = selected
+        self.refresh()
 
     def preferences(self) -> None:
         dialog = PreferencesDialog(self.settings, self)
@@ -1653,10 +1692,12 @@ class MainWindow(QMainWindow):
     def refresh(self) -> None:
         try:
             self.backend = self._backend()
-            self.month_json = self.backend.load_month(self.year, self.month)
-            self.use_or_lose_json = self.backend.use_or_lose(self.year)
-            self._refresh_balance_snapshot()
             metadata = self.backend.leave_years()
+            self.month_json, self.display_ledger_year = self._load_display_month(metadata)
+            self.use_or_lose_json = (
+                self.backend.use_or_lose(self.display_ledger_year) if self.display_ledger_year is not None else None
+            )
+            self._refresh_balance_snapshot(metadata)
             self._refresh_yearly_comparison_menu(metadata)
             self._refresh_chart_visibility(metadata)
         except BackendMissingError:
@@ -1671,6 +1712,52 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(self, "Backend Error", str(exc))
             return
         self.render_month()
+
+    def _load_display_month(self, metadata: dict[str, Any]) -> tuple[dict[str, Any], int | None]:
+        dates = list(calendar.Calendar(calendar.SUNDAY).itermonthdates(self.year, self.month))
+        active = sorted(
+            (start, end, row["leave_year"])
+            for start, end, row in _valid_year_ranges(metadata)
+            if start <= dates[-1] and end >= dates[0]
+        )
+        if not active:
+            return {
+                "year": self.year,
+                "month": self.month,
+                "days": [
+                    {
+                        "date": day.isoformat(),
+                        "in_display_month": day.month == self.month,
+                        "is_today": day == self.today,
+                        "entries": [],
+                    }
+                    for day in dates
+                ],
+                "pay_periods": [],
+            }, None
+
+        if any(end >= next_start for (_, end, _), (next_start, _, _) in zip(active, active[1:])):
+            raise BackendError("Overlapping leave years affect this month. Check the stored schedules.")
+        focus = (
+            self.today
+            if (self.year, self.month) == (self.today.year, self.today.month)
+            else date(self.year, self.month, 15)
+        )
+        primary = _year_for_date(focus, metadata) or active[-1][2]
+        payloads = {year: self.backend.load_month(year, self.month, calendar_year=self.year) for _, _, year in active}
+        result = payloads[primary]
+        if len(payloads) > 1:
+            days_by_year = {year: {row["date"]: row for row in view["days"]} for year, view in payloads.items()}
+            for cell in result["days"]:
+                day = date.fromisoformat(cell["date"])
+                owner = next((year for start, end, year in active if start <= day <= end), None)
+                if owner is not None and owner != primary:
+                    cell.update(days_by_year[owner][cell["date"]])
+            result["pay_periods"] = sorted(
+                [period for view in payloads.values() for period in view["pay_periods"]],
+                key=lambda period: period["start"],
+            )
+        return result, primary
 
     def render_month(self) -> None:
         if not self.month_json:
@@ -1755,11 +1842,11 @@ class MainWindow(QMainWindow):
         self.pay_period_layout.addStretch(1)
 
     def _render_balances(self) -> None:
-        snapshot = (
-            self.balance_snapshot or (self.month_json.get("balance_as_of_today") if self.month_json else {}) or {}
-        )
+        snapshot = self.balance_snapshot or {}
         warnings = snapshot.get("warnings", [])
         message = "; ".join(f"{row['code']}: {row.get('message', '')}" for row in warnings)
+        if not snapshot:
+            message = f"Balances unavailable for {_balance_date_label(self.balance_as_of)}."
         parental = snapshot.get("parental")
         if parental:
             fmla = parental["fmla"]
@@ -1779,13 +1866,12 @@ class MainWindow(QMainWindow):
         self.statusBar().showMessage(message)
         self.balance_button.setToolTip(message)
         balance = snapshot.get("balances") or {}
-        use_or_lose = (
-            (self.use_or_lose_json or {}).get("use_or_lose") if isinstance(self.use_or_lose_json, dict) else {}
-        )
+        forecast = snapshot.get("balance_year_forecast", self.use_or_lose_json) or {}
+        use_or_lose = forecast.get("use_or_lose")
         if not isinstance(use_or_lose, dict):
             use_or_lose = {}
-        if not use_or_lose:
-            use_or_lose = (self.month_json.get("projected_balance") or {}).get("use_or_lose") or {}
+        if not use_or_lose and "balance_year_forecast" not in snapshot:
+            use_or_lose = ((self.month_json or {}).get("projected_balance") or {}).get("use_or_lose") or {}
         self.balance_table.setRowCount(0)
         for category, value in sorted(balance.items()):
             if not _nonzero(value):
@@ -1806,6 +1892,9 @@ class MainWindow(QMainWindow):
             table.setItem(row, column, _table_item(value, alignment))
 
     def edit_day(self, day: dict[str, Any]) -> None:
+        selected = date.fromisoformat(str(day["date"]))
+        if self._ensure_leave_year(selected) is None:
+            return
         dialog = DayEditDialog(day, self)
         if dialog.exec() != QDialog.Accepted:
             return
@@ -1852,6 +1941,8 @@ class MainWindow(QMainWindow):
 
     def go_today(self) -> None:
         self.today = date.today()
+        if self._ensure_leave_year(self.today) is None:
+            return
         self.balance_as_of = self.today
         self.year = self.today.year
         self.month = self.today.month
@@ -1864,44 +1955,115 @@ class MainWindow(QMainWindow):
         self.year, self.month = dialog.selected_year_month()
         self.refresh()
 
-    def new_leave_year(self) -> None:
-        dialog = StartYearDialog(self, backend=self.backend)
-        if dialog.exec() != QDialog.Accepted:
-            return
-        manual = dialog.mode.currentData() == "manual"
-        confirmation = (
-            MANUAL_YEAR_WARNING + "\n\n"
-            if manual
-            else "Carry Over From Previous Leave Year using the reviewed CLI preview.\n\n"
-        )
-        confirmation += f"Create Leave Year {dialog.year.value()}?"
-        if QMessageBox.question(self, "Create Leave Year", confirmation) != QMessageBox.Yes:
-            return
+    def _ensure_leave_year(self, selected: date, metadata: dict[str, Any] | None = None) -> int | None:
+        """Resolve inclusive ledger dates, with confirmed setup for a current or future gap."""
         try:
-            options = dialog.creation_options()
-            if dialog.preview_payload:
-                options["expected_fingerprint"] = dialog.preview_payload["preview_fingerprint"]
+            metadata = self.backend.leave_years() if metadata is None else metadata
+            while (owner := _year_for_date(selected, metadata)) is None:
+                if selected < date.today():
+                    QMessageBox.warning(
+                        self, "Leave Year Unavailable", f"No leave year contains {selected.isoformat()}."
+                    )
+                    return None
+                earlier = [(end, row) for _, end, row in _valid_year_ranges(metadata) if end < selected]
+                predecessor = max(earlier, key=lambda pair: pair[0])[1] if earlier else None
+                proposed_year = predecessor["leave_year"] + 1 if predecessor else selected.year
+                if not 1900 <= proposed_year <= 9998 or any(
+                    row["leave_year"] == proposed_year for row in metadata["years"]
+                ):
+                    raise BackendError(
+                        f"No leave year contains {selected.isoformat()}, and the proposed leave year "
+                        f"{proposed_year} cannot be created. Check the existing files and schedules."
+                    )
+                if (
+                    QMessageBox.question(
+                        self,
+                        "Create a Leave Year",
+                        f"No leave year contains {selected.isoformat()}. Set up leave year {proposed_year}?",
+                        QMessageBox.Yes | QMessageBox.No,
+                        QMessageBox.Yes,
+                    )
+                    != QMessageBox.Yes
+                ):
+                    return None
+                if not self._create_leave_year(target=selected, proposed_year=proposed_year, predecessor=predecessor):
+                    return None
+                metadata = self.backend.leave_years()
+                if not any(row["leave_year"] == proposed_year and row["valid"] for row in metadata["years"]):
+                    raise BackendError(f"The new leave year {proposed_year} could not be verified.")
+            return owner
+        except (BackendError, ValueError) as exc:
+            QMessageBox.warning(self, "Leave Year Unavailable", str(exc))
+            return None
+
+    def _create_leave_year(
+        self,
+        *,
+        target: date | None = None,
+        proposed_year: int | None = None,
+        predecessor: dict[str, Any] | None = None,
+    ) -> dict[str, Any] | None:
+        dialog = StartYearDialog(self, backend=self.backend, proposed_year=proposed_year, predecessor=predecessor)
+        if dialog.exec() != QDialog.Accepted:
+            return None
+        manual = dialog.mode.currentData() == "manual"
+        options = dialog.creation_options()
+        preview = dialog.preview_payload
+        try:
+            if target is not None:
+                preview = preview or self.backend.preview_year(**options)
+                start = date.fromisoformat(preview["leave_year_start"])
+                end = date.fromisoformat(preview["leave_year_end"])
+                if start > target or (end < target and target.year <= options["year"]):
+                    raise BackendError(f"The proposed schedule does not reach {target.isoformat()}.")
+                if predecessor and start != date.fromisoformat(predecessor["end_date"]) + timedelta(days=1):
+                    raise BackendError("Start the new leave year the day after the preceding ledger ends.")
+                if any(
+                    start <= existing_end and existing_start <= end
+                    for existing_start, existing_end, _ in _valid_year_ranges(self.backend.leave_years())
+                ):
+                    raise BackendError("The proposed schedule overlaps an existing leave year.")
+            confirmation = (
+                MANUAL_YEAR_WARNING if manual else "Carry Over From Previous Leave Year using the reviewed CLI preview."
+            )
+            if preview:
+                confirmation += f"\n\n{preview['leave_year_start']} through {preview['leave_year_end']}."
+                options["expected_fingerprint"] = preview["preview_fingerprint"]
+            confirmation += f"\n\nCreate Leave Year {dialog.year.value()}?"
+            if QMessageBox.question(self, "Create Leave Year", confirmation) != QMessageBox.Yes:
+                return None
             if manual:
                 self.backend.init_year(**options)
             else:
-                if not dialog.preview_payload:
+                if not preview:
                     raise BackendError("Preview the selected predecessor before creating the year.")
                 self.backend.create_carryover_year(**options)
-        except BackendError as exc:
+        except (BackendError, KeyError, ValueError) as exc:
             QMessageBox.warning(self, "Create Failed", str(exc))
+            return None
+        return options
+
+    def new_leave_year(self) -> None:
+        options = self._create_leave_year()
+        if options is None:
             return
+        start = (
+            date.fromisoformat(options["leave_year_start"])
+            if "leave_year_start" in options
+            else date(options["year"], 1, 1)
+        )
         self.balance_as_of = date.today()
-        self.year = dialog.year.value()
-        self.month = 1
+        self.year, self.month = start.year, start.month
         self.refresh()
 
     def reconcile_carryover(self) -> None:
-        dialog = CarryoverReconciliationDialog(self.backend, self.year, self)
+        year = self.display_ledger_year or self.year
+        dialog = CarryoverReconciliationDialog(self.backend, year, self)
         if dialog.exec() != QDialog.Accepted or not dialog.preview_payload:
             return
         try:
             self.backend.reconcile_carryover(
-                self.year, preview=False, expected_fingerprint=dialog.preview_payload["preview_fingerprint"]
+                year, preview=False, expected_fingerprint=dialog.preview_payload["preview_fingerprint"]
             )
         except BackendError as exc:
             QMessageBox.warning(self, "Reconciliation Failed", str(exc))
@@ -1937,8 +2099,7 @@ class MainWindow(QMainWindow):
         prompt.setIcon(QMessageBox.Question)
         prompt.setText("How should the selected backup be imported?")
         prompt.setInformativeText(
-            "Merge adds transactions that are missing from the current data and keeps current "
-            "transactions when IDs match.\n\n"
+            "Merge adds missing transactions to compatible leave years and stops for accounting conflicts.\n\n"
             "Replace restores the selected backup over matching files. Current files are backed "
             "up first."
         )
@@ -1953,6 +2114,71 @@ class MainWindow(QMainWindow):
             return "--overwrite"
         return None
 
+    def _offer_import_recovery(self) -> None:
+        result = QMessageBox.question(
+            self,
+            "Recover Interrupted Import",
+            "A backup import was interrupted. Restore the complete datastore from before the import?",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No,
+        )
+        if result == QMessageBox.Yes:
+            try:
+                self.backend.recover_import()
+            except BackendError as exc:
+                QMessageBox.warning(self, "Recovery Failed", str(exc))
+                return
+            self.start_initial_load()
+
+    def _review_import(self, preview: dict[str, Any], mode: str) -> str | None:
+        dialog = QMessageBox(self)
+        dialog.setWindowTitle("Review Backup Import")
+        dialog.setTextFormat(Qt.PlainText)
+        if preview["status"] == "blocked":
+            conflicts = preview["conflicts"]
+            details = []
+            for conflict in conflicts:
+                current = conflict.get("current", {}).get("balance")
+                incoming = conflict.get("incoming", {}).get("balance")
+                if current is not None and incoming is not None:
+                    category = _category_display_text(conflict["category"])
+                    details.append(
+                        f"{category} on {conflict['date']} is {current:g} h in your current data "
+                        f"and {incoming:g} h in the backup."
+                    )
+                else:
+                    details.append(conflict["message"])
+            dialog.setIcon(QMessageBox.Warning)
+            dialog.setText("The import was blocked. Your data was not changed.\n\n" + "\n".join(details[:8]))
+            keep = dialog.addButton("Keep current data", QMessageBox.RejectRole)
+            dialog.setDefaultButton(keep)
+            replace = (
+                dialog.addButton("Review Replace", QMessageBox.ActionRole)
+                if mode == "--merge" and all(row["code"] in MERGE_CONFLICT_CODES for row in conflicts)
+                else None
+            )
+            dialog.exec()
+            return "--overwrite" if replace is not None and dialog.clickedButton() is replace else None
+
+        actions = {"add": "Add", "replace": "Replace", "merge": "Merge", "keep": "Keep", "unchanged": "Already current"}
+        lines = []
+        for change in preview["changes"]:
+            line = f"{actions[change['action']]} {change['file']}"
+            if "added_records" in change:
+                line += f" (+{change['added_records']} / −{change['removed_records']} records)"
+            lines.append(line)
+        lines.extend(f"Keep current transaction {row['leave_year']}:{row['id']}" for row in preview["warnings"])
+        dialog.setText("Replace included files?" if mode == "--overwrite" else "Merge the reviewed changes?")
+        if mode == "--overwrite":
+            dialog.setInformativeText("Matching current files will be backed up first. Other files are kept.")
+        dialog.setDetailedText("\n".join(lines))
+        if lines:
+            details = "\n".join(lines[:8]) + ("\nOpen Details for the complete list." if len(lines) > 8 else "")
+            dialog.setInformativeText((dialog.informativeText() + "\n\n" + details).strip())
+        dialog.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+        dialog.setDefaultButton(QMessageBox.Cancel)
+        return mode if dialog.exec() == QMessageBox.Ok else None
+
     def import_data(self) -> None:
         path, _ = QFileDialog.getOpenFileName(self, "Import FedLeave Data", "", "JSON files (*.json)")
         if not path:
@@ -1962,11 +2188,23 @@ class MainWindow(QMainWindow):
             return
 
         try:
-            self.backend.run_text(["import-data", "--input", path, import_option])
-        except BackendError as exc:
+            while import_option:
+                preview = self.backend.preview_import(path, import_option)
+                if any(
+                    row["code"] == "RECOVERY_REQUIRED" and "import-data --recover" in row["message"]
+                    for row in preview["conflicts"]
+                ):
+                    self._offer_import_recovery()
+                    return
+                confirmed = self._review_import(preview, import_option)
+                if confirmed and confirmed == import_option and preview["status"] == "ready":
+                    self.backend.apply_import(path, import_option, preview["preview_fingerprint"])
+                    self.refresh()
+                    return
+                import_option = confirmed
+        except (BackendError, KeyError, TypeError) as exc:
             QMessageBox.warning(self, "Import Failed", str(exc))
             return
-        self.refresh()
 
     def import_wms_http_leave_report(self) -> None:
         if (
@@ -2010,9 +2248,12 @@ class MainWindow(QMainWindow):
         dialog = ChangeAccrualDialog(self)
         if dialog.exec() != QDialog.Accepted:
             return
+        effective_date = dialog.selected_effective_date()
+        if self._ensure_leave_year(date.fromisoformat(effective_date)) is None:
+            return
         try:
             self.backend.accrual_change(
-                as_of=dialog.selected_effective_date(),
+                as_of=effective_date,
                 hours=dialog.selected_hours(),
                 category="annual",
             )
@@ -2025,8 +2266,11 @@ class MainWindow(QMainWindow):
         dialog = ForceBalanceDialog(self)
         if dialog.exec() != QDialog.Accepted:
             return
+        values = dialog.values()
+        if self._ensure_leave_year(date.fromisoformat(values["date"])) is None:
+            return
         try:
-            result = self.backend.force_balance(**dialog.values())
+            result = self.backend.force_balance(**values)
         except BackendError as exc:
             QMessageBox.warning(self, "Force Leave Balance", str(exc))
             return

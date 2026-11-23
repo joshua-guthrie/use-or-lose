@@ -516,6 +516,15 @@ fedleave export-data --output fedleave_backup.json
 fedleave import-data --input fedleave_backup.json --data-dir /path/to/new_data
 ```
 
+For an existing datastore, preview **Merge** before applying:
+
+```bash
+fedleave import-data --input fedleave_backup.json --merge --dry-run --json
+fedleave import-data --input fedleave_backup.json --merge --expected-fingerprint REVIEWED_HASH
+```
+
+The preview does no writes. Its JSON includes `status`, `preview_fingerprint`, `changes`, `affected_years`, `warnings` and `conflicts`. A ready preview exits zero. A conflict exits 2, identifies the affected year and date where applicable, and preserves both copies. A missing backup exits 1 and an unreadable JSON file exits 3. Use `--overwrite` in place of `--merge` to review and explicitly replace only the files included in the backup. FedLeave keeps pre-replacement copies in the datastore's backups directory. If an import is interrupted and FedLeave reports `RECOVERY_REQUIRED`, run `fedleave import-data --recover` using the same data directory to restore the prior complete store.
+
 Validate and normalize stored JSON data:
 
 ```bash
@@ -529,6 +538,9 @@ Older leave-year files are migrated automatically. Voided transactions and store
 FedLeave Calendar is a cross-platform PySide6 desktop GUI for the `fedleave` backend. It displays the current month, calendar day values, pay days, pay-period endings, pay-period summaries, and as-of-today balances using `fedleave month --json`.
 
 The GUI does not read or edit leave JSON files directly. Reads and writes go through the selected `fedleave` executable. Day edits call `fedleave set-day --authoritative --json`, then the month is reloaded from the backend.
+
+Calendar uses the stored start and end dates to find the ledger for a day. When Today or a selected future action needs a missing ledger, Calendar offers setup and resumes the original action after confirmed creation. The setup suggests the adjacent predecessor when carryover is available. Browsing a month performs a read. CLI callers create years explicitly with `fedleave init` or `fedleave rollover`. The desktop **Import FedLeave Data** dialog previews Merge or Replace and explains blocking conflicts before offering a separate Replace review.
+
 In packaged builds, the GUI looks for `fedleave` in the sibling `fedleave` application directory inside the same platform tree, or in any explicit backend path you configure.
 On Windows, select the installed `fedleave.exe` as a custom backend. Batch (`.bat`/`.cmd`) backends are rejected because Windows can interpret their arguments through a shell. Linux executable scripts remain supported.
 

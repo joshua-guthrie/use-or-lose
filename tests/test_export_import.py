@@ -70,6 +70,10 @@ def test_import_merge_adds_missing_transactions_and_keeps_current_conflicts(tmp_
         {
             "id": "20260701-001",
             "date": "2026-07-01",
+            "category": "annual",
+            "direction": "used",
+            "hours": 1,
+            "status": "approved",
             "description": "Current version",
         }
     ]
@@ -78,11 +82,11 @@ def test_import_merge_adds_missing_transactions_and_keeps_current_conflicts(tmp_
     imported = dict(current)
     imported["transactions"] = [
         {
-            "id": "20260701-001",
-            "date": "2026-07-01",
+            **current["transactions"][0],
             "description": "Imported version",
         },
         {
+            **current["transactions"][0],
             "id": "20260702-001",
             "date": "2026-07-02",
             "description": "Imported missing transaction",
@@ -93,18 +97,7 @@ def test_import_merge_adds_missing_transactions_and_keeps_current_conflicts(tmp_
     import_data(input=archive, merge=True, data_dir=target)
 
     merged = json.loads(year_path.read_text(encoding="utf-8"))
-    assert merged["transactions"] == [
-        {
-            "id": "20260701-001",
-            "date": "2026-07-01",
-            "description": "Current version",
-        },
-        {
-            "id": "20260702-001",
-            "date": "2026-07-02",
-            "description": "Imported missing transaction",
-        },
-    ]
+    assert merged["transactions"] == [current["transactions"][0], imported["transactions"][1]]
     backups = list((target / "backups").glob("2026.json.*.bak"))
     assert len(backups) == 1
 
@@ -131,11 +124,6 @@ def _snapshot_files(store: Path) -> dict[Path, bytes]:
     return {path.relative_to(store): path.read_bytes() for path in store.rglob("*") if path.is_file()}
 
 
-class _KnownForcedBalanceMergeBug(AssertionError):
-    """The importer reported success for a competing Force Balance record."""
-
-
-@pytest.mark.xfail(strict=True, raises=_KnownForcedBalanceMergeBug, reason="GH-152: Merge must block before writes")
 @pytest.mark.parametrize("distinct_ids", [True, False], ids=["different-ids", "same-id"])
 @pytest.mark.parametrize("legacy", [False, True], ids=["archive", "legacy-year"])
 def test_import_merge_blocks_competing_forced_balances(tmp_path: Path, distinct_ids: bool, legacy: bool):
@@ -179,11 +167,27 @@ def test_import_merge_blocks_competing_forced_balances(tmp_path: Path, distinct_
     original_archive = archive.read_bytes()
     original_store = _snapshot_files(current)
 
-    result = runner.invoke(app, ["import-data", "--merge", "--input", str(archive), "--data-dir", str(current)])
+    args = ["import-data", "--merge", "--input", str(archive), "--data-dir", str(current)]
+    preview = runner.invoke(app, [*args, "--dry-run", "--json"])
+    assert preview.exit_code == 2, preview.output
+    report = json.loads(preview.output)
+    assert report["status"] == "blocked"
+    conflict = report["conflicts"][0]
+    assert (conflict["code"], conflict["date"], conflict["category"]) == (
+        "FORCED_BALANCE_CONFLICT",
+        "2026-02-01",
+        "annual",
+    )
+    assert conflict["current"] == {"balance": 5.0, "adjustments": [-15.0], "ids": ["20260201-001"]}
+    assert conflict["incoming"] == {
+        "balance": 8.0,
+        "adjustments": [-12.0],
+        "ids": ["20260201-002" if distinct_ids else "20260201-001"],
+    }
+    assert _snapshot_files(current) == original_store
+    result = runner.invoke(app, args)
     assert archive.read_bytes() == original_archive
     annual = _balances_on_february_first(runner, current)["annual"]
-    if result.exit_code == 0 and annual == (-7 if distinct_ids else 5) and "Imported " in result.output:
-        raise _KnownForcedBalanceMergeBug(f"Merge reported success with an annual balance of {annual} h")
 
     assert result.exit_code != 0, result.output
     assert "Imported " not in result.output
@@ -275,56 +279,37 @@ def test_import_accepts_single_leave_year_backup(tmp_path: Path):
 def test_import_removes_legacy_transaction_history(tmp_path: Path):
     target = tmp_path / "target"
     archive = tmp_path / "legacy.json"
+    active = {
+        "id": "active",
+        "date": "2026-01-12",
+        "category": "annual",
+        "direction": "used",
+        "hours": 1.0,
+        "status": "approved",
+    }
+    ledger = manual_ledger(2026, "2026-01-11", 0, {"annual": 20}, pay_periods=26)
     legacy = {
-        "schema_version": 1,
-        "leave_year": 2026,
+        **ledger,
         "transactions": [
-            {"id": "active", "void": False, "void_reason": None, "reconcile_history": []},
+            {**active, "void": False, "void_reason": None, "reconcile_history": []},
             {"id": "obsolete", "void": True, "void_reason": "replaced"},
         ],
         "starting_balance_history": [{"old_hours": 100.0, "new_hours": 120.0}],
-        "pay_periods": [],
     }
     archive.write_text(json.dumps(legacy), encoding="utf-8")
 
     import_data(input=archive, data_dir=target)
 
     imported = json.loads((target / "leave_years" / "2026.json").read_text(encoding="utf-8"))
-    assert imported["transactions"] == [{"id": "active"}]
+    assert imported["transactions"] == [active]
     assert "starting_balance_history" not in imported
 
 
 def test_import_preserves_existing_current_year_file(tmp_path: Path):
     target = tmp_path / "target"
     archive = tmp_path / "previous-year.json"
-    current_year = {
-        "schema_version": 1,
-        "leave_year": 2026,
-        "leave_year_start": "2026-01-11",
-        "leave_year_end": "2027-01-09",
-        "pay_period_count": 1,
-        "annual_leave_accrual_hours": 6.0,
-        "sick_leave_accrual_hours": 4.0,
-        "starting_balances": {"annual": 120.0, "sick": 180.0},
-        "carryover_from_previous_year": {"annual": 120.0, "sick": 180.0},
-        "transactions": [],
-        "pay_periods": [],
-        "holidays": [],
-    }
-    previous_year = {
-        "schema_version": 1,
-        "leave_year": 2025,
-        "leave_year_start": "2025-01-12",
-        "leave_year_end": "2026-01-10",
-        "pay_period_count": 1,
-        "annual_leave_accrual_hours": 6.0,
-        "sick_leave_accrual_hours": 4.0,
-        "starting_balances": {"annual": 100.0, "sick": 160.0},
-        "carryover_from_previous_year": {"annual": 100.0, "sick": 160.0},
-        "transactions": [],
-        "pay_periods": [],
-        "holidays": [],
-    }
+    current_year = manual_ledger(2026, "2026-01-11", 6, {"annual": 120.0, "sick": 180.0}, pay_periods=26)
+    previous_year = manual_ledger(2025, "2025-01-12", 6, {"annual": 100.0, "sick": 160.0}, pay_periods=26)
     target_years = target / "leave_years"
     target_years.mkdir(parents=True)
     (target_years / "2026.json").write_text(json.dumps(current_year), encoding="utf-8")

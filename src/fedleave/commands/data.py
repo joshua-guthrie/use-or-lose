@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import sys
 from datetime import datetime as _datetime
@@ -13,8 +14,12 @@ from typer.models import OptionInfo
 from ..cli_app import _print_json, app, console
 from ..cli_helpers import load_leave_year, parse_iso_date
 from ..config import get_default_data_dir, load_config
+from ..cross_year import AccountingError
+from ..import_storage import JOURNAL, import_path, publish_import, read_store, recover_import
+from ..importing import ImportPlan, plan_import
 from ..ledger import apply_fixes_to_leave_year, validate_leave_year
-from ..storage import atomic_write_json, ensure_data_dir, load_json, remove_legacy_transaction_history, write_json
+from ..locking import datastore_lock, datastore_read_lock
+from ..storage import atomic_write_json, ensure_data_dir, load_json, write_json
 from ..transaction_effects import transaction_is_effective
 from ..wms_import import (
     WmsImportError,
@@ -311,179 +316,125 @@ def export_data(
     console.print(f"Exported fedleave data to {output}")
 
 
-def _write_import_file(path: Path, data: dict, *, overwrite: bool) -> None:
-    if path.exists() and not overwrite:
-        raise FileExistsError(f"Refusing to overwrite existing file: {path}")
-    if path.exists():
-        write_json(path, data, backup=True)
-    else:
-        atomic_write_json(path, data)
-
-
-def _is_single_leave_year_backup(data: dict) -> bool:
-    return (
-        isinstance(data.get("leave_year"), int)
-        and isinstance(data.get("transactions"), list)
-        and isinstance(data.get("pay_periods"), list)
+def _build_import_plan(base: Path, source: Path, mode: str) -> ImportPlan:
+    raw = source.read_bytes()
+    archive = json.loads(raw.decode("utf-8"))
+    current, identity = read_store(base)
+    plan = plan_import(
+        current, archive, mode, current_identity=identity, archive_identity=hashlib.sha256(raw).hexdigest()
     )
+    for key in plan.writes:
+        if import_path(base, key).resolve() == source.resolve():
+            raise AccountingError("INVALID_PATH", "Import would replace its source backup")
+    return plan
 
 
-def _normalize_import_archive(data: dict) -> tuple[dict, str]:
-    if isinstance(data.get("leave_years"), dict):
-        if data.get("schema_version") != 1:
-            raise ValueError("Unsupported import archive schema_version")
-        return data, "archive"
+def _report_import(plan: ImportPlan, json_output: bool, *, preview: bool) -> None:
+    if json_output:
+        _print_json(
+            {**plan.summary(), "action": "preview" if preview else "applied" if not plan.conflicts else "blocked"}
+        )
+    else:
+        for finding in plan.conflicts:
+            details = []
+            for origin in ("current", "incoming"):
+                if side := finding.get(origin):
+                    amounts = ", ".join(f"{amount:+g} h" for amount in side["adjustments"])
+                    balance = f"{side['balance']:g} h" if "balance" in side else "balance unavailable"
+                    details.append(f"{origin} {balance}, adjustments {amounts or 'none'}, IDs {', '.join(side['ids'])}")
+            suffix = (" " + "; ".join(details)) if details else ""
+            console.print(f"{finding['code']}: {finding['message']}{suffix}", markup=False, soft_wrap=True)
+        for warning in plan.warnings:
+            console.print(
+                f"KEPT_CURRENT_TRANSACTION: kept {warning['leave_year']}:{warning['id']}",
+                markup=False,
+                soft_wrap=True,
+            )
+        if not plan.conflicts and preview:
+            for change in plan.changes:
+                console.print(f"{change['action']}: {change['file']}", markup=False)
+            console.print(f"Preview fingerprint: {plan.preview_fingerprint}")
+        elif not plan.conflicts:
+            console.print("Imported FedLeave data." if plan.writes else "FedLeave data is already up to date.")
 
-    if _is_single_leave_year_backup(data):
-        year = str(data["leave_year"])
-        return {
-            "schema_version": 1,
-            "config": None,
-            "leave_years": {year: data},
-            "holiday_cache": {},
-        }, "single leave-year backup"
-
-    if data.get("schema_version") != 1:
-        raise ValueError("Unsupported import archive schema_version")
-    raise ValueError("Import archive missing leave_years mapping")
-
-
-def _merge_leave_year(existing: dict, imported: dict) -> dict:
-    """Add imported transactions that are not already in an existing leave year."""
-    existing_transactions = existing.get("transactions")
-    imported_transactions = imported.get("transactions")
-    if not isinstance(existing_transactions, list):
-        raise ValueError("Existing leave year transactions must be a list")
-    if not isinstance(imported_transactions, list):
-        raise ValueError("Imported leave year transactions must be a list")
-
-    merged = dict(existing)
-    merged_transactions = list(existing_transactions)
-    existing_ids = {
-        str(transaction.get("id"))
-        for transaction in existing_transactions
-        if isinstance(transaction, dict) and transaction.get("id") is not None
-    }
-    for transaction in imported_transactions:
-        if not isinstance(transaction, dict):
-            raise ValueError("Imported leave year transactions must contain objects")
-        transaction_id = transaction.get("id")
-        if transaction_id is None:
-            raise ValueError("Imported leave year transaction is missing an id")
-        if str(transaction_id) in existing_ids:
-            continue
-        merged_transactions.append(transaction)
-        existing_ids.add(str(transaction_id))
-
-    merged["transactions"] = merged_transactions
-    for key, value in imported.items():
-        if key not in merged:
-            merged[key] = value
-    return merged
+    if plan.conflicts:
+        raise typer.Exit(2)
 
 
 @app.command("import-data")
 def import_data(
-    input: Path = typer.Option(..., help="Input JSON archive path."),
-    overwrite: bool = typer.Option(False, help="Overwrite existing files, creating backups first."),
-    merge: bool = typer.Option(
-        False,
-        help="Merge missing transactions into existing leave years; keep current data on conflicts.",
-    ),
+    input: Path | None = typer.Option(None, help="Input JSON archive path (required unless recovering)."),
+    overwrite: bool = typer.Option(False, help="Replace included files, creating backups first."),
+    merge: bool = typer.Option(False, help="Merge compatible leave years; stop on accounting conflicts."),
     data_dir: Path | None = typer.Option(None, help="Data directory override."),
+    dry_run: bool = typer.Option(False, help="Review a complete candidate without writing files."),
+    json_output: bool = typer.Option(False, "--json", help="Emit a machine-readable preview or result."),
+    expected_fingerprint: str | None = typer.Option(None, help="Reject apply if the reviewed inputs changed."),
+    recover: bool = typer.Option(False, help="Restore the files from an interrupted import."),
 ) -> None:
-    """Import a JSON archive created by export-data or a single leave-year backup."""
-    if not isinstance(overwrite, bool):
-        overwrite = False
-    if not isinstance(merge, bool):
-        merge = False
-    if isinstance(data_dir, OptionInfo):
-        data_dir = None
-
-    if overwrite and merge:
-        console.print("[red]ERROR:[/red] Choose either --merge or --overwrite, not both")
-        raise typer.Exit(code=2)
-
-    if not input.exists():
-        console.print(f"[red]ERROR:[/red] Import archive not found: {input}")
-        raise typer.Exit(code=1)
-
+    """Import a schema-v1 JSON archive or a single leave-year backup."""
+    overwrite, merge, dry_run, json_output, recover = (
+        value is True for value in (overwrite, merge, dry_run, json_output, recover)
+    )
+    input = input if isinstance(input, Path) else None
+    expected_fingerprint = expected_fingerprint if isinstance(expected_fingerprint, str) else None
+    base = get_default_data_dir(None if isinstance(data_dir, OptionInfo) else data_dir)
+    mode = "replace" if overwrite else "merge" if merge else "create"
+    plan = ImportPlan(mode, "")
     try:
-        archive = load_json(input)
-    except json.JSONDecodeError as exc:
-        console.print(f"[red]ERROR:[/red] Invalid JSON archive: {exc}")
-        raise typer.Exit(code=3)
-
-    try:
-        archive, import_kind = _normalize_import_archive(archive)
-    except ValueError as exc:
-        console.print(f"[red]ERROR:[/red] {exc}")
-        raise typer.Exit(code=2)
-
-    base = get_default_data_dir(data_dir)
-    try:
-        write_items: list[tuple[Path, dict]] = []
-
-        config = archive.get("config")
-        if config is not None:
-            if not isinstance(config, dict):
-                raise ValueError("config must be an object")
-            write_items.append((base / "config.json", config))
-
-        for year, leave_year in archive.get("leave_years", {}).items():
-            if not str(year).isdigit() or not isinstance(leave_year, dict):
-                raise ValueError(f"Invalid leave year entry: {year}")
-            remove_legacy_transaction_history(leave_year)
-            write_items.append((base / "leave_years" / f"{year}.json", leave_year))
-
-        holiday_cache = archive.get("holiday_cache", {})
-        if not isinstance(holiday_cache, dict):
-            raise ValueError("holiday_cache must be an object")
-        for name, cache in holiday_cache.items():
-            # A Windows drive-relative name or ADS must never replace this root.
-            if any(character in str(name) for character in ("/", "\\", ":")) or not isinstance(cache, dict):
-                raise ValueError(f"Invalid holiday cache entry: {name}")
-            write_items.append((base / "holiday_cache" / f"{name}.json", cache))
-
-        if any(not path.resolve().is_relative_to(base.resolve()) for path, _ in write_items):
-            raise ValueError("Import target escapes the selected datastore")
-
-        if merge:
-            merged_items: list[tuple[Path, dict]] = []
-            for path, payload in write_items:
-                if not path.exists():
-                    merged_items.append((path, payload))
-                elif path.parent.name == "leave_years":
-                    existing = load_json(path)
-                    merged_items.append((path, _merge_leave_year(existing, payload)))
-                # Existing config and holiday-cache files remain authoritative
-                # during a merge.
-            write_items = merged_items
-        elif not overwrite:
-            for path, _ in write_items:
-                if path.exists():
-                    console.print(f"[red]ERROR:[/red] Refusing to overwrite existing file: {path}")
-                    raise typer.Exit(code=2)
-    except ValueError as exc:
-        console.print(f"[red]ERROR:[/red] {exc}")
-        raise typer.Exit(code=2)
-
-    from ..parental import validate_imports
-
-    validate_imports(base, write_items)
-    ensure_data_dir(base)
-
-    try:
-        for path, payload in write_items:
-            _write_import_file(path, payload, overwrite=overwrite or merge)
-    except FileExistsError as exc:
-        console.print(f"[red]ERROR:[/red] {exc}")
-        raise typer.Exit(code=2)
-    except ValueError as exc:
-        console.print(f"[red]ERROR:[/red] {exc}")
-        raise typer.Exit(code=2)
-
-    console.print(f"Imported fedleave {import_kind} into {base}")
+        if overwrite and merge:
+            raise AccountingError("INVALID_OPTIONS", "Choose either --merge or --overwrite")
+        if recover:
+            if input is not None or merge or overwrite or dry_run or expected_fingerprint:
+                raise AccountingError("INVALID_OPTIONS", "--recover is a separate action")
+            journal = base / JOURNAL
+            if journal.exists() or journal.is_symlink():
+                with datastore_lock(base):
+                    result = recover_import(base)
+            else:
+                result = {"status": "unchanged", "restored_files": []}
+            if json_output:
+                _print_json(result)
+            else:
+                console.print(
+                    "Previous datastore restored." if result["status"] == "recovered" else "No import to recover."
+                )
+            return
+        if input is None:
+            raise AccountingError("INVALID_OPTIONS", "--input is required")
+        if not input.is_file():
+            plan.block("ARCHIVE_NOT_FOUND", "The selected backup could not be opened.")
+            if json_output:
+                _print_json(plan.summary())
+            else:
+                console.print(plan.conflicts[0]["message"])
+            raise typer.Exit(1)
+        with datastore_read_lock(base):
+            plan = _build_import_plan(base, input, mode)
+        if expected_fingerprint is not None and expected_fingerprint != plan.preview_fingerprint:
+            raise AccountingError("STALE_IMPORT_PREVIEW", "The backup or current datastore changed. Review again.")
+        if dry_run or plan.conflicts or not plan.writes:
+            _report_import(plan, json_output, preview=dry_run)
+            return
+        with datastore_lock(base):
+            plan = _build_import_plan(base, input, mode)
+            if expected_fingerprint is not None and expected_fingerprint != plan.preview_fingerprint:
+                raise AccountingError("STALE_IMPORT_PREVIEW", "The backup or current datastore changed. Review again.")
+            if not plan.conflicts:
+                publish_import(base, plan)
+    except (json.JSONDecodeError, UnicodeError):
+        plan.block("INVALID_JSON", "A backup or datastore file is not readable UTF-8 JSON.")
+        if json_output:
+            _print_json(plan.summary())
+        else:
+            console.print(plan.conflicts[-1]["message"])
+        raise typer.Exit(3) from None
+    except (AccountingError, OSError, ValueError) as exc:
+        if isinstance(exc, AccountingError):
+            plan.block(exc.code, str(exc).removeprefix(f"{exc.code}: "))
+        else:
+            plan.block("IMPORT_FAILED", "Could not read or write the backup or datastore.")
+    _report_import(plan, json_output, preview=dry_run)
 
 
 @app.command("import-wms-http")

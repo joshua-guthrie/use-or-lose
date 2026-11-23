@@ -112,14 +112,16 @@ class FedleaveBackend:
         except subprocess.TimeoutExpired as exc:
             raise BackendError(f"fedleave backend did not respond within {timeout:g} seconds.") from exc
 
-    def run_json(self, args: list[str], *, include_data_dir: bool = True) -> dict[str, Any]:
+    def run_json(
+        self, args: list[str], *, include_data_dir: bool = True, accepted_exit_codes: tuple[int, ...] = (0,)
+    ) -> dict[str, Any]:
         """Run a CLI command and require a successful JSON object response."""
         fedleave = find_fedleave(self.options.fedleave_path)
         command = [str(fedleave), *args]
         if include_data_dir and self.options.data_dir:
             command.extend(["--data-dir", self.options.data_dir])
         result = self._run_command(command)
-        if result.returncode != 0:
+        if result.returncode not in accepted_exit_codes:
             message = (result.stderr or result.stdout or "fedleave command failed").strip()
             raise BackendError(message)
         try:
@@ -129,6 +131,17 @@ class FedleaveBackend:
         if not isinstance(payload, dict):
             raise BackendError("fedleave returned an unexpected JSON payload.")
         return payload
+
+    def preview_import(self, path: str, mode: str) -> dict[str, Any]:
+        return self.run_json(
+            ["import-data", "--input", path, mode, "--dry-run", "--json"], accepted_exit_codes=(0, 1, 2, 3)
+        )
+
+    def apply_import(self, path: str, mode: str, fingerprint: str) -> dict[str, Any]:
+        return self.run_json(["import-data", "--input", path, mode, "--expected-fingerprint", fingerprint, "--json"])
+
+    def recover_import(self) -> dict[str, Any]:
+        return self.run_json(["import-data", "--recover", "--json"])
 
     def run_text(self, args: list[str], *, include_data_dir: bool = True) -> str:
         """Run a CLI command and return its successful standard output."""
@@ -208,8 +221,11 @@ class FedleaveBackend:
     def expirations(self, year: int) -> dict[str, Any]:
         return self.run_json(["expirations", "--year", str(year), "--json"])
 
-    def load_month(self, year: int, month: int) -> dict[str, Any]:
-        return self.run_json(["month", "--year", str(year), "--month", str(month), "--json"])
+    def load_month(self, year: int, month: int, *, calendar_year: int | None = None) -> dict[str, Any]:
+        args = ["month", "--year", str(year), "--month", str(month), "--json"]
+        if calendar_year is not None and calendar_year != year:
+            args.extend(["--calendar-year", str(calendar_year)])
+        return self.run_json(args)
 
     def leave_years(self) -> dict[str, Any]:
         payload = self.run_json(["years", "--json"])

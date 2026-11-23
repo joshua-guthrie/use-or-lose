@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import os
 import shutil
+from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
 from tempfile import NamedTemporaryFile
@@ -36,6 +37,19 @@ def atomic_write_json(path: Path, data: dict, overwrite: bool = True) -> None:
     one filesystem. A failed serialization or replacement removes its temporary
     file and leaves the previous destination intact.
     """
+    with _atomic_file(path, overwrite=overwrite, binary=False) as handle:
+        json.dump(data, handle, indent=2, sort_keys=False, allow_nan=False)
+        handle.write("\n")
+
+
+def atomic_write_bytes(path: Path, data: bytes, overwrite: bool = True) -> None:
+    """Write or restore exact bytes through a temporary file on the same filesystem."""
+    with _atomic_file(path, overwrite=overwrite, binary=True) as handle:
+        handle.write(data)
+
+
+@contextmanager
+def _atomic_file(path: Path, *, overwrite: bool, binary: bool):
     check_write(path)
     if path.is_symlink() or path.parent.is_symlink():
         raise ValueError(f"INVALID_PATH: refusing symbolic-link JSON destination: {path}")
@@ -45,16 +59,15 @@ def atomic_write_json(path: Path, data: dict, overwrite: bool = True) -> None:
     temp_path: Path | None = None
     try:
         with NamedTemporaryFile(
-            "w",
-            encoding="utf-8",
+            "wb" if binary else "w",
+            encoding=None if binary else "utf-8",
             dir=path.parent,
             prefix=f"{path.name}.",
             suffix=".tmp",
             delete=False,
         ) as f:
             temp_path = Path(f.name)
-            json.dump(data, f, indent=2, sort_keys=False, allow_nan=False)
-            f.write("\n")
+            yield f
             f.flush()
             os.fsync(f.fileno())
         if overwrite:

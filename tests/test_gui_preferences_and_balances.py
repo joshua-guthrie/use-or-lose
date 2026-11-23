@@ -111,10 +111,17 @@ def test_balance_button_updates_to_selected_as_of_date(monkeypatch):
             self.calls.append((year, as_of))
             return {"year": year, "as_of": as_of, "balances": {"annual": 48.0, "sick": 12.0}}
 
+        def leave_years(self):
+            return {
+                "years": [{"leave_year": 2026, "valid": True, "start_date": "2026-01-11", "end_date": "2027-01-09"}]
+            }
+
     fake_backend = FakeBackend()
     monkeypatch.setattr(MainWindow, "refresh", lambda self: None)
     monkeypatch.setattr(MainWindow, "_backend", lambda self: fake_backend)
     window = MainWindow()
+    window.display_ledger_year = 2026
+    window.refresh = lambda: (window._refresh_balance_snapshot(fake_backend.leave_years()), window._render_balances())
     window.month_json = {"projected_balance": {"use_or_lose": {"annual": 24.0}}}
     window.use_or_lose_json = {"use_or_lose": {"annual": 24.0}}
 
@@ -132,7 +139,7 @@ def test_balance_button_updates_to_selected_as_of_date(monkeypatch):
 
     window.select_balance_date()
 
-    assert fake_backend.calls == [(window.year, "2026-05-08")]
+    assert fake_backend.calls == [(2026, "2026-05-08")]
     assert window.balance_button.text() == "Leave Balances as of 5/8/2026"
     assert window.balance_snapshot["balances"]["annual"] == 48.0
     assert window.balance_table.item(0, 0).text() == "Annual Leave"

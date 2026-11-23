@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from collections.abc import Callable
 from copy import deepcopy
 from datetime import date, timedelta
 from math import isfinite
@@ -92,8 +93,13 @@ def read_raw(base: Path, year: int) -> dict:
         raise AccountingError("MISSING_SOURCE_YEAR", f"Leave year {year} is missing from {base}") from exc
     except (ValueError, OSError) as exc:
         raise AccountingError("INVALID_LEDGER", f"Cannot load {year}: {exc}") from exc
+    return checked_ledger(payload, year)
+
+
+def checked_ledger(payload: object, year: int) -> dict:
+    """Check the common ledger shape for filesystem and in-memory callers."""
     if not isinstance(payload, dict) or payload.get("leave_year") != year:
-        raise AccountingError("INVALID_LEDGER", f"Year metadata does not match {path.name}")
+        raise AccountingError("INVALID_LEDGER", f"Year metadata does not match {year}.json")
     if not isinstance(payload.get("transactions", []), list):
         raise AccountingError("INVALID_LEDGER", f"Transactions in {year} must be a list")
     if any(not isinstance(tx, dict) for tx in payload.get("transactions", [])):
@@ -155,10 +161,17 @@ def resolve_snapshot(
     if (base / "carryover-reconciliation.json").exists():
         raise AccountingError("RECOVERY_REQUIRED", "Interrupted reconciliation; run carryover-reconcile --recover")
     config = config or (load_json(base / "config.json") if (base / "config.json").exists() else {})
+    return resolve_snapshot_from(lambda requested: read_raw(base, requested), year, config, cache=cache)
+
+
+def resolve_snapshot_from(
+    read_year: Callable[[int], dict], year: int, config: dict, *, cache: dict[int, Snapshot] | None = None
+) -> Snapshot:
+    """Resolve a leave year against stored or proposed ledgers supplied by the caller."""
     cache = {} if cache is None else cache
     if year in cache:
         return deepcopy(cache[year])
-    raw = read_raw(base, year)
+    raw = read_year(year)
     rules = effective_rules(config)
     ledger = deepcopy(raw)
     remove_legacy_transaction_history(ledger)
@@ -170,7 +183,7 @@ def resolve_snapshot(
         if source_year != year - 1:
             raise AccountingError("SOURCE_NOT_CONTIGUOUS", f"Invalid predecessor {source_year} for {year}")
         try:
-            source = resolve_snapshot(base, source_year, config, cache=cache)
+            source = resolve_snapshot_from(read_year, source_year, config, cache=cache)
         except AccountingError as exc:
             if exc.code == "MISSING_SOURCE_YEAR":
                 raise AccountingError(

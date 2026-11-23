@@ -579,14 +579,18 @@ def month(
     month: int = typer.Option(..., help="Calendar month number, 1-12."),
     json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
     data_dir: Path | None = typer.Option(None, help="Data directory override."),
+    calendar_year: int | None = typer.Option(
+        None, help="Display this calendar year when it differs from the ledger year."
+    ),
 ) -> None:
     if not isinstance(json_output, bool):
         json_output = False
     if isinstance(data_dir, OptionInfo):
         data_dir = None
 
+    display_year = calendar_year if isinstance(calendar_year, int) else year
     try:
-        month_start, month_end, calendar_start, calendar_end = _month_bounds(year, month)
+        month_start, month_end, calendar_start, calendar_end = _month_bounds(display_year, month)
     except ValueError as exc:
         if getattr(exc, "code", None):
             from .rollover import report_error
@@ -612,7 +616,7 @@ def month(
         console.print(f"[red]ERROR:[/red] {exc}")
         raise typer.Exit(code=2)
 
-    holidays = _holiday_names_by_date(year, data_dir)
+    holidays = _holiday_names_by_date(display_year, data_dir)
     transactions = _transactions_by_date(leave_year, calendar_start, calendar_end)
     pay_period_rows = _pay_periods_for_range(
         leave_year,
@@ -666,7 +670,7 @@ def month(
     use_or_lose = calculate_use_or_lose(leave_year, projected_balances, cfg)
 
     result = {
-        "year": year,
+        "year": display_year,
         "month": month,
         "today": today.isoformat(),
         "month_start": month_start.isoformat(),
@@ -699,7 +703,7 @@ def month(
         _print_json(result)
         return
 
-    console.print(f"Month view for {year}-{month:02d} ({calendar_start} to {calendar_end})")
+    console.print(f"Month view for {display_year}-{month:02d} ({calendar_start} to {calendar_end})")
     if added_accruals:
         console.print(f"Posted {added_accruals} automatic annual/sick accrual transactions through {calendar_end}.")
     for day in days:

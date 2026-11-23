@@ -93,7 +93,8 @@ def effects(command, values):
         result["write"] = action != "list"
         result["import"] = action == "import-ics"
     elif command.path == ("import-data",):
-        result["high_impact"] = bool(values.get("overwrite"))
+        result["write"] = not values.get("dry_run", False)
+        result["high_impact"] = result["write"] and bool(values.get("overwrite") or values.get("recover"))
     elif command.path == ("init",):
         result["write"] = not values.get("preview", False)
         result["network"] = (

@@ -28,12 +28,31 @@ def datastore_lock(data_dir: Path | str, timeout: float | None = None):
         yield
 
 
+@contextmanager
+def datastore_read_lock(data_dir: Path | str):
+    """Share an existing lock without creating a datastore during a preview."""
+    lock_path = Path(data_dir) / ".fedleave.lock"
+    if lock_path.is_symlink():
+        raise ValueError("Datastore lock must not be a symbolic link")
+    if lock_path.exists():
+        with portalocker.Lock(
+            str(lock_path),
+            mode="r",
+            flags=portalocker.LOCK_SH | portalocker.LOCK_NB,
+            timeout=float(os.environ.get("FEDLEAVE_LOCK_TIMEOUT", "30")),
+        ):
+            yield
+    else:
+        yield
+
+
 class LockedCommand(TyperCommand):
     """Serialize every CLI leaf, including reports that migrate/backfill data."""
 
     def invoke(self, ctx):
         from .config import get_default_data_dir
         from .cross_year import AccountingError, preflight_creation
+        from .import_storage import check_pending_import
 
         readonly = (
             ctx.info_name
@@ -59,22 +78,21 @@ class LockedCommand(TyperCommand):
             or (ctx.info_name == "validate" and not ctx.params.get("apply"))
         )
         try:
-            if ctx.info_name in {"init", "rollover"}:
-                preflight_creation(Path(get_default_data_dir(ctx.params.get("data_dir"))), ctx.info_name, ctx.params)
-            if readonly:
-                # An existing shared lock avoids racing writers without
-                # creating any file or directory during a query or preview.
-                lock_path = Path(get_default_data_dir(ctx.params.get("data_dir"))) / ".fedleave.lock"
-                if lock_path.exists():
-                    with portalocker.Lock(
-                        str(lock_path),
-                        mode="r",
-                        flags=portalocker.LOCK_SH | portalocker.LOCK_NB,
-                        timeout=float(os.environ.get("FEDLEAVE_LOCK_TIMEOUT", "30")),
-                    ):
-                        return super().invoke(ctx)
+            if ctx.info_name == "import-data":
+                # The command preflights under a read lock and validates again
+                # under a writer lock. Preview and blocked preflight write nothing.
                 return super().invoke(ctx)
-            with datastore_lock(get_default_data_dir(ctx.params.get("data_dir"))):
+            base = Path(get_default_data_dir(ctx.params.get("data_dir")))
+            if ctx.info_name in {"init", "rollover"}:
+                check_pending_import(base)
+                preflight_creation(base, ctx.info_name, ctx.params)
+            if readonly:
+                with datastore_read_lock(base):
+                    check_pending_import(base)
+                    return super().invoke(ctx)
+            check_pending_import(base)
+            with datastore_lock(base):
+                check_pending_import(base)
                 return super().invoke(ctx)
         except portalocker.exceptions.LockException:
             typer.echo("Datastore busy: lock wait timed out; retry the command.", err=True)

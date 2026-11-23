@@ -115,6 +115,7 @@ def test_edit_day_requires_preview_confirmation(monkeypatch):
 
     fake_backend = FakeBackend()
     monkeypatch.setattr(MainWindow, "refresh", lambda self: None)
+    monkeypatch.setattr(MainWindow, "_ensure_leave_year", lambda self, selected: 2026)
     monkeypatch.setattr(MainWindow, "_backend", lambda self: fake_backend)
     window = MainWindow()
 

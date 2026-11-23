@@ -20,6 +20,7 @@ def test_balance_table_headers_follow_left_aligned_text(monkeypatch):
         "balance_as_of_today": {"balances": {"annual": 12.0, "sick": 8.0}},
         "projected_balance": {"use_or_lose": {"use_or_lose": 240.0}},
     }
+    window.balance_snapshot = window.month_json["balance_as_of_today"]
 
     window._render_balances()
 

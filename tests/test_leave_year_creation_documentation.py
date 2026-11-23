@@ -100,7 +100,7 @@ def test_GUI_025_PKG_005_no_GUI_ledger_writer():
     # access. Settings/report export writes elsewhere in Qt remain legitimate.
     main = (ROOT / "src/fedleave_gui/main_window.py").read_text()
     dialog = main[main.index("class StartYearDialog") : main.index("class SelectMonthDialog")]
-    create = main[main.index("    def new_leave_year") : main.index("    def validate_data")]
+    create = main[main.index("    def _ensure_leave_year") : main.index("    def validate_data")]
     backend = (ROOT / "src/fedleave_gui/backend.py").read_text()
     for source in (dialog, create, backend):
         assert "write_json" not in source and "leave_years/" not in source

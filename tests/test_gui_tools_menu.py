@@ -252,7 +252,7 @@ def test_startup_loads_current_leave_year_when_available(monkeypatch, tmp_path):
     assert refreshed == [window.today.year]
 
 
-def test_startup_uses_latest_available_leave_year_when_current_is_missing(monkeypatch, tmp_path):
+def test_startup_can_decline_current_year_and_browse_latest_available(monkeypatch, tmp_path):
     _application()
     monkeypatch.setattr(MainWindow, "refresh", lambda self: None)
     monkeypatch.setattr(
@@ -265,12 +265,15 @@ def test_startup_uses_latest_available_leave_year_when_current_is_missing(monkey
     _write_valid_year(leave_years / "2024.json", 2024)
     _write_valid_year(leave_years / "2025.json", 2025)
     refreshed = []
+    prompts = []
     window.refresh = lambda: refreshed.append(window.year)
+    monkeypatch.setattr(QMessageBox, "question", lambda _parent, title, *_: prompts.append(title) or QMessageBox.No)
 
     window.start_initial_load()
 
     assert window.year == 2025
     assert refreshed == [2025]
+    assert prompts == ["Create a Leave Year"]
 
 
 def test_first_run_offers_to_open_new_leave_year_dialog(monkeypatch, tmp_path):
@@ -287,11 +290,11 @@ def test_first_run_offers_to_open_new_leave_year_dialog(monkeypatch, tmp_path):
     )
     window = MainWindow()
     opened = []
-    window.new_leave_year = lambda: opened.append(True)
+    window._create_leave_year = lambda **options: opened.append(options["proposed_year"])
 
     window.start_initial_load()
 
-    assert opened == [True]
+    assert opened == [window.today.year]
 
 
 def test_first_run_can_decline_new_leave_year_without_backend_error(monkeypatch, tmp_path):
@@ -410,6 +413,7 @@ def test_change_accrual_action_updates_backend_and_refreshes(monkeypatch):
             return 8.0
 
     monkeypatch.setattr("fedleave_gui.main_window.ChangeAccrualDialog", FakeChangeAccrualDialog)
+    monkeypatch.setattr(window, "_ensure_leave_year", lambda selected: 2026)
 
     window.change_accrual()
 
@@ -425,19 +429,23 @@ def test_change_accrual_action_updates_backend_and_refreshes(monkeypatch):
 
 def test_import_data_can_merge_and_refreshes(monkeypatch, tmp_path):
     _application()
-    captured: list[list[str]] = []
+    captured = []
     refreshed: list[bool] = []
 
     class FakeBackend:
-        def run_text(self, args, include_data_dir=True):
-            captured.append(list(args))
-            return "imported"
+        def preview_import(self, path, mode):
+            captured.append(("preview", path, mode))
+            return {"status": "ready", "preview_fingerprint": "reviewed", "conflicts": []}
+
+        def apply_import(self, path, mode, fingerprint):
+            captured.append(("apply", path, mode, fingerprint))
 
     monkeypatch.setattr(MainWindow, "refresh", lambda self: None)
     monkeypatch.setattr(MainWindow, "_backend", lambda self: FakeBackend())
     window = MainWindow()
     window.refresh = lambda: refreshed.append(True)
     monkeypatch.setattr(window, "_select_import_mode", lambda: "--merge")
+    monkeypatch.setattr(window, "_review_import", lambda preview, mode: mode)
 
     archive = tmp_path / "backup.json"
     archive.write_text("{}", encoding="utf-8")
@@ -445,23 +453,27 @@ def test_import_data_can_merge_and_refreshes(monkeypatch, tmp_path):
 
     window.import_data()
 
-    assert captured == [["import-data", "--input", str(archive), "--merge"]]
+    assert captured == [("preview", str(archive), "--merge"), ("apply", str(archive), "--merge", "reviewed")]
     assert refreshed == [True]
 
 
 def test_import_data_can_replace(monkeypatch, tmp_path):
     _application()
-    captured: list[list[str]] = []
+    captured = []
 
     class FakeBackend:
-        def run_text(self, args, include_data_dir=True):
-            captured.append(list(args))
-            return "imported"
+        def preview_import(self, path, mode):
+            captured.append(("preview", path, mode))
+            return {"status": "ready", "preview_fingerprint": "reviewed", "conflicts": []}
+
+        def apply_import(self, path, mode, fingerprint):
+            captured.append(("apply", path, mode, fingerprint))
 
     monkeypatch.setattr(MainWindow, "refresh", lambda self: None)
     monkeypatch.setattr(MainWindow, "_backend", lambda self: FakeBackend())
     window = MainWindow()
     monkeypatch.setattr(window, "_select_import_mode", lambda: "--overwrite")
+    monkeypatch.setattr(window, "_review_import", lambda preview, mode: mode)
 
     archive = tmp_path / "backup.json"
     archive.write_text("{}", encoding="utf-8")
@@ -469,7 +481,7 @@ def test_import_data_can_replace(monkeypatch, tmp_path):
 
     window.import_data()
 
-    assert captured == [["import-data", "--input", str(archive), "--overwrite"]]
+    assert captured == [("preview", str(archive), "--overwrite"), ("apply", str(archive), "--overwrite", "reviewed")]
 
 
 def test_import_data_cancel_does_not_run_backend(monkeypatch, tmp_path):
@@ -604,6 +616,7 @@ def test_force_balance_dialog_calls_backend_and_refreshes(monkeypatch):
     monkeypatch.setattr(QMessageBox, "information", lambda *args, **kwargs: None)
     window = MainWindow()
     window.refresh = lambda: refreshed.append(True)
+    monkeypatch.setattr(window, "_ensure_leave_year", lambda selected: 2026)
 
     window.force_leave_balance()
 
