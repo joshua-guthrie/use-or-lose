@@ -9,8 +9,10 @@ Paths below start at the repository root. Add implementation and evidence direct
 | Path | Contents and owner |
 | --- | --- |
 | `android/specification/specification.md` | Product scope, pinned desktop reference, and numbered chapter index. |
+| `android/specification/orchestration.md` | Entry point for the development workflow, supporting design material, verification, and staged pilot. |
 | `android/specification/chapters/NN-topic/NN-NN-subject.md` | Authoritative requirements, annotated screen guides, architecture and delivery chapters. Name each Markdown file with its subsection number. |
-| `android/specification/planning/` | How to write and maintain the specification, including the five-hour writing and handoff routine. |
+| `android/specification/planning/` | Specification-writing plans and staged proposals, including the [reviewed orchestration plan](../../planning/multi-model-orchestrator-plan-v1.5.md). Once integrated, the numbered chapters govern execution. |
+| `android/specification/detailed-design/` | Design index and versioned detailed contracts for tasks that need more than the governing chapters. Name files with the milestone, sequence, and subject. |
 | `android/specification/artwork/mockups/` | Editable JSON manifests, renderer, annotated PNGs and reference material. Keep source and generated boards together and regenerate both in the change that revises a screen. |
 | `android/specification/help/` | Reviewed help text to bundle with the phone app. Use the same names and artwork as the governing chapters. |
 | `android/specification/verification/` | Cross-chapter feature parity and acceptance cases with fixtures and exact outcomes. |
@@ -24,6 +26,7 @@ Paths below start at the repository root. Add implementation and evidence direct
 | `android/qa/evidence/`, `android/qa/reports/` | Screenshots and test evidence by milestone, or a durable artifact link. The Markdown report is the gate decision and records commands, build and fixture identities. |
 | `android/reviews/code/` | One AI code review report for each candidate milestone or completed subset. Use `I05-01.md` and record follow-up findings and the final candidate in the same report. |
 | `android/deliverables/` | Versioned release notes, artifact manifest and references to approved APK/AAB outputs and Play Console evidence. Build products are stored by the release tooling. |
+| `.orchestrator/` | Planned ignored local location for generated worker packets, temporary worktrees, the trusted run journal, settings, and transient run data. Establish the ignore rule before creating run files. Track sanitized evidence in the existing QA and review directories. |
 
 ## Keep related evidence discoverable
 
@@ -35,6 +38,8 @@ Paths below start at the repository root. Add implementation and evidence direct
 ## Document code review in every milestone
 
 After implementation, a distinct AI review reads the final diff against the approved chapters, brief, mockups, acceptance data and actual QA evidence. Put findings, resolutions and retest evidence in the [AI code review report](../../../reviews/code/template.md). Link it from the QA report. Review the revised portions after material fixes and leave the milestone open until required work passes. The project owner approves any intended change to the product specification or visual design. [QA completion gates](../05-quality/05-02-quality-gates.md#required-gates)
+
+For delegated work, follow the [model workflow and candidate approval rules](07-02-multi-model-development-workflow.md) and the [design and handoff rules](07-03-design-and-implementation-handoffs.md). Keep one maintained copy of each brief in the existing brief directory.
 
 ## Changes to this organization
 

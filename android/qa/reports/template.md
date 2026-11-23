@@ -8,6 +8,7 @@
 | Spec revision and approved decisions | |
 | Code revision, build ID and source identity | |
 | Implementation brief, starting revision, and preflight results | |
+| Package, check policy and isolation result, when delegated | |
 | Affected requirements, acceptance and screen IDs | |
 | Device, API, density, font scale, theme and locale | |
 | Fixture revision, checksum and fixed clock | |
@@ -45,4 +46,4 @@ Use Pass, Fail, Blocked or Not applicable and include reasons and evidence.
 | Code review and retest | | |
 | Completion and release evidence | | |
 
-Record the completion decision, exact candidate and next action. Leave the milestone open if any applicable gate fails or is blocked.
+Record the completion decision, exact candidate and next action. Leave the milestone open if any applicable gate fails or is blocked. If source was pushed to `master`, record the integrated source and workflow, stable release assets and installer mirror when closing the [Distribution gate](../../specification/chapters/07-organization/07-02-multi-model-development-workflow.md#distribution-after-a-source-push-to-master).

@@ -11,3 +11,5 @@ Start with the [milestones and dependencies](../../specification/chapters/06-del
 | [Implementation brief template](template.md) | Required for each bounded implementation task, including splits within a milestone. |
 
 The person or model preparing the brief resolves product behavior and compatibility questions before assigning code. A smaller coding model should be able to follow the brief with chapter links and repository access. Close the work with the [QA loop](../../specification/chapters/05-quality/05-02-quality-gates.md) and a separate linked code review. Record unfinished work in the passdown.
+
+For delegated work, use the [design and packet gate](../../specification/chapters/07-organization/07-03-design-and-implementation-handoffs.md). Pin this brief's revision in the task manifest and generate the worker packet from those inputs. For orchestration development, use the [pilot milestones](../../specification/chapters/06-delivery/06-03-orchestrator-pilot-milestones.md) and their acceptance cases.

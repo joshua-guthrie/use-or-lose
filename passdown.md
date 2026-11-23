@@ -2,7 +2,9 @@
 
 ## Where to resume
 
-Start with the [menu structure and tap paths](android/specification/chapters/01-calendar/01-07-menu-structure.md). Review this draft with the owner before approval to begin I01. The next specification session also owes the I02–I04 implementation briefs and reference fixtures. [Current checkpoint](android/specification/passdowns/27-menu-structure-and-dated-entries.md) · [Specification index](android/specification/specification.md) · [I01 startup brief](android/implementation/briefs/I01-01-start-the-android-project.md)
+The multi-model orchestrator plan has been revised and incorporated into the Android specification. For orchestration work, start by preparing the OR01 offline pilot brief and selecting an enforceable Linux sandbox for its synthetic fixture. For product work, continue with the menu review below. [Orchestration specification](android/specification/orchestration.md) · [Current documentation checkpoint](android/specification/passdowns/28-orchestration-specification.md)
+
+Start with the [menu structure and tap paths](android/specification/chapters/01-calendar/01-07-menu-structure.md). Review this draft with the owner before approval to begin I01. The next specification session also owes the I02–I04 implementation briefs and reference fixtures. [Latest product-spec checkpoint](android/specification/passdowns/27-menu-structure-and-dated-entries.md) · [Specification index](android/specification/specification.md) · [I01 startup brief](android/implementation/briefs/I01-01-start-the-android-project.md)
 
 The owner approved scoping **Edit Day** to one selected group, with individual correction for incompatible rows. The updated rule, mockup and acceptance case are ready for the I08 brief. I17 can use the shared Python planner for Android Restore Merge. The dedicated CLI regressions cover competing forced balances in both compatible archive formats. [Decision and regression checkpoint](android/specification/passdowns/26-edit-day-and-merge-regression.md) · [Shared planner](src/fedleave/importing.py) · [Import issue](https://github.com/joshua-guthrie/fedleave/issues/152)
 

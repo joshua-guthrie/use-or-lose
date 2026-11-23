@@ -4,6 +4,8 @@ This is the order of work after the owner reviews the specification. Each row ta
 
 Start each milestone or subset with a [self-contained implementation brief](../05-quality/05-02-quality-gates.md#make-each-milestone-executable-from-a-brief) suitable for a smaller coding model. Every milestone and separately completed subset must pass the [QA completion gates](../05-quality/05-02-quality-gates.md#required-gates). Use the [implementation briefs index](../../../implementation/briefs/README.md) for task handoffs. A partial checkpoint or a passdown records work in progress and leaves the milestone open. The final QA and AI code review reports identify the tested candidate and link the evidence before completion.
 
+The [orchestrator pilot](06-03-orchestrator-pilot-milestones.md) is a separate development track. Its offline milestones use disposable synthetic work before it accepts an Android implementation task. Product work can proceed through the existing workflow after its own prerequisites and approvals.
+
 ## Review menu navigation before I01
 
 Walk through the [menu structure and tap paths](../01-calendar/01-07-menu-structure.md) with the owner before coding. The chapter shows the Calendar dropdown, bottom Reports and Settings lists, Settings submenus, and Back behavior. Review the exact labels and reachability for every analytics view and Help. Take a separate specification checkpoint for any navigation changes that need another window. Record decisions in a passdown before approving I01.

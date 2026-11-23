@@ -23,15 +23,17 @@ For a visual review, start with the [Calendar mockups](chapters/01-calendar/01-0
 
 **Calendar main screen selected.** Use a tappable balance card, a month selector and daily activity inside the day cells. [View the selected Calendar](chapters/01-calendar/01-01-main-screen.md)
 
+**Development workflow.** Start with the [orchestration specification](orchestration.md) to find the rules for design handoffs, coding delegation, independent review and the offline pilot.
+
 | Chapter | Content |
 | --- | --- |
 | 01. Calendar and navigation | [01.01 Main screen](chapters/01-calendar/01-01-main-screen.md) · [01.02 Balances](chapters/01-calendar/01-02-balances.md) · [01.03 Navigation and screen states](chapters/01-calendar/01-03-navigation-and-screens.md) · [01.04 Date markers](chapters/01-calendar/01-04-date-markers.md) · [01.05 Calendar menu and PDF sharing](chapters/01-calendar/01-05-menu-and-pdf.md) · [01.06 Force Balance](chapters/01-calendar/01-06-force-balance.md) · [01.07 Menu structure and tap paths](chapters/01-calendar/01-07-menu-structure.md) |
 | 02. Ledger | [02.01 Ledger and leave years](chapters/02-ledger/02-01-ledger-and-leave-years.md) |
 | 03. Reports, data, and preferences | [03.01 Behavior and requirements](chapters/03-reports-data/03-01-reports-data-and-preferences.md) · [03.02 Report screens](chapters/03-reports-data/03-02-report-screens.md) · [03.03 Data and settings screens](chapters/03-reports-data/03-03-data-and-settings-screens.md) |
 | 04. Architecture | [04.01 Shared core and compatibility](chapters/04-architecture/04-01-core-and-compatibility.md) · [04.02 Device storage, backups, and sharing](chapters/04-architecture/04-02-device-storage.md) |
-| 05. Quality | [05.01 Developer setup and testing](chapters/05-quality/05-01-developer-setup-and-testing.md) · [05.02 Iterative QA and completion gates](chapters/05-quality/05-02-quality-gates.md) |
-| 06. Delivery | [06.01 Google Play](chapters/06-delivery/06-01-google-play.md) · [06.02 Implementation milestones and decisions](chapters/06-delivery/06-02-implementation-milestones.md) |
-| 07. Organization | [07.01 Project organization](chapters/07-organization/07-01-project-organization.md) |
+| 05. Quality | [05.01 Developer setup and testing](chapters/05-quality/05-01-developer-setup-and-testing.md) · [05.02 Iterative QA and completion gates](chapters/05-quality/05-02-quality-gates.md) · [05.03 Orchestrator verification](chapters/05-quality/05-03-orchestrator-verification.md) |
+| 06. Delivery | [06.01 Google Play](chapters/06-delivery/06-01-google-play.md) · [06.02 Implementation milestones and decisions](chapters/06-delivery/06-02-implementation-milestones.md) · [06.03 Orchestrator pilot milestones](chapters/06-delivery/06-03-orchestrator-pilot-milestones.md) |
+| 07. Organization | [07.01 Project organization](chapters/07-organization/07-01-project-organization.md) · [07.02 Multi-model development workflow](chapters/07-organization/07-02-multi-model-development-workflow.md) · [07.03 Design and implementation handoffs](chapters/07-organization/07-03-design-and-implementation-handoffs.md) · [07.04 Orchestrator execution](chapters/07-organization/07-04-orchestrator-execution.md) |
 
 Use the [feature parity matrix](verification/feature-parity.md) to trace a desktop behavior to its Android requirement, screen and test. The [acceptance tests](verification/acceptance-tests.md) include the synthetic fixtures and exact results. [Implementation briefs](../implementation/briefs/README.md) map the approved chapters to executable coding assignments. [Mockup sources and images](artwork/mockups) · [Writing checkpoints](passdowns)
 
