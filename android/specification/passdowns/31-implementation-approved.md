@@ -12,11 +12,4 @@ Documentation and fixture changes from [checkpoint 30](30-briefs-fixtures-and-re
 
 ## Where to resume
 
-Start I01 from the [startup brief](../../implementation/briefs/I01-01-start-the-android-project.md):
-
-1. Record the owner's application ID decision, or an explicit prototype ID approved for this milestone.
-2. Install the Android SDK command-line tools or Android Studio, the platform, build tools and platform-tools, and create the project's pinned Gradle wrapper.
-3. Create the single `app` module, run the launch smoke test on an emulator image (RAM is limited, so prefer a lean image and profile) or a physical phone.
-4. Replace the [README toolchain placeholders](../../README.md#pinned-toolchain) and the planned commands with the tested versions, per the repository working rule.
-
-The distribution rule still applies to any future source push to `master`; local checkpoint commits do not publish installers. The five-hour window and the 30% closeout rule govern each I01 session.
+I01 is complete and recorded in the [implementation passdown](../../implementation/passdowns/I01-01.md). Resume with I02, the [bridge packaging experiment](../../implementation/briefs/I02-bridge-experiment.md), whose evidence decides the Chaquopy bridge and API floor. Keep the distribution rule in mind for any future source push to `master`; local checkpoint commits do not publish installers.

@@ -2,7 +2,7 @@
 
 ## Where to resume
 
-The owner approved implementation for I01 through I06 on November 23, 2026. Coding starts with I01: record the application ID decision, install the Android toolchain, scaffold the Gradle and Compose project under `android/`, and replace the README toolchain placeholders with the tested versions. The machine has JDK 21 and KVM but no Android SDK or Studio yet. [Implementation approval checkpoint](android/specification/passdowns/31-implementation-approved.md) · [I01 startup brief](android/implementation/briefs/I01-01-start-the-android-project.md) · [Preparation checkpoint](android/specification/passdowns/30-briefs-fixtures-and-readme.md)
+I01 is complete: the `android/` Gradle project builds with the pinned toolchain (Gradle 8.14.3, AGP 8.13.2, Kotlin 2.2.20, compile/target SDK 36, app ID `com.westmouthbay.fedleave`), and the launch smoke test plus an offline relaunch pass on the API 36 emulator. The [Android README](android/README.md) records the tested versions and commands. Next is I02, the bridge packaging experiment, whose evidence decides the Chaquopy bridge and API floor. [I01 passdown](android/implementation/passdowns/I01-01.md) · [I02 brief](android/implementation/briefs/I02-bridge-experiment.md) · [Implementation approval checkpoint](android/specification/passdowns/31-implementation-approved.md)
 
 For orchestration work, start by preparing the OR01 offline pilot brief and selecting an enforceable Linux sandbox for its synthetic fixture. [Orchestration specification](android/specification/orchestration.md) · [Documentation checkpoint](android/specification/passdowns/28-orchestration-specification.md)
 

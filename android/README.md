@@ -4,49 +4,57 @@ The phone app for FedLeave. It shares the desktop accounting core, keeps its wor
 
 ## Status
 
-The product specification, acceptance plan, orchestration rules and the first implementation briefs are complete. **The Android Gradle project does not exist yet.** I01 creates it after the owner approves implementation; until then, opening `android/` in Android Studio shows documentation only and Gradle sync will not run.
+The product specification, acceptance plan, orchestration rules and the first implementation briefs are complete. I01 has landed: `android/` is a working Gradle project with the single `app` module, pinned toolchain, launch screen and device smoke test. Open the directory in Android Studio to work on it.
 
 | Track | State |
 | --- | --- |
 | Product specification and parity | Complete; menu review approved November 23, 2026 |
 | Orchestration specification | Complete; OR01 pilot not started |
-| Implementation briefs | I01–I05 plus I06-02 drafts ready; I02–I04 add the bridge, read facade and private store |
-| Android project | Not started (I01) |
+| Implementation briefs | I01-01 complete; I02–I05 plus I06-02 drafts ready |
+| Android project | I01 complete — builds, smoke test and offline launch pass on the API 36 emulator |
 | Fixtures | Calendar 2026 store, golden outputs and malformed-store variants under `qa/` |
 
-Keep this file current. I01 must replace every planned command and toolchain value below with the tested values from its report.
+Keep this file current. Each milestone replaces planned commands and toolchain values with the tested values from its report.
 
 ## Open and run in Android Studio
 
 1. Install the current stable **Android Studio** for your platform, including the Android SDK, Platform-Tools and an emulator image.
-2. **Open the `android/` directory, not the repository root.** After I01, `android/settings.gradle.kts` is the Gradle root and Studio discovers the single `app` module.
+2. **Open the `android/` directory, not the repository root.** `android/settings.gradle.kts` is the Gradle root and Studio discovers the single `app` module.
 3. Let the Gradle sync finish. On Linux, verify hardware virtualization if the emulator is slow.
 4. Create a compact phone AVD for the development host's architecture, or connect a physical phone with USB debugging enabled.
-5. Select the device and run the `app` configuration. I01 records the exact AVD image, API level, ABI, density and JDK used.
+5. Select the device and run the `app` configuration.
 
 The beginner walkthrough, SDK details and device matrix are in [Developer setup and testing](specification/chapters/05-quality/05-01-developer-setup-and-testing.md). The provisional minimum is **API 26**. The permanent app ID, signing identity and final API floor are recorded by I01 and I02.
 
-### Pinned toolchain
+The pinned versions below were verified by I01's report. A clean-sync launch from the Android Studio GUI has not been run on this machine; do it once when Studio is installed and update the QA report if anything differs.
 
-I01 replaces this placeholder table with the tested combination:
+### Pinned toolchain
 
 | Item | Value |
 | --- | --- |
-| Android Gradle Plugin / Gradle | Pending I01 |
-| Kotlin / Compose / Material 3 | Pending I01 |
-| JDK and Gradle JDK | Pending I01 |
-| compileSdk / targetSdk / minSdk | Pending I01; minSdk 26 provisional |
-| Emulator image and ABI | Pending I01 |
+| Application ID | `com.westmouthbay.fedleave` (owner-approved) |
+| Android Gradle Plugin / Gradle | 8.13.2 / 8.14.3 (wrapper) |
+| Kotlin / Compose BOM / Material 3 | 2.2.20 / 2025.06.01 / from BOM |
+| JDK | 21 to run Gradle; source/target 17 |
+| compileSdk / targetSdk / minSdk | 36 / 36 / 26 |
+| Emulator | `fedleave_test` AVD, pixel_5, API 36 `google_apis` `x86_64`, 1080x2340 @ 440 dpi |
 | Bridge runtime and Chaquopy | Pending I02 |
 
 ## Compile and test
 
-After I01 creates the wrapper, run from `android/`. On Windows use `gradlew.bat` for the same tasks.
+Run from `android/` with `JAVA_HOME` pointing at the pinned JDK. On Windows use `gradlew.bat` for the same tasks. All of these passed in I01:
 
 ```bash
 ./gradlew --version
 ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
 ./gradlew :app:connectedDebugAndroidTest
+```
+
+The connected test needs a booted emulator or a phone. On this machine, stop the Gradle daemon before starting the emulator to avoid memory pressure:
+
+```bash
+./gradlew --stop
+~/Android/Sdk/emulator/emulator -avd fedleave_test -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect &
 ```
 
 Run the shared desktop core checks from the repository root. These work today:

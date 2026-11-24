@@ -4,7 +4,7 @@ Start with the [milestones and dependencies](../../specification/chapters/06-del
 
 | Brief | Status and scope |
 | --- | --- |
-| [I01-01 Start the Android project](I01-01-start-the-android-project.md) | Draft pending owner approval to start. Sets the source and verification foundation. |
+| [I01-01 Start the Android project](I01-01-start-the-android-project.md) | Complete. Toolchain pinned in the README; smoke test and offline launch pass on the API 36 emulator. [QA report](../../qa/reports/I01-01.md) |
 | [I02 Bridge packaging experiment](I02-bridge-experiment.md) | Handoff draft. Decides Chaquopy or the fallback with packaging, parity, offline and timing evidence. |
 | [I03 Read-only core boundary](I03-read-only-core.md) | Handoff draft. Extracts the snapshot, dated balance, day, period and month facade. |
 | [I04 Private JSON store](I04-private-store.md) | Handoff draft. Adds the no-backup canonical store, generation writer and recovery. |
