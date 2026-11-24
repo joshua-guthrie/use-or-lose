@@ -10,9 +10,9 @@ The product specification, acceptance plan, orchestration rules and the first im
 | --- | --- |
 | Product specification and parity | Complete; menu review approved November 23, 2026 |
 | Orchestration specification | Complete; OR01 pilot not started |
-| Implementation briefs | I01–I04 complete; I05 finalized and in progress (I05-01 landed); I06-02 draft ready |
-| Android project | I05-01 complete — typed bridge adapter, clock/settings injection and the Calendar state machine pass JVM (35/35) and device (17/17) suites; next is I05-02 Calendar screen, navigation and markers |
-| Fixtures | Calendar 2026 store, golden outputs and malformed-store variants under `qa/` |
+| Implementation briefs | I01–I04 complete; I05 in progress (I05-01 and I05-02 landed); I06-02 draft ready |
+| Android project | I05-02 complete — the Calendar screen, three-tab navigation, month picker, the four date-marker glyphs, the read-only day route and Menu > Today pass the mockup-verified visual loop plus 35 unit and 38 device tests; next is I05-03 balance detail and date selection |
+| Fixtures | Calendar 2026 store, golden outputs, malformed-store variants and the marker overlap fixture under `qa/` (builder emits both; digests `03e9e175…` and `d60bd8d0…`) |
 
 Keep this file current. Each milestone replaces planned commands and toolchain values with the tested values from its report.
 
@@ -75,7 +75,7 @@ Rebuild the pinned Android fixtures instead of editing them by hand:
 .venv/bin/python android/qa/fixtures/build_calendar_fixture.py
 ```
 
-The builder prints the fixture tree digest. It must stay `03e9e1757f73015b356b900703a13a88390e854f274c7bce78bd2f9f00c7aea9`; see [the manifest](qa/fixtures/calendar-2026.manifest.json).
+The builder prints the fixture tree digest. It must stay `03e9e1757f73015b356b900703a13a88390e854f274c7bce78bd2f9f00c7aea9`; see [the manifest](qa/fixtures/calendar-2026.manifest.json). The builder also emits the marker overlap fixture under `qa/fixtures/marker-fixture/` (digest `d60bd8d0…`, manifest `qa/fixtures/calendar-markers.manifest.json`). Device evidence captures land in the app files dir during the connected suite; keep `android.injected.androidTest.leaveApksInstalledAfterRun=true` to pull them with adb.
 
 Release builds, signing, Play uploads and device release rehearsal belong to I19 and I20. Do not commit `local.properties`, keystores, APKs, AABs or machine-specific SDK paths. [Google Play delivery](specification/chapters/06-delivery/06-01-google-play.md)
 
@@ -93,7 +93,7 @@ flowchart LR
 | Layer | Responsibility | Governing design |
 | --- | --- | --- |
 | Compose UI | Screens, navigation, accessibility, view state, lifecycle, clock injection, chart rendering, Sharesheet and document picker. | [Calendar](specification/chapters/01-calendar/01-01-main-screen.md) and [Reports](specification/chapters/03-reports-data/03-02-report-screens.md) |
-| Kotlin bridge | One typed in-process interface to the Python core: `app/src/main/java/com/westmouthbay/fedleave/core/` (`CoreBridge`, `CoreModels`, `CoreError`, `TimeSource`, `AppDependencies`) over the Chaquopy module `fedleave_probe`. The Calendar state machine lives in `.../calendar/` (`CalendarViewModel`, `CalendarUiState`, `CalendarDisplaySettings`). | [Core and compatibility](specification/chapters/04-architecture/04-01-core-and-compatibility.md) |
+| Kotlin bridge | One typed in-process interface to the Python core: `app/src/main/java/com/westmouthbay/fedleave/core/` (`CoreBridge`, `CoreModels`, `CoreError`, `TimeSource`, `AppDependencies`) over the Chaquopy module `fedleave_probe`. The Calendar state machine lives in `.../calendar/` (`CalendarViewModel`, `CalendarUiState`, `CalendarDisplaySettings`), the screens in `calendar/` and the navigation host in `ui/`. | [Core and compatibility](specification/chapters/04-architecture/04-01-core-and-compatibility.md) |
 | Shared Python core | Accounting rules, eligibility, accrual, leave-year boundaries, carryover, lots, parental windows, report inputs. Lives in the repository's root `src/`. | [Responsibilities and data flow](specification/chapters/04-architecture/04-01-core-and-compatibility.md#responsibilities-and-data-flow) |
 | Private store | Canonical `config.json`, `leave_years/<year>.json` and `holiday_cache/*.json` in internal no-backup storage. One serialized writer, immutable read snapshots, candidate validation and generation recovery. | [Device storage](specification/chapters/04-architecture/04-02-device-storage.md) |
 | Desktop | Existing CLI and GUI entry points remain the compatibility baseline and share the same accounting rules and datastore schema. | [Architecture](../docs/ARCHITECTURE.md) |
