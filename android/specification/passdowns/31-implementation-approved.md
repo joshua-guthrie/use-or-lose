@@ -12,4 +12,4 @@ Documentation and fixture changes from [checkpoint 30](30-briefs-fixtures-and-re
 
 ## Where to resume
 
-I01 is complete and recorded in the [implementation passdown](../../implementation/passdowns/I01-01.md). Resume with I02, the [bridge packaging experiment](../../implementation/briefs/I02-bridge-experiment.md), whose evidence decides the Chaquopy bridge and API floor. Keep the distribution rule in mind for any future source push to `master`; local checkpoint commits do not publish installers.
+I01, I02 and I03 are complete and recorded in the [implementation passdowns](../../implementation/passdowns/). Resume with I04, the [private JSON store](../../implementation/briefs/I04-private-store.md), which consumes I03's snapshot contract and the I02 bridge. Keep the distribution rule in mind for any future source push to `master`; local checkpoint commits do not publish installers.

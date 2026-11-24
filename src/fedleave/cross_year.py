@@ -17,10 +17,10 @@ from pathlib import Path
 from typing import Any
 
 from .categories import CATEGORY_POLICIES, category_policy
-from .config import Config
 from .expirations import EPSILON, synchronize_expirations
 from .ledger import accrual_hours_for_date, calculate_balances, ensure_automatic_accruals
 from .payperiods import generate_pay_periods, leave_year_period_count, validate_pay_periods
+from .rule_defaults import DEFAULT_RULES
 from .storage import atomic_write_json, backup_file, load_json, remove_legacy_transaction_history
 from .transaction_effects import signed_balance_effect, transaction_is_effective
 
@@ -65,7 +65,7 @@ def fingerprint(value: Any) -> str:
 
 
 def effective_rules(config: dict | None) -> dict:
-    defaults = Config().model_dump()["rules"]
+    defaults = deepcopy(DEFAULT_RULES)
     supplied = (config or {}).get("rules", {})
     if not isinstance(supplied, dict):
         raise AccountingError("UNSUPPORTED_CATEGORY_POLICY", "rules must be an object")

@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 import os
 import sys
+from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
@@ -16,6 +17,7 @@ from pydantic import BaseModel, Field
 from rich.console import Console
 
 from .holidays import DEFAULT_OPM_ICS_URL, generate_federal_holidays
+from .rule_defaults import DEFAULT_RULES
 from .storage import atomic_write_json, ensure_data_dir
 from .validation import sanitize_url
 
@@ -146,20 +148,7 @@ class Config(BaseModel):
     user: UserConfig = Field(default_factory=UserConfig)
     defaults: DefaultsConfig = Field(default_factory=DefaultsConfig)
     holidays: HolidaysConfig = Field(default_factory=HolidaysConfig)
-    rules: dict[str, object] = Field(
-        default_factory=lambda: {
-            "annual": AnnualRules().model_dump(),
-            "sick": SickRules().model_dump(),
-            "comp": CompRules().model_dump(),
-            "travel_comp": TravelCompRules().model_dump(),
-            "credit": CreditRules().model_dump(),
-            "time_off_award": TimeOffAwardRules().model_dump(),
-            "restored_annual": RestoredAnnualRules().model_dump(),
-            "religious_comp": ReligiousCompRules().model_dump(),
-            "ppl": {"expires": True, "expiration_action": "expire", "allow_extension": False},
-            "fmla": {"carryover_mode": "usage_tracking", "weekly_hours": None, "history_complete_from": None},
-        }
-    )
+    rules: dict[str, object] = Field(default_factory=lambda: deepcopy(DEFAULT_RULES))
 
 
 class LeaveYear(BaseModel):

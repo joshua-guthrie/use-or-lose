@@ -13,6 +13,14 @@ val prepareBridgePython by tasks.registering(Sync::class) {
         include("categories.py")
         include("transaction_effects.py")
         include("ledger.py")
+        include("payperiods.py")
+        include("storage.py")
+        include("storage_guard.py")
+        include("expirations.py")
+        include("cross_year.py")
+        include("parental.py")
+        include("read_api.py")
+        include("rule_defaults.py")
         into("fedleave")
     }
     from(rootProject.file("bridge/src")) {

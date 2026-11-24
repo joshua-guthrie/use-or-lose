@@ -40,21 +40,30 @@ class BridgeProbeTest {
         InstrumentationRegistry.getInstrumentation().context.assets.open(name)
             .bufferedReader(Charsets.UTF_8).use { it.readText() }
 
-    private fun request(asOf: String): String =
-        JSONObject()
+    private fun call(request: JSONObject): JSONObject {
+        val payload = JSONObject()
             .put("schema_version", 1)
-            .put("as_of", asOf)
-            .put("leave_year", JSONObject(asset("leave_years/2026.json")))
-            .toString()
+            .put("local_date", "2026-01-16")
+            .put(
+                "files",
+                JSONObject()
+                    .put("config.json", asset("config.json"))
+                    .put("leave_years/2026.json", asset("leave_years/2026.json"))
+                    .put(
+                        "holiday_cache/federal_holidays_2026.json",
+                        asset("holiday_cache/federal_holidays_2026.json"),
+                    ),
+            )
+            .put("request", request)
+        val response = JSONObject(probe().callAttr("call", payload.toString()).toString())
+        assertTrue(response.getString("ok"), response.getBoolean("ok"))
+        return response.getJSONObject("result")
+    }
 
     @Test
     fun datedBalanceMatchesPinnedGolden() {
-        val response = JSONObject(probe().callAttr("dated_balance", request("2026-01-16")).toString())
-        assertTrue(response.getBoolean("ok"))
-        assertEquals("2026-01-16", response.getString("as_of"))
-        assertEquals(2026, response.getInt("year"))
-
-        val balances = response.getJSONObject("balances")
+        val result = call(JSONObject().put("operation", "dated_balance").put("as_of", "2026-01-16"))
+        val balances = result.getJSONObject("balances")
         val golden = JSONObject(asset("balance-2026-01-16.json")).getJSONObject("balances")
         assertEquals(golden.length(), balances.length())
         val keys = golden.keys()
@@ -65,9 +74,41 @@ class BridgeProbeTest {
     }
 
     @Test
+    fun payPeriodMatchesPinnedGolden() {
+        val result = call(JSONObject().put("operation", "pay_period").put("date", "2026-01-24"))
+        val golden = JSONObject(asset("pay-period-2026-01-24.json"))
+        assertEquals(92.0, result.getJSONObject("ending_balances").getDouble("annual"), 0.0)
+        assertEquals(
+            golden.getJSONObject("activity").getJSONObject("used").getDouble("annual"),
+            result.getJSONObject("activity").getJSONObject("used").getDouble("annual"),
+            0.0,
+        )
+    }
+
+    @Test
+    fun dayActivityMatchesPinnedGolden() {
+        val result = call(JSONObject().put("operation", "day_activity").put("date", "2026-01-16"))
+        assertTrue(result.getBoolean("has_activity"))
+        assertEquals(2.0, result.getJSONObject("activity").getJSONObject("used").getDouble("annual"), 0.0)
+    }
+
+    @Test
+    fun monthViewMatchesPinnedGolden() {
+        val result = call(JSONObject().put("operation", "month_view").put("year", 2026).put("month", 1))
+        val golden = JSONObject(asset("month-2026-01.json"))
+        assertEquals("2026-01-16", result.getString("today"))
+        assertEquals(
+            golden.getJSONObject("balance_as_of_today").getJSONObject("balances").getDouble("annual"),
+            result.getJSONObject("balance_as_of_today").getJSONObject("balances").getDouble("annual"),
+            0.0,
+        )
+        assertEquals(golden.getJSONArray("days").length(), result.getJSONArray("days").length())
+    }
+
+    @Test
     fun rejectsMalformedRequestsWithoutLoadingDesktopModules() {
         val probe = probe()
-        val bad = JSONObject(probe.callAttr("dated_balance", "not-json").toString())
+        val bad = JSONObject(probe.callAttr("call", "not-json").toString())
         assertFalse(bad.getBoolean("ok"))
         assertEquals("INVALID_REQUEST", bad.getJSONObject("error").getString("code"))
 
@@ -81,16 +122,16 @@ class BridgeProbeTest {
     @Test
     fun reportsColdAndWarmTimings() {
         val probe = probe()
-        val request = request("2026-01-16")
+        val request = JSONObject().put("operation", "dated_balance").put("as_of", "2026-01-16")
 
         val coldStart = System.nanoTime()
-        probe.callAttr("dated_balance", request)
+        call(request)
         val coldMs = (System.nanoTime() - coldStart) / 1_000_000.0
 
         val warmSamples = DoubleArray(20)
         for (i in 0 until 20) {
             val start = System.nanoTime()
-            probe.callAttr("dated_balance", request)
+            call(request)
             warmSamples[i] = (System.nanoTime() - start) / 1_000_000.0
         }
         warmSamples.sort()

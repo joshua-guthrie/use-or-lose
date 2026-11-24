@@ -103,5 +103,6 @@ files = [
   "src/fedleave/payperiods.py",
   "src/fedleave/project_info.py",
   "src/fedleave/transaction_effects.py",
+  "src/fedleave/read_api.py",
 ]
 strict = true

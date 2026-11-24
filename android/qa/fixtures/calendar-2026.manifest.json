@@ -182,7 +182,7 @@
   ],
   "description": "Pinned synthetic Calendar balance fixture for Android bridge, core and store milestones.",
   "desktop_reference": {
-    "generator_source_revision": "507e5a58d948d8c024cc82bc292e63dd84be5f64",
+    "generator_source_revision": "094763585cd221de4c799ba96c89d07b40c356cf",
     "published_build": "0.2.2.dev0+g7041ce9e",
     "source_revision": "7041ce9e9921dd4c407595ed3269de1aca43e699"
   },

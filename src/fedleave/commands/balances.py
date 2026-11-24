@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-import calendar as _calendar
 from datetime import date as _date
-from datetime import timedelta as _timedelta
 from pathlib import Path
 
 import typer
@@ -13,84 +11,37 @@ from typer.models import OptionInfo
 from ..cli_app import _print_json, app, console
 from ..cli_helpers import load_read_snapshot as load_leave_year
 from ..cli_helpers import parse_iso_date, resolve_leave_year_for_date
-from ..config import get_default_data_dir, load_config
+from ..config import get_default_data_dir
 from ..ledger import (
     calculate_balances,
-    calculate_daily_activity,
     calculate_pay_period_activity,
-    calculate_use_or_lose,
     ensure_automatic_accruals,
 )
-from ..payperiods import normalize_pay_period, pay_period_pay_date
+from ..payperiods import normalize_pay_period
+from ..read_api import (
+    _is_leave_year_end_keyword,
+    _month_bounds,
+    _names_from_rows,
+)
+from ..read_api import (
+    dated_balance as read_dated_balance,
+)
+from ..read_api import (
+    day_activity as read_day_activity,
+)
+from ..read_api import (
+    month_view as read_month_view,
+)
+from ..read_api import (
+    pay_period as read_pay_period,
+)
 from ..storage import load_json
-from ..transaction_effects import signed_balance_effect, transaction_is_effective, transaction_is_physical_absence
-
-_DISPLAY_CATEGORY_LABELS = {
-    "annual": "A",
-    "sick": "S",
-    "overtime": "OT",
-    "comp": "Comp",
-    "credit": "Cr",
-    "travel_comp": "TC",
-    "admin": "Admin",
-    "lwop": "LWOP",
-    "military": "Mil",
-    "court": "Court",
-    "religious_comp": "RC",
-    "time_off_award": "TOA",
-    "excused": "Exc",
-    "holiday": "Hol",
-    "flex": "Flex",
-    "other": "Other",
-    "restored_annual": "RA",
-    "ppl": "PPL",
-    "fmla": "FMLA",
-}
-
-
-def _physical_absence_hours(ledger: dict, start: str, end: str) -> float:
-    return sum(
-        float(row["hours"])
-        for row in ledger.get("transactions", [])
-        if start <= row["date"] <= end and transaction_is_physical_absence(row)
-    )
-
-
-def _parental_payload(ledger: dict, as_of: str | None = None) -> dict | None:
-    from ..parental import parental_report
-
-    if not any(tx.get("category") in {"ppl", "fmla"} for tx in ledger.get("transactions", [])) and not getattr(
-        ledger, "entitlement_history", []
-    ):
-        return None
-    return parental_report(
-        ledger, getattr(ledger, "config", None), as_of=parse_iso_date(as_of) if as_of else _date.today()
-    )
 
 
 def _show_accounting_warnings(leave_year: dict, json_output: bool) -> None:
     if not json_output:
         for warning in getattr(leave_year, "warnings", []):
             console.print(f"{warning['code']}: {warning.get('message', '')}")
-
-
-def _display_line(transaction: dict) -> str:
-    label = _DISPLAY_CATEGORY_LABELS.get(transaction.get("category"), str(transaction.get("category", "")))
-    signed_hours = signed_balance_effect(transaction)
-    hours = abs(signed_hours)
-    sign = "-" if signed_hours < 0 else "+"
-    return f"{label} {sign}{hours:.1f}"
-
-
-def _month_bounds(year: int, month: int) -> tuple[_date, _date, _date, _date]:
-    if month < 1 or month > 12:
-        raise ValueError("--month must be between 1 and 12.")
-
-    month_start = _date(year, month, 1)
-    month_end = _date(year, month, _calendar.monthrange(year, month)[1])
-    calendar_start = month_start - _timedelta(days=(month_start.weekday() + 1) % 7)
-    calendar_end = month_end + _timedelta(days=(5 - month_end.weekday()) % 7)
-    return month_start, month_end, calendar_start, calendar_end
 
 
 def _holiday_names_by_date(year: int, data_dir: Path | None) -> dict[str, str]:
@@ -101,97 +52,7 @@ def _holiday_names_by_date(year: int, data_dir: Path | None) -> dict[str, str]:
         cache = load_json(cache_file)
     except Exception:
         return {}
-    names = {}
-    for holiday in cache.get("holidays", []):
-        display_date = holiday.get("display_date") or holiday.get("observed_date") or holiday.get("actual_date")
-        name = holiday.get("name") or holiday.get("short_name")
-        if display_date and name:
-            names[str(display_date)] = str(name)
-    return names
-
-
-def _transactions_by_date(leave_year: dict, start: _date, end: _date) -> dict[str, list[dict]]:
-    entries: dict[str, list[dict]] = {}
-    for transaction in leave_year.get("transactions", []):
-        if transaction.get("carryover_generated") or transaction.get("source") == "expiration-rollover":
-            continue
-        if not transaction_is_effective(transaction):
-            continue
-        try:
-            transaction_date = parse_iso_date(str(transaction.get("date", "")))
-        except ValueError:
-            continue
-        if not start <= transaction_date <= end:
-            continue
-        day_entries = entries.setdefault(transaction_date.isoformat(), [])
-        day_entries.append(
-            {
-                "id": transaction.get("id"),
-                "category": transaction.get("category"),
-                "direction": transaction.get("direction"),
-                "hours": float(transaction.get("hours", 0.0)),
-                "status": transaction.get("status"),
-                "source": transaction.get("source"),
-                "description": transaction.get("description", ""),
-            }
-        )
-
-    for day_entries in entries.values():
-        day_entries.sort(key=lambda entry: str(entry.get("id") or ""))
-    return entries
-
-
-def _pay_periods_for_range(
-    leave_year: dict,
-    range_start: _date,
-    range_end: _date,
-    month_start: _date,
-    month_end: _date,
-) -> list[dict]:
-    rows = []
-    for pay_period in leave_year.get("pay_periods", []):
-        try:
-            period_start = parse_iso_date(str(pay_period["start_date"]))
-            period_end = parse_iso_date(str(pay_period["end_date"]))
-        except (KeyError, ValueError):
-            continue
-        if period_end < range_start or period_start > range_end:
-            continue
-        activity = calculate_pay_period_activity(leave_year, period_start.isoformat())
-        totals = {}
-        categories = sorted({*activity["earned"], *activity["used"], *activity["worked"], *activity["net"]})
-        for category in categories:
-            totals[category] = {
-                "earned": activity["earned"].get(category, 0.0),
-                "used": activity["used"].get(category, 0.0),
-                "worked": activity["worked"].get(category, 0.0),
-                "net": activity["net"].get(category, 0.0),
-            }
-        rows.append(
-            {
-                "number": pay_period.get("pay_period_number"),
-                "start": period_start.isoformat(),
-                "end": period_end.isoformat(),
-                "pay_date": pay_period_pay_date(pay_period),
-                "physical_absence_hours": _physical_absence_hours(
-                    leave_year, period_start.isoformat(), period_end.isoformat()
-                ),
-                "touches_display_month": not (period_end < month_start or period_start > month_end),
-                "totals": totals,
-                "ending_balances": dict(
-                    sorted(calculate_balances(leave_year, until_date=period_end.isoformat()).items())
-                ),
-            }
-        )
-    return rows
-
-
-def _dates_from_pay_periods(pay_periods: list[dict], field: str) -> set[str]:
-    return {str(period.get(field)) for period in pay_periods if period.get(field)}
-
-
-def _is_leave_year_end_keyword(value: str | None) -> bool:
-    return bool(value and value.strip().lower() == "leave-year-end")
+    return _names_from_rows(cache.get("holidays", []))
 
 
 def _resolve_balance_leave_year(
@@ -205,17 +66,6 @@ def _resolve_balance_leave_year(
     target = "today" if as_of is None or _is_leave_year_end_keyword(as_of) else as_of
     year, _ = resolve_leave_year_for_date(target, data_dir)
     return year, load_leave_year(year, data_dir)
-
-
-def _resolve_balance_date(value: str | None, leave_year: dict, *, default_today: bool) -> str | None:
-    if value is None:
-        return _date.today().isoformat() if default_today else None
-    if _is_leave_year_end_keyword(value):
-        leave_year_end = leave_year.get("leave_year_end")
-        if not leave_year_end:
-            raise ValueError("Leave year is missing leave_year_end.")
-        return parse_iso_date(str(leave_year_end)).isoformat()
-    return parse_iso_date(value).isoformat()
 
 
 @app.command()
@@ -255,8 +105,19 @@ def balance(
     try:
         year, leave_year = _resolve_balance_leave_year(year, as_of, data_dir)
         _show_accounting_warnings(leave_year, json_output)
-        as_of = _resolve_balance_date(as_of, leave_year, default_today=True)
-        project_to = _resolve_balance_date(project_to, leave_year, default_today=False)
+        local_date = _date.today().isoformat()
+        result = read_dated_balance(
+            {},
+            {
+                "year": year,
+                "as_of": as_of,
+                "project": project,
+                "project_to": project_to,
+                "use_or_lose": use_or_lose,
+            },
+            local_date=local_date,
+            snapshot=leave_year,
+        )
     except FileNotFoundError as exc:
         console.print(f"[red]ERROR:[/red] {exc}")
         raise typer.Exit(code=1)
@@ -268,51 +129,17 @@ def balance(
         console.print(f"[red]ERROR:[/red] {exc}")
         raise typer.Exit(code=2)
 
-    accrual_through = as_of
-    try:
-        added_accruals = ensure_automatic_accruals(leave_year, accrual_through)
-    except ValueError as exc:
-        if getattr(exc, "code", None):
-            from .rollover import report_error
+    as_of = result["as_of"]
+    projection_label = result["project_to"]
+    include_projected = result["projected"]
+    balances = result["balances"]
+    added_accruals = result["automatic_accruals_posted"]
+    accrual_through = result["automatic_accruals_posted_through"]
+    parental = result["parental"]
+    use_or_lose_data = result["use_or_lose"]
 
-            report_error(exc, json_output)
-        console.print(f"[red]ERROR:[/red] {exc}")
-        raise typer.Exit(code=2)
-
-    include_projected = project or use_or_lose or project_to is not None
-    balances = calculate_balances(
-        leave_year,
-        until_date=as_of,
-        include_projected=include_projected,
-        project_until=project_to,
-    )
-    projection_label = project_to or leave_year.get("leave_year_end") or "year end"
-    use_or_lose_data = None
-    if use_or_lose:
-        try:
-            cfg = load_config(data_dir)
-        except FileNotFoundError:
-            cfg = None
-        use_or_lose_data = calculate_use_or_lose(leave_year, balances, cfg)
-
-    parental = _parental_payload(
-        leave_year, (project_to or leave_year.get("leave_year_end")) if include_projected else as_of
-    )
     if json_output:
-        _print_json(
-            {
-                "warnings": [*getattr(leave_year, "warnings", []), *((parental or {}).get("warnings", []))],
-                "parental": parental,
-                "year": year,
-                "as_of": as_of,
-                "projected": include_projected,
-                "project_to": projection_label if include_projected else None,
-                "balances": dict(sorted(balances.items())),
-                "automatic_accruals_posted": added_accruals,
-                "automatic_accruals_posted_through": accrual_through,
-                "use_or_lose": use_or_lose_data,
-            }
-        )
+        _print_json(result)
         return
 
     if include_projected:
@@ -389,10 +216,12 @@ def pay_period_summary(
 
     try:
         date = parse_iso_date(date).isoformat()
-        pay_period = calculate_pay_period_activity(leave_year, date)["pay_period"]
-        accrual_through = pay_period.get("accrual_date") or pay_period.get("end_date")
-        added_accruals = ensure_automatic_accruals(leave_year, accrual_through)
-        activity = calculate_pay_period_activity(leave_year, date)
+        result = read_pay_period(
+            {},
+            {"year": year, "date": date, "daily": daily},
+            local_date=_date.today().isoformat(),
+            snapshot=leave_year,
+        )
     except ValueError as exc:
         if getattr(exc, "code", None):
             from .rollover import report_error
@@ -401,38 +230,14 @@ def pay_period_summary(
         console.print(f"[red]ERROR:[/red] {exc}")
         raise typer.Exit(code=2)
 
-    pay_period = activity["pay_period"]
-    ending_balances = calculate_balances(leave_year, until_date=pay_period.get("end_date"))
-    daily_activity_rows = []
-    if daily or json_output:
-        current = _date.fromisoformat(pay_period["start_date"])
-        end = _date.fromisoformat(pay_period["end_date"])
-        while current <= end:
-            day = current.isoformat()
-            day_activity = calculate_daily_activity(leave_year, day)
-            daily_activity_rows.append({"date": day, **day_activity})
-            current += _timedelta(days=1)
+    pay_period = result["pay_period"]
+    activity = result["activity"]
+    ending_balances = result["ending_balances"]
+    added_accruals = result["automatic_accruals_posted"]
+    daily_activity_rows = result["daily_activity"] or []
 
     if json_output:
-        activity_output = dict(activity)
-        activity_output["pay_period"] = normalize_pay_period(activity["pay_period"])
-        _print_json(
-            {
-                "warnings": getattr(leave_year, "warnings", []),
-                "year": year,
-                "date": date,
-                "pay_period": normalize_pay_period(pay_period),
-                "activity": activity_output,
-                "daily_activity": daily_activity_rows if daily else None,
-                "ending_balances": dict(sorted(ending_balances.items())),
-                "parental": _parental_payload(leave_year, pay_period["end_date"]),
-                "physical_absence_hours": _physical_absence_hours(
-                    leave_year, pay_period["start_date"], pay_period["end_date"]
-                ),
-                "automatic_accruals_posted": added_accruals,
-                "automatic_accruals_posted_through": accrual_through,
-            }
-        )
+        _print_json(result)
         return
 
     console.print(
@@ -590,7 +395,7 @@ def month(
 
     display_year = calendar_year if isinstance(calendar_year, int) else year
     try:
-        month_start, month_end, calendar_start, calendar_end = _month_bounds(display_year, month)
+        _month_bounds(display_year, month)
     except ValueError as exc:
         if getattr(exc, "code", None):
             from .rollover import report_error
@@ -606,8 +411,16 @@ def month(
         console.print(f"[red]ERROR:[/red] {exc}")
         raise typer.Exit(code=1)
 
+    holidays = _holiday_names_by_date(display_year, data_dir)
+    today = _date.today()
     try:
-        added_accruals = ensure_automatic_accruals(leave_year, calendar_end.isoformat())
+        result = read_month_view(
+            {},
+            {"year": year, "month": month, "calendar_year": calendar_year},
+            local_date=today.isoformat(),
+            snapshot=leave_year,
+            holidays=holidays,
+        )
     except ValueError as exc:
         if getattr(exc, "code", None):
             from .rollover import report_error
@@ -616,88 +429,10 @@ def month(
         console.print(f"[red]ERROR:[/red] {exc}")
         raise typer.Exit(code=2)
 
-    holidays = _holiday_names_by_date(display_year, data_dir)
-    transactions = _transactions_by_date(leave_year, calendar_start, calendar_end)
-    pay_period_rows = _pay_periods_for_range(
-        leave_year,
-        calendar_start,
-        calendar_end,
-        month_start,
-        month_end,
-    )
-    all_pay_dates = _dates_from_pay_periods(pay_period_rows, "pay_date")
-    pay_dates = set()
-    for pay_date in all_pay_dates:
-        try:
-            parsed_pay_date = parse_iso_date(pay_date)
-        except ValueError:
-            continue
-        if calendar_start <= parsed_pay_date <= calendar_end:
-            pay_dates.add(pay_date)
-    pay_period_end_dates = _dates_from_pay_periods(pay_period_rows, "end")
-    today = _date.today()
-
-    days = []
-    current = calendar_start
-    while current <= calendar_end:
-        date_key = current.isoformat()
-        entries = transactions.get(date_key, [])
-        days.append(
-            {
-                "date": date_key,
-                "in_display_month": month_start <= current <= month_end,
-                "holiday_name": holidays.get(date_key),
-                "is_today": current == today,
-                "is_payday": date_key in pay_dates,
-                "is_pay_period_end": date_key in pay_period_end_dates,
-                "entries": entries,
-                "display_lines": [_display_line(entry) for entry in entries],
-            }
-        )
-        current += _timedelta(days=1)
-
-    today_balance = calculate_balances(leave_year, until_date=today.isoformat())
-    projected_balances = calculate_balances(
-        leave_year,
-        until_date=today.isoformat(),
-        include_projected=True,
-        project_until=leave_year.get("leave_year_end"),
-    )
-    try:
-        cfg = load_config(data_dir)
-    except FileNotFoundError:
-        cfg = None
-    use_or_lose = calculate_use_or_lose(leave_year, projected_balances, cfg)
-
-    result = {
-        "year": display_year,
-        "month": month,
-        "today": today.isoformat(),
-        "month_start": month_start.isoformat(),
-        "month_end": month_end.isoformat(),
-        "calendar_start": calendar_start.isoformat(),
-        "calendar_end": calendar_end.isoformat(),
-        "days": days,
-        "pay_periods": pay_period_rows,
-        "pay_dates": sorted(pay_dates),
-        "pay_period_end_dates": sorted(pay_period_end_dates),
-        "warnings": getattr(leave_year, "warnings", []),
-        "parental": _parental_payload(leave_year),
-        "balance_as_of_today": {
-            "parental": _parental_payload(leave_year),
-            "warnings": getattr(leave_year, "warnings", []),
-            "as_of": today.isoformat(),
-            "balances": dict(sorted(today_balance.items())),
-        },
-        "projected_balance": {
-            "parental": _parental_payload(leave_year, leave_year.get("leave_year_end")),
-            "project_to": leave_year.get("leave_year_end"),
-            "balances": dict(sorted(projected_balances.items())),
-            "use_or_lose": use_or_lose,
-        },
-        "automatic_accruals_posted": added_accruals,
-        "automatic_accruals_posted_through": calendar_end.isoformat(),
-    }
+    days = result["days"]
+    calendar_start = result["calendar_start"]
+    calendar_end = result["calendar_end"]
+    added_accruals = result["automatic_accruals_posted"]
 
     if json_output:
         _print_json(result)
@@ -748,6 +483,12 @@ def daily_activity(
 
     try:
         date = parse_iso_date(date).isoformat()
+        result = read_day_activity(
+            {},
+            {"year": year, "date": date},
+            local_date=_date.today().isoformat(),
+            snapshot=leave_year,
+        )
     except ValueError as exc:
         if getattr(exc, "code", None):
             from .rollover import report_error
@@ -756,34 +497,16 @@ def daily_activity(
         console.print(f"[red]ERROR:[/red] {exc}")
         raise typer.Exit(code=2)
 
-    activity = calculate_daily_activity(leave_year, date)
-    if not any(activity.values()):
+    activity = result["activity"]
+    if not result["has_activity"]:
         if json_output:
-            _print_json(
-                {
-                    "year": year,
-                    "date": date,
-                    "activity": activity,
-                    "has_activity": False,
-                    "physical_absence_hours": 0.0,
-                    "parental": _parental_payload(leave_year, date),
-                }
-            )
+            _print_json(result)
             return
         console.print(f"No leave activity recorded on {date} for {year}.")
         raise typer.Exit(code=0)
 
     if json_output:
-        _print_json(
-            {
-                "year": year,
-                "date": date,
-                "activity": activity,
-                "has_activity": True,
-                "physical_absence_hours": _physical_absence_hours(leave_year, date, date),
-                "parental": _parental_payload(leave_year, date),
-            }
-        )
+        _print_json(result)
         return
 
     console.print(f"Leave activity for {date} ({year}):")

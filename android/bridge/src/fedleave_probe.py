@@ -1,15 +1,11 @@
-"""Debug-only read probe for the I02 bridge packaging experiment.
-
-The probe is experimental and versioned. I03 replaces it with the typed
-read facade from the shared core.
-"""
+"""Debug-only bridge adapter over the versioned read facade."""
 
 from __future__ import annotations
 
 import json
 import sys
 
-from fedleave.ledger import calculate_balances
+from fedleave.read_api import ReadApiError, read
 
 SCHEMA_VERSION = 1
 
@@ -25,46 +21,40 @@ def _error(code: str, field: str, message: str) -> str:
     )
 
 
-def dated_balance(request: str) -> str:
-    """Return the dated category balances for a supplied ledger JSON string."""
+def call(payload: str) -> str:
+    """Run one read operation against parsed store files and return JSON."""
     try:
-        payload = json.loads(request)
+        body = json.loads(payload)
     except (TypeError, ValueError):
         return _error("INVALID_REQUEST", "request", "request must be a UTF-8 JSON string.")
-
-    if not isinstance(payload, dict):
+    if not isinstance(body, dict):
         return _error("INVALID_REQUEST", "request", "request must decode to a JSON object.")
-
-    if payload.get("schema_version") != SCHEMA_VERSION:
+    if body.get("schema_version") != SCHEMA_VERSION:
         return _error("INVALID_REQUEST", "schema_version", "Unsupported schema_version.")
 
-    for key in ("leave_year", "as_of"):
-        if key not in payload:
-            return _error("INVALID_REQUEST", key, f"Missing required field {key!r}.")
+    local_date = body.get("local_date")
+    raw_files = body.get("files")
+    request = body.get("request")
+    if not isinstance(local_date, str):
+        return _error("INVALID_REQUEST", "local_date", "local_date must be an ISO date string.")
+    if not isinstance(raw_files, dict):
+        return _error("INVALID_REQUEST", "files", "files must be an object of JSON strings.")
+    if not isinstance(request, dict):
+        return _error("INVALID_REQUEST", "request", "request must be an object.")
 
-    leave_year = payload["leave_year"]
-    if not isinstance(leave_year, dict):
-        return _error("INVALID_REQUEST", "leave_year", "leave_year must be a JSON object.")
-
-    as_of = payload["as_of"]
-    if not isinstance(as_of, str):
-        return _error("INVALID_REQUEST", "as_of", "as_of must be an ISO date string.")
+    files = {}
+    for name, text in raw_files.items():
+        if not isinstance(name, str):
+            return _error("INVALID_REQUEST", "files", "File names must be strings.")
+        try:
+            files[name] = json.loads(text)
+        except (TypeError, ValueError):
+            return _error("INVALID_REQUEST", "files", f"{name} must be a UTF-8 JSON string.")
 
     try:
-        balances = calculate_balances(leave_year, until_date=as_of)
-    except Exception as exc:
-        return _error("CALCULATION_ERROR", "leave_year", type(exc).__name__)
-
-    return json.dumps(
-        {
-            "schema_version": SCHEMA_VERSION,
-            "ok": True,
-            "year": leave_year.get("leave_year"),
-            "as_of": as_of,
-            "balances": dict(sorted(balances.items())),
-        },
-        sort_keys=True,
-    )
+        return json.dumps(read(files, request, local_date=local_date), sort_keys=True)
+    except ReadApiError as exc:
+        return _error(exc.code, exc.field, str(exc))
 
 
 def loaded_modules() -> str:

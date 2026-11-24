@@ -8,9 +8,9 @@ from math import ceil, isfinite
 from typing import Any
 
 from .categories import CATEGORY_POLICIES
-from .config import Config
 from .ledger import generate_transaction_id
 from .payperiods import leave_year_period_count
+from .rule_defaults import DEFAULT_RULES
 from .transaction_effects import transaction_is_effective
 
 EXPIRING_CATEGORIES = tuple(name for name, policy in CATEGORY_POLICIES.items() if policy.mode == "lot_carryover")
@@ -20,7 +20,7 @@ EPSILON = 0.000001
 
 
 def expiration_rules(config: dict[str, Any] | None) -> dict[str, dict[str, Any]]:
-    defaults = Config().model_dump()["rules"]
+    defaults = deepcopy(DEFAULT_RULES)
     supplied = (config or {}).get("rules", {})
     if not isinstance(supplied, dict):
         raise ValueError("UNSUPPORTED_CATEGORY_POLICY: rules must be an object")
