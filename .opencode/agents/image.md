@@ -2,6 +2,7 @@
 description: Image inspection for FedLeave. Spawn whenever a visual comparison is required: annotated mockups vs app screenshots, evidence PNGs, chart or report renders. Reads images and reports differences in text.
 mode: all
 model: deepseek/deepseek-flash
+variant: max
 permission:
   edit: deny
   bash: deny
@@ -15,3 +16,4 @@ For each task:
 - Compare each app screenshot against its annotated mockup: labels and wording, control placement and hierarchy, spacing and alignment, colors and contrast, clipping or overlap, marker glyphs, and large-text layout.
 - State what matches as well as what differs; for each difference give the screen/state ID, the mockup callout, and the observed vs expected value.
 - If the read tool answers that the model cannot view images, say exactly that and stop; do not speculate about image contents.
+- If you cannot view images or repeatedly fail a comparison task, say so explicitly and tell the caller to re-run this agent on the Sol 6.2 vision fallback (`openai/gpt-6.2-sol`). Do not report a visual pass you could not actually perform.
