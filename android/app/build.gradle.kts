@@ -66,6 +66,11 @@ android {
                 rootProject.file("qa/fixtures/storage"),
             )
         }
+        getByName("test") {
+            // The pinned calendar fixture doubles as the JVM test metadata
+            // input for CalendarViewModel tests.
+            resources.srcDirs(rootProject.file("qa/fixtures/calendar-2026"))
+        }
     }
 }
 
@@ -96,6 +101,7 @@ kotlin {
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
