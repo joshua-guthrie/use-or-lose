@@ -59,5 +59,5 @@ For grouped rows, commit the first verified subset before extending it. Keep the
 - [x] Android Studio, virtual or physical phones, testing and Play account and release steps have beginner walkthroughs.
 - [x] Implementation is divided into bounded, reviewable checkpoints with commits and passdowns.
 - [x] Review the draft menu labels, nested routes and Back behavior with the owner using Chapter 01.07. Approved November 23, 2026 as written, including **Force Balance**, **Overtime, comp and credit**, the top-right Share control, and the nested Settings lists. [Checkpoint 29](../../passdowns/29-menu-review-approval.md)
-- [ ] The owner reviews draft choices and approves implementation.
+- [x] The owner reviews draft choices and approves implementation. Approved November 23, 2026 for I01 through I06. [Checkpoint 31](../../passdowns/31-implementation-approved.md)
 - [ ] Run the bridge proof of concept, all Android acceptance cases, and the Linux and Windows GUI round trips on the real builds before release.
