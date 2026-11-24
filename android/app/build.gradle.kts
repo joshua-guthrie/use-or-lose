@@ -2,6 +2,23 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.chaquopy)
+}
+
+val bridgePythonSrc = layout.buildDirectory.dir("generated/bridge-python")
+
+val prepareBridgePython by tasks.registering(Sync::class) {
+    from(rootProject.file("../src/fedleave")) {
+        include("__init__.py")
+        include("categories.py")
+        include("transaction_effects.py")
+        include("ledger.py")
+        into("fedleave")
+    }
+    from(rootProject.file("bridge/src")) {
+        include("fedleave_probe.py")
+    }
+    into(bridgePythonSrc)
 }
 
 android {
@@ -15,6 +32,9 @@ android {
         versionCode = 1
         versionName = "0.1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        ndk {
+            abiFilters += listOf("arm64-v8a", "x86_64")
+        }
     }
 
     buildTypes {
@@ -29,6 +49,32 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+    sourceSets {
+        getByName("androidTest") {
+            assets.srcDirs(
+                rootProject.file("qa/fixtures/calendar-2026"),
+                rootProject.file("qa/golden/calendar-2026"),
+            )
+        }
+    }
+}
+
+chaquopy {
+    defaultConfig {
+        version = "3.13"
+    }
+    sourceSets {
+        getByName("main") {
+            srcDir(bridgePythonSrc.get().asFile)
+        }
+    }
+}
+
+afterEvaluate {
+    tasks.named("preBuild").configure { dependsOn(prepareBridgePython) }
+    tasks.matching { it.name.startsWith("merge") && it.name.contains("PythonSources") }.configureEach {
+        dependsOn(prepareBridgePython)
     }
 }
 

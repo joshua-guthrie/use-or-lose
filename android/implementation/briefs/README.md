@@ -5,7 +5,7 @@ Start with the [milestones and dependencies](../../specification/chapters/06-del
 | Brief | Status and scope |
 | --- | --- |
 | [I01-01 Start the Android project](I01-01-start-the-android-project.md) | Complete. Toolchain pinned in the README; smoke test and offline launch pass on the API 36 emulator. [QA report](../../qa/reports/I01-01.md) |
-| [I02 Bridge packaging experiment](I02-bridge-experiment.md) | Handoff draft. Decides Chaquopy or the fallback with packaging, parity, offline and timing evidence. |
+| [I02 Bridge packaging experiment](I02-bridge-experiment.md) | Complete. Chaquopy 17.2.0 and Python 3.13 pass parity, offline, dependency-audit and timing checks. [QA report](../../qa/reports/I02.md) |
 | [I03 Read-only core boundary](I03-read-only-core.md) | Handoff draft. Extracts the snapshot, dated balance, day, period and month facade. |
 | [I04 Private JSON store](I04-private-store.md) | Handoff draft. Adds the no-backup canonical store, generation writer and recovery. |
 | [I05 Calendar navigation and balances](I05-calendar.md) | Detailed handoff draft. I01–I04 supply the pinned source, actual module paths, bridge calls, and run settings. |

@@ -11,7 +11,7 @@ The product specification, acceptance plan, orchestration rules and the first im
 | Product specification and parity | Complete; menu review approved November 23, 2026 |
 | Orchestration specification | Complete; OR01 pilot not started |
 | Implementation briefs | I01-01 complete; I02–I05 plus I06-02 drafts ready |
-| Android project | I01 complete — builds, smoke test and offline launch pass on the API 36 emulator |
+| Android project | I02 complete — Chaquopy bridge passes parity, offline, dependency-audit and timing checks; owner decision in the [I02 QA report](qa/reports/I02.md) |
 | Fixtures | Calendar 2026 store, golden outputs and malformed-store variants under `qa/` |
 
 Keep this file current. Each milestone replaces planned commands and toolchain values with the tested values from its report.
@@ -38,16 +38,19 @@ The pinned versions below were verified by I01's report. A clean-sync launch fro
 | JDK | 21 to run Gradle; source/target 17 |
 | compileSdk / targetSdk / minSdk | 36 / 36 / 26 |
 | Emulator | `fedleave_test` AVD, pixel_5, API 36 `google_apis` `x86_64`, 1080x2340 @ 440 dpi |
-| Bridge runtime and Chaquopy | Pending I02 |
+| Bridge runtime and Chaquopy | Chaquopy 17.2.0 with Python 3.13, ABIs `arm64-v8a` and `x86_64` |
 
 ## Compile and test
 
-Run from `android/` with `JAVA_HOME` pointing at the pinned JDK. On Windows use `gradlew.bat` for the same tasks. All of these passed in I01:
+Run from `android/` with `JAVA_HOME` pointing at the pinned JDK and the repository virtual environment on `PATH` (Chaquopy's host Python must match the app's Python 3.13). On Windows use `gradlew.bat` for the same tasks. All of these passed in I01 and I02:
 
 ```bash
+export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+export PATH="$PWD/../.venv/bin:$PATH"
 ./gradlew --version
 ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
 ./gradlew :app:connectedDebugAndroidTest
+./gradlew :app:bundleDebug
 ```
 
 The connected test needs a booted emulator or a phone. On this machine, stop the Gradle daemon before starting the emulator to avoid memory pressure:

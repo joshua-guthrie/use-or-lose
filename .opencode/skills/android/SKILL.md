@@ -10,7 +10,9 @@ description: FedLeave Android app development. Use when working on the android/ 
 - Android SDK: `~/Android/Sdk` (cmdline-tools `latest`, platform-tools, `platforms;android-36`, `build-tools;36.0.0`, `emulator`, `system-images;android-36;google_apis;x86_64`)
 - JDK: `JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64`
 - SDK tools: `~/Android/Sdk/cmdline-tools/latest/bin/{sdkmanager,avdmanager}`, `~/Android/Sdk/platform-tools/adb`
-- Pinned versions: Gradle wrapper 8.14.3, AGP 8.13.2, Kotlin 2.2.20, Compose BOM 2025.06.01, compileSdk/targetSdk 36, minSdk 26, application ID `com.westmouthbay.fedleave`
+- Pinned versions: Gradle wrapper 8.14.3, AGP 8.13.2, Kotlin 2.2.20, Compose BOM 2025.06.01, Chaquopy 17.2.0 with Python 3.13, compileSdk/targetSdk 36, minSdk 26, application ID `com.westmouthbay.fedleave`
+- Export `JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64` and put the repo `.venv/bin` on `PATH` before Gradle builds: Chaquopy's host Python must match the app Python 3.13.
+- The bridge syncs a pinned file subset from `src/fedleave` into the app via the `prepareBridgePython` task. If the shared core's read path adds an import, extend the include list in `android/app/build.gradle.kts`. Keep pydantic out of the bundled subset.
 - AVD: `fedleave_test` (pixel_5, API 36 `google_apis` x86_64, 1080x2340 @ 440 dpi, 1536 MB RAM). Start headless:
   `~/Android/Sdk/emulator/emulator -avd fedleave_test -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect &`
 - The host has 5.6 GB RAM. Stop the Gradle daemon (`./gradlew --stop`) before booting the emulator; System UI may show ANR dialogs under memory pressure (tap **Wait**, not Close). Dismiss airplane-mode ANRs the same way.
