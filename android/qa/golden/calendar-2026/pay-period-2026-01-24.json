@@ -1,0 +1,63 @@
+{
+  "activity": {
+    "earned": {
+      "annual": 6.0,
+      "sick": 4.0
+    },
+    "net": {
+      "annual": -8.0,
+      "sick": 4.0
+    },
+    "pay_period": {
+      "accrual_date": "2026-01-24",
+      "end_date": "2026-01-24",
+      "pay_date": "2026-01-30",
+      "pay_period_number": 1,
+      "start_date": "2026-01-11"
+    },
+    "used": {
+      "annual": 14.0,
+      "sick": 0.0
+    },
+    "worked": {
+      "annual": 0.0,
+      "sick": 0.0
+    }
+  },
+  "automatic_accruals_posted": 0,
+  "automatic_accruals_posted_through": "2026-01-24",
+  "daily_activity": null,
+  "date": "2026-01-24",
+  "ending_balances": {
+    "admin": 0.0,
+    "annual": 92.0,
+    "comp": 0.0,
+    "court": 0.0,
+    "credit": 0.0,
+    "excused": 0.0,
+    "flex": 0.0,
+    "fmla": 0.0,
+    "holiday": 0.0,
+    "lwop": 0.0,
+    "military": 0.0,
+    "other": 0.0,
+    "overtime": 0.0,
+    "ppl": 0.0,
+    "religious_comp": 0.0,
+    "restored_annual": 0.0,
+    "sick": 24.0,
+    "time_off_award": 0.0,
+    "travel_comp": 0.0
+  },
+  "parental": null,
+  "pay_period": {
+    "accrual_date": "2026-01-24",
+    "end_date": "2026-01-24",
+    "pay_date": "2026-01-30",
+    "pay_period_number": 1,
+    "start_date": "2026-01-11"
+  },
+  "physical_absence_hours": 14.0,
+  "warnings": [],
+  "year": 2026
+}

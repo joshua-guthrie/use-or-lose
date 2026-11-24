@@ -1,0 +1,128 @@
+{
+  "generated_at": "2026-01-16T00:00:00",
+  "holidays": [
+    {
+      "actual_date": "2026-01-01",
+      "code": "H",
+      "display_date": "2026-01-01",
+      "manual_override": false,
+      "name": "New Year's Day",
+      "observed_date": "2026-01-01",
+      "short_name": null,
+      "source": "python_holidays"
+    },
+    {
+      "actual_date": "2026-01-19",
+      "code": "H",
+      "display_date": "2026-01-19",
+      "manual_override": false,
+      "name": "Martin Luther King Jr. Day",
+      "observed_date": "2026-01-19",
+      "short_name": null,
+      "source": "python_holidays"
+    },
+    {
+      "actual_date": "2026-02-16",
+      "code": "H",
+      "display_date": "2026-02-16",
+      "manual_override": false,
+      "name": "Washington's Birthday",
+      "observed_date": "2026-02-16",
+      "short_name": null,
+      "source": "python_holidays"
+    },
+    {
+      "actual_date": "2026-05-25",
+      "code": "H",
+      "display_date": "2026-05-25",
+      "manual_override": false,
+      "name": "Memorial Day",
+      "observed_date": "2026-05-25",
+      "short_name": null,
+      "source": "python_holidays"
+    },
+    {
+      "actual_date": "2026-06-19",
+      "code": "H",
+      "display_date": "2026-06-19",
+      "manual_override": false,
+      "name": "Juneteenth National Independence Day",
+      "observed_date": "2026-06-19",
+      "short_name": null,
+      "source": "python_holidays"
+    },
+    {
+      "actual_date": "2026-07-03",
+      "code": "H",
+      "display_date": "2026-07-03",
+      "manual_override": false,
+      "name": "Independence Day (observed)",
+      "observed_date": "2026-07-03",
+      "short_name": null,
+      "source": "python_holidays"
+    },
+    {
+      "actual_date": "2026-07-04",
+      "code": "H",
+      "display_date": "2026-07-04",
+      "manual_override": false,
+      "name": "Independence Day",
+      "observed_date": "2026-07-04",
+      "short_name": null,
+      "source": "python_holidays"
+    },
+    {
+      "actual_date": "2026-09-07",
+      "code": "H",
+      "display_date": "2026-09-07",
+      "manual_override": false,
+      "name": "Labor Day",
+      "observed_date": "2026-09-07",
+      "short_name": null,
+      "source": "python_holidays"
+    },
+    {
+      "actual_date": "2026-10-12",
+      "code": "H",
+      "display_date": "2026-10-12",
+      "manual_override": false,
+      "name": "Columbus Day",
+      "observed_date": "2026-10-12",
+      "short_name": null,
+      "source": "python_holidays"
+    },
+    {
+      "actual_date": "2026-11-11",
+      "code": "H",
+      "display_date": "2026-11-11",
+      "manual_override": false,
+      "name": "Veterans Day",
+      "observed_date": "2026-11-11",
+      "short_name": null,
+      "source": "python_holidays"
+    },
+    {
+      "actual_date": "2026-11-26",
+      "code": "H",
+      "display_date": "2026-11-26",
+      "manual_override": false,
+      "name": "Thanksgiving Day",
+      "observed_date": "2026-11-26",
+      "short_name": null,
+      "source": "python_holidays"
+    },
+    {
+      "actual_date": "2026-12-25",
+      "code": "H",
+      "display_date": "2026-12-25",
+      "manual_override": false,
+      "name": "Christmas Day",
+      "observed_date": "2026-12-25",
+      "short_name": null,
+      "source": "python_holidays"
+    }
+  ],
+  "schema_version": 1,
+  "source": "python_holidays",
+  "year": 2026
+}

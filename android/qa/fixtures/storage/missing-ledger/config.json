@@ -1,0 +1,125 @@
+{
+  "defaults": {
+    "annual_leave_accrual_hours": 6.0,
+    "lunch_end": "12:00",
+    "lunch_start": "11:30",
+    "normal_workdays": [
+      "mon",
+      "tue",
+      "wed",
+      "thu",
+      "fri"
+    ],
+    "sick_leave_accrual_hours": 4.0,
+    "time_increment_hours": 0.25,
+    "workday_end": "15:30",
+    "workday_start": "07:00"
+  },
+  "holidays": {
+    "allow_manual_override": true,
+    "cache_dir": "holiday_cache",
+    "cache_enabled": true,
+    "country": "US",
+    "enabled": true,
+    "fail_if_holidays_unavailable": false,
+    "ics_url": "https://www.opm.gov/policy-data-oversight/pay-leave/federal-holidays/holidays.ics",
+    "include_observed_dates": true,
+    "mark_actual_and_observed": false,
+    "source_preference": "python_holidays"
+  },
+  "rules": {
+    "annual": {
+      "allow_restored_leave": true,
+      "carryover_limit_hours": 240.0,
+      "track_use_or_lose": true
+    },
+    "comp": {
+      "allow_extension": true,
+      "allow_forfeiture_tracking": true,
+      "allow_payout_tracking": true,
+      "expiration_action": "warn",
+      "expiration_pay_periods_after_earned": 26,
+      "expires": true,
+      "reminder_pay_periods": [
+        1,
+        3,
+        6,
+        12
+      ]
+    },
+    "credit": {
+      "enabled": true,
+      "expires": false,
+      "forfeit_excess_at_pay_period_rollover": true,
+      "max_balance_hours": 24.0,
+      "max_carryover_hours": 24.0,
+      "max_earn_per_day_hours": null,
+      "max_earn_per_pay_period_hours": null,
+      "requires_flexible_work_schedule": true,
+      "same_day_use_allowed": false,
+      "same_pay_period_use_allowed": true,
+      "usable_when": "next_day"
+    },
+    "fmla": {
+      "carryover_mode": "usage_tracking",
+      "history_complete_from": null,
+      "weekly_hours": null
+    },
+    "ppl": {
+      "allow_extension": false,
+      "expiration_action": "expire",
+      "expires": true
+    },
+    "religious_comp": {
+      "agency_policy_required": true,
+      "expires": false
+    },
+    "restored_annual": {
+      "allow_extension": true,
+      "expiration_action": "forfeit",
+      "expiration_leave_years_after_restored": 2,
+      "expires": true,
+      "reminder_pay_periods": [
+        1,
+        3,
+        6,
+        12
+      ]
+    },
+    "sick": {
+      "carryover_limit_hours": null,
+      "expires": false
+    },
+    "time_off_award": {
+      "agency_policy_required": true,
+      "allow_extension": true,
+      "expiration_action": "forfeit",
+      "expiration_days_after_earned": null,
+      "expires": false,
+      "reminder_pay_periods": [
+        1,
+        3,
+        6,
+        12
+      ]
+    },
+    "travel_comp": {
+      "allow_extension": true,
+      "expiration_action": "forfeit",
+      "expiration_pay_periods_after_earned": 26,
+      "expires": true,
+      "extension_pay_periods": 26,
+      "reminder_pay_periods": [
+        1,
+        3,
+        6,
+        12
+      ]
+    }
+  },
+  "schema_version": 1,
+  "user": {
+    "display_name": "User",
+    "timezone": "America/New_York"
+  }
+}

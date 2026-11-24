@@ -1,0 +1,214 @@
+{
+  "cases": [
+    {
+      "case_id": "T-CAL-BAL-02",
+      "expected": {
+        "as_of": "2026-01-13",
+        "balances": {
+          "annual": 92.0,
+          "sick": 20.0
+        },
+        "year": 2026
+      },
+      "expected_file": "android/qa/golden/calendar-2026/balance-2026-01-13.json",
+      "operation": "dated_balance",
+      "request": {
+        "as_of": "2026-01-13",
+        "local_date": "2026-01-16"
+      },
+      "stored_state": "unchanged"
+    },
+    {
+      "case_id": "T-CAL-BAL-01",
+      "expected": {
+        "as_of": "2026-01-16",
+        "balances": {
+          "annual": 90.0,
+          "sick": 20.0
+        },
+        "year": 2026
+      },
+      "expected_file": "android/qa/golden/calendar-2026/balance-2026-01-16.json",
+      "operation": "dated_balance",
+      "request": {
+        "as_of": "2026-01-16",
+        "local_date": "2026-01-16"
+      },
+      "stored_state": "unchanged"
+    },
+    {
+      "case_id": "T-CAL-BAL-04",
+      "expected": {
+        "as_of": "2026-01-22",
+        "balances": {
+          "annual": 86.0,
+          "sick": 20.0
+        },
+        "year": 2026
+      },
+      "expected_file": "android/qa/golden/calendar-2026/balance-2026-01-22.json",
+      "operation": "dated_balance",
+      "request": {
+        "as_of": "2026-01-22",
+        "local_date": "2026-01-16"
+      },
+      "stored_state": "unchanged"
+    },
+    {
+      "case_id": "T-CAL-BAL-03",
+      "expected": {
+        "as_of": "2026-01-24",
+        "balances": {
+          "annual": 92.0,
+          "sick": 24.0
+        },
+        "year": 2026
+      },
+      "expected_file": "android/qa/golden/calendar-2026/balance-2026-01-24.json",
+      "operation": "dated_balance",
+      "request": {
+        "as_of": "2026-01-24",
+        "local_date": "2026-01-16"
+      },
+      "stored_state": "unchanged"
+    },
+    {
+      "case_id": "T-CAL-BAL-04",
+      "expected": {
+        "as_of": "2026-01-25",
+        "balances": {
+          "annual": 89.0,
+          "sick": 24.0
+        },
+        "year": 2026
+      },
+      "expected_file": "android/qa/golden/calendar-2026/balance-2026-01-25.json",
+      "operation": "dated_balance",
+      "request": {
+        "as_of": "2026-01-25",
+        "local_date": "2026-01-16"
+      },
+      "stored_state": "unchanged"
+    },
+    {
+      "case_id": "T-CAL-BAL-07",
+      "expected": {
+        "as_of": "2027-01-04",
+        "balances": {
+          "annual": 233.0,
+          "sick": 120.0
+        },
+        "year": 2026
+      },
+      "expected_file": "android/qa/golden/calendar-2026/balance-2027-01-04.json",
+      "operation": "dated_balance",
+      "request": {
+        "as_of": "2027-01-04",
+        "local_date": "2026-01-16"
+      },
+      "stored_state": "unchanged"
+    },
+    {
+      "case_id": "T-CAL-BAL-03",
+      "expected": {
+        "activity": {
+          "earned": {
+            "annual": 6.0,
+            "sick": 4.0
+          },
+          "used": {
+            "annual": 14.0,
+            "sick": 0.0
+          }
+        },
+        "ending_balances": {
+          "annual": 92.0,
+          "sick": 24.0
+        },
+        "period": {
+          "end_date": "2026-01-24",
+          "pay_date": "2026-01-30",
+          "start_date": "2026-01-11"
+        }
+      },
+      "expected_file": "android/qa/golden/calendar-2026/pay-period-2026-01-24.json",
+      "operation": "pay_period_detail",
+      "request": {
+        "date": "2026-01-24",
+        "local_date": "2026-01-16"
+      },
+      "stored_state": "unchanged"
+    },
+    {
+      "case_id": "T-CAL-NAV-01",
+      "expected": {
+        "activity": {
+          "used": {
+            "annual": 2.0
+          }
+        },
+        "has_activity": true,
+        "physical_absence_hours": 2.0
+      },
+      "expected_file": "android/qa/golden/calendar-2026/activity-2026-01-16.json",
+      "operation": "day_activity",
+      "request": {
+        "date": "2026-01-16",
+        "local_date": "2026-01-16"
+      },
+      "stored_state": "unchanged"
+    },
+    {
+      "case_id": "T-CAL-NAV-01",
+      "expected": {
+        "balance_as_of_today": {
+          "annual": 90.0,
+          "sick": 20.0
+        },
+        "is_today": [
+          "2026-01-16"
+        ],
+        "today": "2026-01-16"
+      },
+      "expected_file": "android/qa/golden/calendar-2026/month-2026-01.json",
+      "operation": "month_view",
+      "request": {
+        "local_date": "2026-01-16",
+        "month": 1,
+        "year": 2026
+      },
+      "stored_state": "unchanged"
+    }
+  ],
+  "description": "Pinned synthetic Calendar balance fixture for Android bridge, core and store milestones.",
+  "desktop_reference": {
+    "generator_source_revision": "507e5a58d948d8c024cc82bc292e63dd84be5f64",
+    "published_build": "0.2.2.dev0+g7041ce9e",
+    "source_revision": "7041ce9e9921dd4c407595ed3269de1aca43e699"
+  },
+  "fixture_id": "calendar-2026",
+  "frozen_local_date": "2026-01-16",
+  "generated_by": "android/qa/fixtures/build_calendar_fixture.py",
+  "generator_environment": {
+    "fedleave": "0.2.2",
+    "holidays": "0.98",
+    "pydantic": "2.13.4",
+    "python": "3.13.7"
+  },
+  "schema_version": 1,
+  "store": {
+    "files": {
+      "config.json": "af661f09d1e11368202bd278d6538fe9f609959db63649f02c4d32fb92302aaf",
+      "holiday_cache/federal_holidays_2026.json": "f252e13278065cf60000966accddc8d567e138448924862030545eb9458f5341",
+      "leave_years/2026.json": "c361f5afac82c494876088e399940b8c04b58cadc50c21086e6f4191d000e2be"
+    },
+    "notes": [
+      "Manual transaction and holiday-cache timestamps are normalized to the frozen local date.",
+      "Automatic accrual rows keep their date-derived audit timestamps.",
+      "Local lock files and backup directories are excluded."
+    ],
+    "path": "android/qa/fixtures/calendar-2026",
+    "tree_digest": "03e9e1757f73015b356b900703a13a88390e854f274c7bce78bd2f9f00c7aea9"
+  },
+  "timezone": "America/New_York"
+}

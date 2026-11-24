@@ -1,0 +1,586 @@
+{
+  "automatic_accruals_posted": 0,
+  "automatic_accruals_posted_through": "2026-01-31",
+  "balance_as_of_today": {
+    "as_of": "2026-01-16",
+    "balances": {
+      "admin": 0.0,
+      "annual": 90.0,
+      "comp": 0.0,
+      "court": 0.0,
+      "credit": 0.0,
+      "excused": 0.0,
+      "flex": 0.0,
+      "fmla": 0.0,
+      "holiday": 0.0,
+      "lwop": 0.0,
+      "military": 0.0,
+      "other": 0.0,
+      "overtime": 0.0,
+      "ppl": 0.0,
+      "religious_comp": 0.0,
+      "restored_annual": 0.0,
+      "sick": 20.0,
+      "time_off_award": 0.0,
+      "travel_comp": 0.0
+    },
+    "parental": null,
+    "warnings": []
+  },
+  "calendar_end": "2026-01-31",
+  "calendar_start": "2025-12-28",
+  "days": [
+    {
+      "date": "2025-12-28",
+      "display_lines": [],
+      "entries": [],
+      "holiday_name": null,
+      "in_display_month": false,
+      "is_pay_period_end": false,
+      "is_payday": false,
+      "is_today": false
+    },
+    {
+      "date": "2025-12-29",
+      "display_lines": [],
+      "entries": [],
+      "holiday_name": null,
+      "in_display_month": false,
+      "is_pay_period_end": false,
+      "is_payday": false,
+      "is_today": false
+    },
+    {
+      "date": "2025-12-30",
+      "display_lines": [],
+      "entries": [],
+      "holiday_name": null,
+      "in_display_month": false,
+      "is_pay_period_end": false,
+      "is_payday": false,
+      "is_today": false
+    },
+    {
+      "date": "2025-12-31",
+      "display_lines": [],
+      "entries": [],
+      "holiday_name": null,
+      "in_display_month": false,
+      "is_pay_period_end": false,
+      "is_payday": false,
+      "is_today": false
+    },
+    {
+      "date": "2026-01-01",
+      "display_lines": [],
+      "entries": [],
+      "holiday_name": "New Year's Day",
+      "in_display_month": true,
+      "is_pay_period_end": false,
+      "is_payday": false,
+      "is_today": false
+    },
+    {
+      "date": "2026-01-02",
+      "display_lines": [],
+      "entries": [],
+      "holiday_name": null,
+      "in_display_month": true,
+      "is_pay_period_end": false,
+      "is_payday": false,
+      "is_today": false
+    },
+    {
+      "date": "2026-01-03",
+      "display_lines": [],
+      "entries": [],
+      "holiday_name": null,
+      "in_display_month": true,
+      "is_pay_period_end": false,
+      "is_payday": false,
+      "is_today": false
+    },
+    {
+      "date": "2026-01-04",
+      "display_lines": [],
+      "entries": [],
+      "holiday_name": null,
+      "in_display_month": true,
+      "is_pay_period_end": false,
+      "is_payday": false,
+      "is_today": false
+    },
+    {
+      "date": "2026-01-05",
+      "display_lines": [],
+      "entries": [],
+      "holiday_name": null,
+      "in_display_month": true,
+      "is_pay_period_end": false,
+      "is_payday": false,
+      "is_today": false
+    },
+    {
+      "date": "2026-01-06",
+      "display_lines": [],
+      "entries": [],
+      "holiday_name": null,
+      "in_display_month": true,
+      "is_pay_period_end": false,
+      "is_payday": false,
+      "is_today": false
+    },
+    {
+      "date": "2026-01-07",
+      "display_lines": [],
+      "entries": [],
+      "holiday_name": null,
+      "in_display_month": true,
+      "is_pay_period_end": false,
+      "is_payday": false,
+      "is_today": false
+    },
+    {
+      "date": "2026-01-08",
+      "display_lines": [],
+      "entries": [],
+      "holiday_name": null,
+      "in_display_month": true,
+      "is_pay_period_end": false,
+      "is_payday": false,
+      "is_today": false
+    },
+    {
+      "date": "2026-01-09",
+      "display_lines": [],
+      "entries": [],
+      "holiday_name": null,
+      "in_display_month": true,
+      "is_pay_period_end": false,
+      "is_payday": false,
+      "is_today": false
+    },
+    {
+      "date": "2026-01-10",
+      "display_lines": [],
+      "entries": [],
+      "holiday_name": null,
+      "in_display_month": true,
+      "is_pay_period_end": false,
+      "is_payday": false,
+      "is_today": false
+    },
+    {
+      "date": "2026-01-11",
+      "display_lines": [],
+      "entries": [],
+      "holiday_name": null,
+      "in_display_month": true,
+      "is_pay_period_end": false,
+      "is_payday": false,
+      "is_today": false
+    },
+    {
+      "date": "2026-01-12",
+      "display_lines": [],
+      "entries": [],
+      "holiday_name": null,
+      "in_display_month": true,
+      "is_pay_period_end": false,
+      "is_payday": false,
+      "is_today": false
+    },
+    {
+      "date": "2026-01-13",
+      "display_lines": [
+        "A -8.0"
+      ],
+      "entries": [
+        {
+          "category": "annual",
+          "description": "",
+          "direction": "used",
+          "hours": 8.0,
+          "id": "20260113-001",
+          "source": "manual",
+          "status": "approved"
+        }
+      ],
+      "holiday_name": null,
+      "in_display_month": true,
+      "is_pay_period_end": false,
+      "is_payday": false,
+      "is_today": false
+    },
+    {
+      "date": "2026-01-14",
+      "display_lines": [],
+      "entries": [],
+      "holiday_name": null,
+      "in_display_month": true,
+      "is_pay_period_end": false,
+      "is_payday": false,
+      "is_today": false
+    },
+    {
+      "date": "2026-01-15",
+      "display_lines": [],
+      "entries": [],
+      "holiday_name": null,
+      "in_display_month": true,
+      "is_pay_period_end": false,
+      "is_payday": false,
+      "is_today": false
+    },
+    {
+      "date": "2026-01-16",
+      "display_lines": [
+        "A -2.0"
+      ],
+      "entries": [
+        {
+          "category": "annual",
+          "description": "",
+          "direction": "used",
+          "hours": 2.0,
+          "id": "20260116-001",
+          "source": "manual",
+          "status": "approved"
+        }
+      ],
+      "holiday_name": null,
+      "in_display_month": true,
+      "is_pay_period_end": false,
+      "is_payday": false,
+      "is_today": true
+    },
+    {
+      "date": "2026-01-17",
+      "display_lines": [],
+      "entries": [],
+      "holiday_name": null,
+      "in_display_month": true,
+      "is_pay_period_end": false,
+      "is_payday": false,
+      "is_today": false
+    },
+    {
+      "date": "2026-01-18",
+      "display_lines": [],
+      "entries": [],
+      "holiday_name": null,
+      "in_display_month": true,
+      "is_pay_period_end": false,
+      "is_payday": false,
+      "is_today": false
+    },
+    {
+      "date": "2026-01-19",
+      "display_lines": [],
+      "entries": [],
+      "holiday_name": "Martin Luther King Jr. Day",
+      "in_display_month": true,
+      "is_pay_period_end": false,
+      "is_payday": false,
+      "is_today": false
+    },
+    {
+      "date": "2026-01-20",
+      "display_lines": [],
+      "entries": [],
+      "holiday_name": null,
+      "in_display_month": true,
+      "is_pay_period_end": false,
+      "is_payday": false,
+      "is_today": false
+    },
+    {
+      "date": "2026-01-21",
+      "display_lines": [],
+      "entries": [],
+      "holiday_name": null,
+      "in_display_month": true,
+      "is_pay_period_end": false,
+      "is_payday": false,
+      "is_today": false
+    },
+    {
+      "date": "2026-01-22",
+      "display_lines": [
+        "A -4.0"
+      ],
+      "entries": [
+        {
+          "category": "annual",
+          "description": "",
+          "direction": "used",
+          "hours": 4.0,
+          "id": "20260122-001",
+          "source": "manual",
+          "status": "planned"
+        }
+      ],
+      "holiday_name": null,
+      "in_display_month": true,
+      "is_pay_period_end": false,
+      "is_payday": false,
+      "is_today": false
+    },
+    {
+      "date": "2026-01-23",
+      "display_lines": [],
+      "entries": [],
+      "holiday_name": null,
+      "in_display_month": true,
+      "is_pay_period_end": false,
+      "is_payday": false,
+      "is_today": false
+    },
+    {
+      "date": "2026-01-24",
+      "display_lines": [
+        "A +6.0",
+        "S +4.0"
+      ],
+      "entries": [
+        {
+          "category": "annual",
+          "description": "Automatic annual leave accrual for pay period 1",
+          "direction": "earned",
+          "hours": 6.0,
+          "id": "20260124-001",
+          "source": "auto_accrual",
+          "status": "reconciled"
+        },
+        {
+          "category": "sick",
+          "description": "Automatic sick leave accrual for pay period 1",
+          "direction": "earned",
+          "hours": 4.0,
+          "id": "20260124-002",
+          "source": "auto_accrual",
+          "status": "reconciled"
+        }
+      ],
+      "holiday_name": null,
+      "in_display_month": true,
+      "is_pay_period_end": true,
+      "is_payday": false,
+      "is_today": false
+    },
+    {
+      "date": "2026-01-25",
+      "display_lines": [
+        "A -3.0"
+      ],
+      "entries": [
+        {
+          "category": "annual",
+          "description": "",
+          "direction": "used",
+          "hours": 3.0,
+          "id": "20260125-001",
+          "source": "manual",
+          "status": "planned"
+        }
+      ],
+      "holiday_name": null,
+      "in_display_month": true,
+      "is_pay_period_end": false,
+      "is_payday": false,
+      "is_today": false
+    },
+    {
+      "date": "2026-01-26",
+      "display_lines": [],
+      "entries": [],
+      "holiday_name": null,
+      "in_display_month": true,
+      "is_pay_period_end": false,
+      "is_payday": false,
+      "is_today": false
+    },
+    {
+      "date": "2026-01-27",
+      "display_lines": [],
+      "entries": [],
+      "holiday_name": null,
+      "in_display_month": true,
+      "is_pay_period_end": false,
+      "is_payday": false,
+      "is_today": false
+    },
+    {
+      "date": "2026-01-28",
+      "display_lines": [],
+      "entries": [],
+      "holiday_name": null,
+      "in_display_month": true,
+      "is_pay_period_end": false,
+      "is_payday": false,
+      "is_today": false
+    },
+    {
+      "date": "2026-01-29",
+      "display_lines": [],
+      "entries": [],
+      "holiday_name": null,
+      "in_display_month": true,
+      "is_pay_period_end": false,
+      "is_payday": false,
+      "is_today": false
+    },
+    {
+      "date": "2026-01-30",
+      "display_lines": [],
+      "entries": [],
+      "holiday_name": null,
+      "in_display_month": true,
+      "is_pay_period_end": false,
+      "is_payday": true,
+      "is_today": false
+    },
+    {
+      "date": "2026-01-31",
+      "display_lines": [],
+      "entries": [],
+      "holiday_name": null,
+      "in_display_month": true,
+      "is_pay_period_end": false,
+      "is_payday": false,
+      "is_today": false
+    }
+  ],
+  "month": 1,
+  "month_end": "2026-01-31",
+  "month_start": "2026-01-01",
+  "parental": null,
+  "pay_dates": [
+    "2026-01-30"
+  ],
+  "pay_period_end_dates": [
+    "2026-01-24",
+    "2026-02-07"
+  ],
+  "pay_periods": [
+    {
+      "end": "2026-01-24",
+      "ending_balances": {
+        "admin": 0.0,
+        "annual": 92.0,
+        "comp": 0.0,
+        "court": 0.0,
+        "credit": 0.0,
+        "excused": 0.0,
+        "flex": 0.0,
+        "fmla": 0.0,
+        "holiday": 0.0,
+        "lwop": 0.0,
+        "military": 0.0,
+        "other": 0.0,
+        "overtime": 0.0,
+        "ppl": 0.0,
+        "religious_comp": 0.0,
+        "restored_annual": 0.0,
+        "sick": 24.0,
+        "time_off_award": 0.0,
+        "travel_comp": 0.0
+      },
+      "number": 1,
+      "pay_date": "2026-01-30",
+      "physical_absence_hours": 14.0,
+      "start": "2026-01-11",
+      "totals": {
+        "annual": {
+          "earned": 6.0,
+          "net": -8.0,
+          "used": 14.0,
+          "worked": 0.0
+        },
+        "sick": {
+          "earned": 4.0,
+          "net": 4.0,
+          "used": 0.0,
+          "worked": 0.0
+        }
+      },
+      "touches_display_month": true
+    },
+    {
+      "end": "2026-02-07",
+      "ending_balances": {
+        "admin": 0.0,
+        "annual": 95.0,
+        "comp": 0.0,
+        "court": 0.0,
+        "credit": 0.0,
+        "excused": 0.0,
+        "flex": 0.0,
+        "fmla": 0.0,
+        "holiday": 0.0,
+        "lwop": 0.0,
+        "military": 0.0,
+        "other": 0.0,
+        "overtime": 0.0,
+        "ppl": 0.0,
+        "religious_comp": 0.0,
+        "restored_annual": 0.0,
+        "sick": 28.0,
+        "time_off_award": 0.0,
+        "travel_comp": 0.0
+      },
+      "number": 2,
+      "pay_date": "2026-02-13",
+      "physical_absence_hours": 3.0,
+      "start": "2026-01-25",
+      "totals": {
+        "annual": {
+          "earned": 6.0,
+          "net": 3.0,
+          "used": 3.0,
+          "worked": 0.0
+        },
+        "sick": {
+          "earned": 4.0,
+          "net": 4.0,
+          "used": 0.0,
+          "worked": 0.0
+        }
+      },
+      "touches_display_month": true
+    }
+  ],
+  "projected_balance": {
+    "balances": {
+      "admin": 0.0,
+      "annual": 246.0,
+      "comp": 0.0,
+      "court": 0.0,
+      "credit": 0.0,
+      "excused": 0.0,
+      "flex": 0.0,
+      "fmla": 0.0,
+      "holiday": 0.0,
+      "lwop": 0.0,
+      "military": 0.0,
+      "other": 0.0,
+      "overtime": 0.0,
+      "ppl": 0.0,
+      "religious_comp": 0.0,
+      "restored_annual": 0.0,
+      "sick": 124.0,
+      "time_off_award": 0.0,
+      "travel_comp": 0.0
+    },
+    "parental": null,
+    "project_to": "2027-01-09",
+    "use_or_lose": {
+      "annual_carryover": 240.0,
+      "carryover_limit": 240.0,
+      "use_or_lose": 6.0
+    }
+  },
+  "today": "2026-01-16",
+  "warnings": [],
+  "year": 2026
+}

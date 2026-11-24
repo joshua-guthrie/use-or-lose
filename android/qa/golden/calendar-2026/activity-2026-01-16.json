@@ -1,0 +1,18 @@
+{
+  "activity": {
+    "earned": {
+      "annual": 0.0
+    },
+    "net": {
+      "annual": -2.0
+    },
+    "used": {
+      "annual": 2.0
+    }
+  },
+  "date": "2026-01-16",
+  "has_activity": true,
+  "parental": null,
+  "physical_absence_hours": 2.0,
+  "year": 2026
+}

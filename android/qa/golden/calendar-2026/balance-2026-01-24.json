@@ -1,0 +1,32 @@
+{
+  "as_of": "2026-01-24",
+  "automatic_accruals_posted": 0,
+  "automatic_accruals_posted_through": "2026-01-24",
+  "balances": {
+    "admin": 0.0,
+    "annual": 92.0,
+    "comp": 0.0,
+    "court": 0.0,
+    "credit": 0.0,
+    "excused": 0.0,
+    "flex": 0.0,
+    "fmla": 0.0,
+    "holiday": 0.0,
+    "lwop": 0.0,
+    "military": 0.0,
+    "other": 0.0,
+    "overtime": 0.0,
+    "ppl": 0.0,
+    "religious_comp": 0.0,
+    "restored_annual": 0.0,
+    "sick": 24.0,
+    "time_off_award": 0.0,
+    "travel_comp": 0.0
+  },
+  "parental": null,
+  "project_to": null,
+  "projected": false,
+  "use_or_lose": null,
+  "warnings": [],
+  "year": 2026
+}

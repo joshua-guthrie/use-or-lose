@@ -24,4 +24,4 @@ For delegated work, map checks to trusted registry IDs. Separate baseline checks
 
 ## Handoff
 
-List expected deliverables and the report, code review and passdown paths. Record conditions to mark complete and the next milestone's dependency. Before assignment, resolve any placeholder that affects a build, contract, behavior, file path or test result.
+List expected deliverables and the report, code review and passdown paths. Record conditions to mark complete and the next milestone's dependency. Update `android/README.md` when the change affects setup, build or test commands, toolchain versions, architecture, or directory layout. Before assignment, resolve any placeholder that affects a build, contract, behavior, file path or test result.

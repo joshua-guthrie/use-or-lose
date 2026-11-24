@@ -46,6 +46,8 @@ fedleave balance --as-of 2027-01-04 --json --data-dir "$fixture_dir"
 
 Substitute each date in the expected-results table for the balance command. The month output provides period totals and date markers on any day the commands are run. Its Today field uses the runner's real date. Freeze the calculation clock to January 16 to compare that field directly. The desktop reference checks verified the dated values, inferred leave year, frozen Today snapshot, matching period close, and distinct payday and period-end markers. JSON store hashes matched before and after the dated and period reads.
 
+The committed input store, golden outputs and fixture manifest are under [`android/qa/fixtures/calendar-2026`](../../qa/fixtures/calendar-2026) and [`android/qa/golden/calendar-2026`](../../qa/golden/calendar-2026). Regenerate them with `python android/qa/fixtures/build_calendar_fixture.py`; do not hand-edit the generated files. The manifest records the source revision, frozen clock, tree digest, requests and exact expected results. [Fixture manifest](../../qa/fixtures/calendar-2026.manifest.json)
+
 ## Calendar acceptance cases
 
 | Test ID | Procedure | Pass condition |

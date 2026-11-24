@@ -12,6 +12,6 @@ The review covered every row of Chapter 01.07 against its mockup, the referenced
 
 ## Where to resume
 
-The remaining [specification review checklist](../chapters/06-delivery/06-02-implementation-milestones.md#specification-review-checklist) item for product work is the owner's approval to start implementation. I01 remains blocked until that approval. Before coding proceeds, write the missing I02–I04 briefs and runnable reference fixtures; only I01-01, I05, and I06-02 exist. [Milestone inputs](../../implementation/briefs/milestone-inputs.md) · [I01 startup brief](../../implementation/briefs/I01-01-start-the-android-project.md)
+The remaining [specification review checklist](../chapters/06-delivery/06-02-implementation-milestones.md#specification-review-checklist) item for product work is the owner's approval to start implementation. I01 remains blocked until that approval. The I02–I04 briefs and runnable reference fixtures were completed in [checkpoint 30](30-briefs-fixtures-and-readme.md). [Milestone inputs](../../implementation/briefs/milestone-inputs.md) · [I01 startup brief](../../implementation/briefs/I01-01-start-the-android-project.md)
 
 For the separate orchestrator track, prepare the OR01 pilot brief, pin Python and Git, and choose the Linux isolation backend. [OR01](../chapters/06-delivery/06-03-orchestrator-pilot-milestones.md#or01-offline-mock-pilot)

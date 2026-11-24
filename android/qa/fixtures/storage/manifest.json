@@ -1,0 +1,64 @@
+{
+  "base_fixture": "calendar-2026",
+  "cases": [
+    {
+      "case_id": "STORE-INVALID-INVALID_UTF8",
+      "defect": "invalid-utf8",
+      "expected": "Reject without replacing the active generation; the prior complete store remains readable.",
+      "expected_stage": "decode",
+      "path": "android/qa/fixtures/storage/invalid-utf8",
+      "stored_state": "unchanged"
+    },
+    {
+      "case_id": "STORE-INVALID-FUTURE_SCHEMA",
+      "defect": "future-schema",
+      "expected": "Reject without replacing the active generation; the prior complete store remains readable.",
+      "expected_stage": "validation",
+      "path": "android/qa/fixtures/storage/future-schema",
+      "stored_state": "unchanged"
+    },
+    {
+      "case_id": "STORE-INVALID-INVALID_VALUES",
+      "defect": "invalid-values",
+      "expected": "Reject without replacing the active generation; the prior complete store remains readable.",
+      "expected_stage": "validation",
+      "path": "android/qa/fixtures/storage/invalid-values",
+      "stored_state": "unchanged"
+    },
+    {
+      "case_id": "STORE-INVALID-DUPLICATE_IDS",
+      "defect": "duplicate-ids",
+      "expected": "Reject without replacing the active generation; the prior complete store remains readable.",
+      "expected_stage": "validation",
+      "path": "android/qa/fixtures/storage/duplicate-ids",
+      "stored_state": "unchanged"
+    },
+    {
+      "case_id": "STORE-INVALID-MISSING_LEDGER",
+      "defect": "missing-ledger",
+      "expected": "Reject without replacing the active generation; the prior complete store remains readable.",
+      "expected_stage": "validation",
+      "path": "android/qa/fixtures/storage/missing-ledger",
+      "stored_state": "unchanged"
+    },
+    {
+      "case_id": "STORE-INVALID-MALFORMED_JSON",
+      "defect": "malformed-json",
+      "expected": "Reject without replacing the active generation; the prior complete store remains readable.",
+      "expected_stage": "validation",
+      "path": "android/qa/fixtures/storage/malformed-json",
+      "stored_state": "unchanged"
+    }
+  ],
+  "fixture_id": "storage-invalid",
+  "frozen_local_date": "2026-01-16",
+  "generated_by": "android/qa/fixtures/build_calendar_fixture.py",
+  "generator_source_revision": "507e5a58d948d8c024cc82bc292e63dd84be5f64",
+  "notes": [
+    "Each variant is a complete copy of the Calendar 2026 store with one defect.",
+    "I04 must reject decode, schema, shape, value, uniqueness and completeness defects before publication.",
+    "Cross-year and archive semantic validation remains with the restore milestones."
+  ],
+  "schema_version": 1,
+  "timezone": "America/New_York"
+}

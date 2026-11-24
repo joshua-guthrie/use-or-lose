@@ -1,5 +1,9 @@
 # Repository working rules
 
+## Keep the Android developer README current
+
+`android/README.md` is the entry point for viewing the project in Android Studio, the build and test commands, the architecture and the directory layout. Update it in the same change whenever those facts change. I01 must replace its placeholder toolchain with the tested versions; I02 records the bridge module and runtime. Do not leave stale instructions in it.
+
 ## Installer publication is part of every push
 
 Any source change pushed to `master` is incomplete until the Distribution
