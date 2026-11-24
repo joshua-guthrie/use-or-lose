@@ -10,8 +10,8 @@ The product specification, acceptance plan, orchestration rules and the first im
 | --- | --- |
 | Product specification and parity | Complete; menu review approved November 23, 2026 |
 | Orchestration specification | Complete; OR01 pilot not started |
-| Implementation briefs | I01-01 complete; I02–I05 plus I06-02 drafts ready |
-| Android project | I04 complete — the app-private canonical store with generation identity, one writer, recovery and debug fixture import passes its unit and device suites; next is I05 Calendar |
+| Implementation briefs | I01–I04 complete; I05 finalized and in progress (I05-01 landed); I06-02 draft ready |
+| Android project | I05-01 complete — typed bridge adapter, clock/settings injection and the Calendar state machine pass JVM (35/35) and device (17/17) suites; next is I05-02 Calendar screen, navigation and markers |
 | Fixtures | Calendar 2026 store, golden outputs and malformed-store variants under `qa/` |
 
 Keep this file current. Each milestone replaces planned commands and toolchain values with the tested values from its report.
@@ -93,7 +93,7 @@ flowchart LR
 | Layer | Responsibility | Governing design |
 | --- | --- | --- |
 | Compose UI | Screens, navigation, accessibility, view state, lifecycle, clock injection, chart rendering, Sharesheet and document picker. | [Calendar](specification/chapters/01-calendar/01-01-main-screen.md) and [Reports](specification/chapters/03-reports-data/03-02-report-screens.md) |
-| Kotlin bridge | One typed in-process interface to the Python core. Provisional until the I02 packaging experiment passes. | [Core and compatibility](specification/chapters/04-architecture/04-01-core-and-compatibility.md) |
+| Kotlin bridge | One typed in-process interface to the Python core: `app/src/main/java/com/westmouthbay/fedleave/core/` (`CoreBridge`, `CoreModels`, `CoreError`, `TimeSource`, `AppDependencies`) over the Chaquopy module `fedleave_probe`. The Calendar state machine lives in `.../calendar/` (`CalendarViewModel`, `CalendarUiState`, `CalendarDisplaySettings`). | [Core and compatibility](specification/chapters/04-architecture/04-01-core-and-compatibility.md) |
 | Shared Python core | Accounting rules, eligibility, accrual, leave-year boundaries, carryover, lots, parental windows, report inputs. Lives in the repository's root `src/`. | [Responsibilities and data flow](specification/chapters/04-architecture/04-01-core-and-compatibility.md#responsibilities-and-data-flow) |
 | Private store | Canonical `config.json`, `leave_years/<year>.json` and `holiday_cache/*.json` in internal no-backup storage. One serialized writer, immutable read snapshots, candidate validation and generation recovery. | [Device storage](specification/chapters/04-architecture/04-02-device-storage.md) |
 | Desktop | Existing CLI and GUI entry points remain the compatibility baseline and share the same accounting rules and datastore schema. | [Architecture](../docs/ARCHITECTURE.md) |
