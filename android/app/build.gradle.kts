@@ -63,6 +63,7 @@ android {
             assets.srcDirs(
                 rootProject.file("qa/fixtures/calendar-2026"),
                 rootProject.file("qa/golden/calendar-2026"),
+                rootProject.file("qa/fixtures/storage"),
             )
         }
     }
@@ -104,6 +105,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
 
     testImplementation(libs.junit)
+    testImplementation("org.json:json:20240303")
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

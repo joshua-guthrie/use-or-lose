@@ -7,7 +7,7 @@ Start with the [milestones and dependencies](../../specification/chapters/06-del
 | [I01-01 Start the Android project](I01-01-start-the-android-project.md) | Complete. Toolchain pinned in the README; smoke test and offline launch pass on the API 36 emulator. [QA report](../../qa/reports/I01-01.md) |
 | [I02 Bridge packaging experiment](I02-bridge-experiment.md) | Complete. Chaquopy 17.2.0 and Python 3.13 pass parity, offline, dependency-audit and timing checks. [QA report](../../qa/reports/I02.md) |
 | [I03 Read-only core boundary](I03-read-only-core.md) | Complete. `src/fedleave/read_api.py` powers the desktop read commands and the bridge; golden and regression evidence in the [QA report](../../qa/reports/I03.md). |
-| [I04 Private JSON store](I04-private-store.md) | Handoff draft. Adds the no-backup canonical store, generation writer and recovery. |
+| [I04 Private JSON store](I04-private-store.md) | Complete. No-backup canonical store, pinned generation identity, single writer and recovery pass unit and device suites. [QA report](../../qa/reports/I04.md) |
 | [I05 Calendar navigation and balances](I05-calendar.md) | Detailed handoff draft. I01–I04 supply the pinned source, actual module paths, bridge calls, and run settings. |
 | [I06-02 Start with Today’s balances](I06-02-today-balances.md) | Adds a dated starting point after I06-01 provides independent setup. |
 | [Inputs by milestone](milestone-inputs.md) | Source anchors, acceptance families and handoffs for I01–I20. |

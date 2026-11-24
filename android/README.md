@@ -11,7 +11,7 @@ The product specification, acceptance plan, orchestration rules and the first im
 | Product specification and parity | Complete; menu review approved November 23, 2026 |
 | Orchestration specification | Complete; OR01 pilot not started |
 | Implementation briefs | I01-01 complete; I02–I05 plus I06-02 drafts ready |
-| Android project | I03 complete — the versioned read facade (`src/fedleave/read_api.py`) serves the desktop commands and the bridge with golden parity; next is the I04 private store |
+| Android project | I04 complete — the app-private canonical store with generation identity, one writer, recovery and debug fixture import passes its unit and device suites; next is I05 Calendar |
 | Fixtures | Calendar 2026 store, golden outputs and malformed-store variants under `qa/` |
 
 Keep this file current. Each milestone replaces planned commands and toolchain values with the tested values from its report.

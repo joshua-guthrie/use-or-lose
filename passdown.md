@@ -2,7 +2,7 @@
 
 ## Where to resume
 
-I03 is complete: the versioned read facade `src/fedleave/read_api.py` (`dated_balance`, `pay_period`, `day_activity`, `month_view`, plus the `read` dispatcher) now computes the desktop read results for both the CLI commands and the Android bridge. It resolves snapshots through `cross_year.resolve_snapshot_from`, stays pydantic-free via the extracted `rule_defaults.py`, matches every pinned golden on the desktop and on the API 36 emulator (offline too), and keeps the full desktop suite green (1062 passed). Next is I04, the private JSON store. [I03 passdown](android/implementation/passdowns/I03.md) · [I03 brief](android/implementation/briefs/I03-read-only-core.md) · [I04 brief](android/implementation/briefs/I04-private-store.md)
+I04 is complete: the app-private canonical store lives under `noBackupFilesDir/fedleave/` with the pinned tree-digest generation identity (`03e9e175…`), one serialized writer, stale-base rejection, strict UTF-8 and schema validation, crash recovery with both candidates preserved, active-plus-prior retention, and a debug-only fixture import. Unit (14) and device (10, offline too) suites pass; backup exclusion is configured in the manifest and extraction rules. Next is I05, Calendar navigation and dated balances. [I04 passdown](android/implementation/passdowns/I04.md) · [I04 brief](android/implementation/briefs/I04-private-store.md) · [I05 brief](android/implementation/briefs/I05-calendar.md)
 
 For orchestration work, start by preparing the OR01 offline pilot brief and selecting an enforceable Linux sandbox for its synthetic fixture. [Orchestration specification](android/specification/orchestration.md) · [Documentation checkpoint](android/specification/passdowns/28-orchestration-specification.md)
 
