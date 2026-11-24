@@ -20,6 +20,8 @@ FIXTURE_ID = "calendar-2026"
 FIXTURE_DIR = ROOT / "android" / "qa" / "fixtures" / FIXTURE_ID
 GOLDEN_DIR = ROOT / "android" / "qa" / "golden" / FIXTURE_ID
 STORAGE_DIR = ROOT / "android" / "qa" / "fixtures" / "storage"
+MARKER_FIXTURE_ID = "calendar-markers"
+MARKER_FIXTURE_DIR = ROOT / "android" / "qa" / "fixtures" / "marker-fixture" / MARKER_FIXTURE_ID
 FROZEN_DATE = "2026-01-16"
 TIMEZONE = "America/New_York"
 NORMALIZED_TIMESTAMP = "2026-01-16T00:00:00"
@@ -317,6 +319,95 @@ def mutate_malformed_json(store: Path) -> None:
     path.write_bytes(path.read_bytes()[:120])
 
 
+def build_marker_fixture(source: Path) -> str:
+    """Build the developer-only marker overlap fixture.
+
+    Same store as calendar-2026, but every stored ``pay_date`` equals its
+    period end (display offset 0) and a 2027 holiday cache adds one synthetic
+    January 9, 2027 entry, so January 9 carries all four events: holiday,
+    payday, pay-period end 26, and the leave-year end. Returns the tree digest.
+    """
+    if MARKER_FIXTURE_DIR.exists():
+        shutil.rmtree(MARKER_FIXTURE_DIR)
+    for name in STORED_FILES:
+        target = MARKER_FIXTURE_DIR / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(source / name, target)
+
+    ledger_path = MARKER_FIXTURE_DIR / "leave_years" / "2026.json"
+    ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+    for period in ledger["pay_periods"]:
+        period["pay_date"] = period["end_date"]
+    write_json(ledger_path, ledger)
+
+    holiday_temp = Path(tempfile.mkdtemp(prefix="fedleave-marker-holidays-"))
+    try:
+        run_cli("holidays", "--action", "generate", "--year", "2027", data_dir=holiday_temp)
+        cache_path = holiday_temp / "holiday_cache" / "federal_holidays_2027.json"
+        cache = json.loads(cache_path.read_text(encoding="utf-8"))
+        synthetic = dict(cache["holidays"][0])
+        synthetic.update(
+            {
+                "actual_date": "2027-01-09",
+                "observed_date": "2027-01-09",
+                "display_date": "2027-01-09",
+                "name": "Overlap Test Day",
+                "short_name": "Overlap",
+                "code": "overlap-test",
+                "manual_override": True,
+                "source": "fixture",
+            }
+        )
+        cache["holidays"].append(synthetic)
+        cache["holidays"].sort(key=lambda row: str(row.get("display_date") or row.get("observed_date") or ""))
+        cache["generated_at"] = NORMALIZED_TIMESTAMP
+        write_json(MARKER_FIXTURE_DIR / "holiday_cache" / "federal_holidays_2027.json", cache)
+    finally:
+        shutil.rmtree(holiday_temp, ignore_errors=True)
+
+    files = tree_hashes(MARKER_FIXTURE_DIR)
+    write_json(
+        ROOT / "android" / "qa" / "fixtures" / f"{MARKER_FIXTURE_ID}.manifest.json",
+        {
+            "schema_version": 1,
+            "fixture_id": MARKER_FIXTURE_ID,
+            "description": (
+                "Developer-only marker overlap fixture for T-CAL-MARK-01. The "
+                "calendar-2026 store with every stored pay_date equal to its "
+                "period end (display offset 0) and a 2027 holiday cache with "
+                "one synthetic January 9, 2027 entry, so January 9 carries all "
+                "four events: holiday, payday, pay-period end 26, leave-year end."
+            ),
+            "generated_by": "android/qa/fixtures/build_calendar_fixture.py",
+            "generator_source_revision": git_head(),
+            "base_fixture": FIXTURE_ID,
+            "frozen_local_date": FROZEN_DATE,
+            "timezone": TIMEZONE,
+            "store": {
+                "path": f"android/qa/fixtures/marker-fixture/{MARKER_FIXTURE_ID}",
+                "files": files,
+                "tree_digest": tree_digest(files),
+                "notes": [
+                    "Zero display payday offset is baked into the stored pay_date fields.",
+                    "The synthetic holiday never leaves developer fixtures; production "
+                    "holiday data comes from offline generation or restored backups.",
+                ],
+            },
+            "cases": [
+                {
+                    "case_id": "T-CAL-MARK-01",
+                    "expectation": (
+                        "January 9, 2027 shows holiday, payday, pay-period end 26 and "
+                        "leave-year end together; January 2026 still shows Jan 1/19 "
+                        "holidays, Jan 24 period end and Jan 30 payday."
+                    ),
+                }
+            ],
+        },
+    )
+    return tree_digest(files)
+
+
 def build_storage_fixtures(source: Path) -> None:
     if STORAGE_DIR.exists():
         shutil.rmtree(STORAGE_DIR)
@@ -403,10 +494,13 @@ def main() -> None:
             },
         )
         build_storage_fixtures(FIXTURE_DIR)
+        marker_digest = build_marker_fixture(FIXTURE_DIR)
         print(f"fixture: {FIXTURE_DIR}")
         print(f"golden:  {GOLDEN_DIR}")
         print(f"storage: {STORAGE_DIR}")
+        print(f"marker:  {MARKER_FIXTURE_DIR}")
         print(f"tree:    {tree_digest(files)}")
+        print(f"marker tree: {marker_digest}")
     finally:
         shutil.rmtree(temp_store, ignore_errors=True)
 

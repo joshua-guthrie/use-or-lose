@@ -1,3 +1,77 @@
 <resources>
     <string name="app_name">FedLeave</string>
+
+    <!-- Calendar main screen -->
+    <string name="calendar_title">Calendar</string>
+    <string name="calendar_as_of_today">As of today \u00b7 %1$s</string>
+    <string name="calendar_month_select">%1$s %2$d</string>
+    <string name="calendar_view_all_balances">View all %1$d balances \u00b7 %2$d more</string>
+    <string name="calendar_open_balances_action">Open balances and date</string>
+    <string name="calendar_choose_month">Choose month</string>
+    <string name="calendar_year_row">Calendar year</string>
+    <string name="calendar_current">Current</string>
+    <string name="cancel">Cancel</string>
+    <string name="calendar_choose_date">Choose date</string>
+    <string name="back_to_calendar">Back to Calendar</string>
+
+    <!-- Menu -->
+    <string name="menu_today">Today</string>
+    <string name="menu_open">Menu</string>
+
+    <!-- Day route -->
+    <string name="day_title">Edit day</string>
+    <string name="day_activity_heading">Leave activity</string>
+    <string name="day_event_holiday">Holiday</string>
+    <string name="day_event_payday">Payday</string>
+    <string name="day_event_period_end">Pay-period end</string>
+    <string name="day_event_period_number">Period %1$d</string>
+    <string name="day_event_year_end">Leave-year end</string>
+    <string name="day_event_year_label">Leave year %1$d</string>
+    <string name="day_no_entries">No entries</string>
+
+    <!-- Balance categories: full labels for lists and accessibility -->
+    <string name="cat_annual_full">Annual leave</string>
+    <string name="cat_sick_full">Sick leave</string>
+    <string name="cat_comp_full">Compensatory time</string>
+    <string name="cat_credit_full">Credit hours</string>
+    <string name="cat_travel_comp_full">Travel comp</string>
+    <string name="cat_time_off_award_full">Time-off award</string>
+    <string name="cat_restored_annual_full">Restored annual</string>
+    <string name="cat_religious_comp_full">Religious comp</string>
+    <string name="cat_ppl_full">Paid parental leave</string>
+    <string name="cat_fmla_full">FMLA remaining</string>
+    <string name="cat_overtime_full">Overtime</string>
+    <string name="cat_admin_full">Administrative leave</string>
+    <string name="cat_lwop_full">Leave without pay</string>
+    <string name="cat_military_full">Military leave</string>
+    <string name="cat_court_full">Court leave</string>
+    <string name="cat_excused_full">Excused absence</string>
+    <string name="cat_holiday_full">Holiday</string>
+    <string name="cat_flex_full">Flex hours</string>
+    <string name="cat_other_full">Other</string>
+
+    <!-- Balance categories: short labels for the balance card -->
+    <string name="cat_annual_short">Annual</string>
+    <string name="cat_sick_short">Sick</string>
+    <string name="cat_comp_short">Comp</string>
+    <string name="cat_credit_short">Credit</string>
+    <string name="cat_travel_comp_short">Travel comp</string>
+    <string name="cat_time_off_award_short">Time award</string>
+    <string name="cat_restored_annual_short">Restored AL</string>
+    <string name="cat_religious_comp_short">Relig. comp</string>
+    <string name="cat_ppl_short">PPL</string>
+    <string name="cat_fmla_short">FMLA</string>
+
+    <!-- Hours -->
+    <string name="hours_value">%1$s h</string>
+    <string name="hours_earned">%1$s h earned</string>
+    <string name="hours_used">%1$s h used</string>
+    <string name="hours_direction">%1$s h %2$s</string>
+    <string name="unavailable">Unavailable</string>
+
+    <!-- Bottom navigation -->
+    <string name="tab_calendar">Calendar</string>
+    <string name="tab_reports">Reports</string>
+    <string name="tab_settings">Settings</string>
+    <string name="placeholder_coming_soon">Coming in a later build</string>
 </resources>

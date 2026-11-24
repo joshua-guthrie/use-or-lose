@@ -5,6 +5,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.File
@@ -24,6 +25,14 @@ class PrivateStoreTest {
     private fun targetContext() = InstrumentationRegistry.getInstrumentation().targetContext
 
     private fun assetsContext() = InstrumentationRegistry.getInstrumentation().context
+
+    @Before
+    fun resetStoreBetweenSuites() {
+        // The I05 UI suites also publish fixture stores into the shared app
+        // data directory; reset it so imports below always start clean and
+        // test order cannot affect the result.
+        StorePaths.forContext(targetContext()).deleteRecursively()
+    }
 
     private fun tree(dir: File): Map<String, String> =
         Files.walk(dir.toPath())

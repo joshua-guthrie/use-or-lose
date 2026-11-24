@@ -1,0 +1,30 @@
+{
+  "base_fixture": "calendar-2026",
+  "cases": [
+    {
+      "case_id": "T-CAL-MARK-01",
+      "expectation": "January 9, 2027 shows holiday, payday, pay-period end 26 and leave-year end together; January 2026 still shows Jan 1/19 holidays, Jan 24 period end and Jan 30 payday."
+    }
+  ],
+  "description": "Developer-only marker overlap fixture for T-CAL-MARK-01. The calendar-2026 store with every stored pay_date equal to its period end (display offset 0) and a 2027 holiday cache with one synthetic January 9, 2027 entry, so January 9 carries all four events: holiday, payday, pay-period end 26, leave-year end.",
+  "fixture_id": "calendar-markers",
+  "frozen_local_date": "2026-01-16",
+  "generated_by": "android/qa/fixtures/build_calendar_fixture.py",
+  "generator_source_revision": "b501af2aa12aefbdfb6d8a5579b60cb8823bac4e",
+  "schema_version": 1,
+  "store": {
+    "files": {
+      "config.json": "af661f09d1e11368202bd278d6538fe9f609959db63649f02c4d32fb92302aaf",
+      "holiday_cache/federal_holidays_2026.json": "f252e13278065cf60000966accddc8d567e138448924862030545eb9458f5341",
+      "holiday_cache/federal_holidays_2027.json": "d3f5e3b24a85652bd6cf516befa67c3e9ba459e3e8c7538c34c3b810ae7ee0a6",
+      "leave_years/2026.json": "7dd3deac0752e5d99fc6d1baf33a21f67a65dcb15c901a1da1e9e85f95eee432"
+    },
+    "notes": [
+      "Zero display payday offset is baked into the stored pay_date fields.",
+      "The synthetic holiday never leaves developer fixtures; production holiday data comes from offline generation or restored backups."
+    ],
+    "path": "android/qa/fixtures/marker-fixture/calendar-markers",
+    "tree_digest": "d60bd8d05b849fcc305b3801ce9af183e0dbfbdc1b9e7d5c1419b78d08d57cbb"
+  },
+  "timezone": "America/New_York"
+}

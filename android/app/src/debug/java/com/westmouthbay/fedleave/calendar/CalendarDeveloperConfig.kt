@@ -21,4 +21,19 @@ object CalendarDeveloperConfig {
         "leave_years/2026.json",
         "holiday_cache/federal_holidays_2026.json",
     )
+
+    /**
+     * Asset names of the pinned marker overlap fixture (asset root
+     * `qa/fixtures/marker-fixture`, prefix `calendar-markers/`).
+     */
+    val markerFixtureAssets: List<String> = listOf(
+        "calendar-markers/config.json",
+        "calendar-markers/leave_years/2026.json",
+        "calendar-markers/holiday_cache/federal_holidays_2026.json",
+        "calendar-markers/holiday_cache/federal_holidays_2027.json",
+    )
+
+    const val MARKER_FIXTURE_PREFIX = "calendar-markers/"
+
+    const val MARKER_FIXTURE_DIGEST = "d60bd8d05b849fcc305b3801ce9af183e0dbfbdc1b9e7d5c1419b78d08d57cbb"
 }

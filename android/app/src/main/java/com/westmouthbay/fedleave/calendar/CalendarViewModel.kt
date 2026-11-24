@@ -1,7 +1,11 @@
 package com.westmouthbay.fedleave.calendar
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.westmouthbay.fedleave.core.AppDependencies
 import com.westmouthbay.fedleave.core.CoreError
 import com.westmouthbay.fedleave.core.CoreRead
 import com.westmouthbay.fedleave.core.DatedBalanceRequest
@@ -58,6 +62,9 @@ class CalendarViewModel(
 
     /** Fresh Calendar launch: open the store, then read today's month and balance. */
     fun onLaunch() {
+        if (_state.value.today != null) {
+            return
+        }
         launchRead {
             val open = store.open()
             val ready = open as? OpenResult.Ready
@@ -262,6 +269,13 @@ class CalendarViewModel(
     fun leaveYearEndFor(date: LocalDate): LocalDate? =
         years.values.firstOrNull { date in it.start..it.end }?.end
 
+    /** The leave-year number covering [date], for day events and labels. */
+    fun leaveYearNumberFor(date: LocalDate): Int? =
+        years.values.firstOrNull { date in it.start..it.end }?.year
+
+    /** Stored leave years for the month picker's year row. */
+    fun availableYears(): List<Int> = years.keys.sorted()
+
     // ---- reads -----------------------------------------------------------
 
     private suspend fun loadMonth(month: YearMonth) {
@@ -463,5 +477,19 @@ class CalendarViewModel(
     private fun Throwable.toCoreError(): CoreError = when (this) {
         is CoreError -> this
         else -> CoreError.Unexpected(message ?: javaClass.simpleName, this)
+    }
+
+    companion object {
+        /** Activity-scoped factory over the composition root (I05-02 wiring). */
+        fun factory(dependencies: AppDependencies): ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                CalendarViewModel(
+                    bridge = dependencies.bridge,
+                    store = dependencies.store,
+                    timeSource = dependencies.timeSource,
+                    displaySettings = dependencies.displaySettings,
+                )
+            }
+        }
     }
 }

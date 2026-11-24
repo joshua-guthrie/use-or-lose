@@ -12,7 +12,7 @@ class LaunchSmokeTest {
     val composeRule = createAndroidComposeRule<MainActivity>()
 
     @Test
-    fun launchesAndShowsFedLeaveHeading() {
-        composeRule.onNodeWithTag("fedleave_heading").assertIsDisplayed()
+    fun launchesAndShowsTheCalendarScreen() {
+        composeRule.onNodeWithTag("calendar_screen").assertIsDisplayed()
     }
 }
