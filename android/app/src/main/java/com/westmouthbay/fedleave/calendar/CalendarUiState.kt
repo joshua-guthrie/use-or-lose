@@ -4,6 +4,8 @@ import com.westmouthbay.fedleave.core.CoreError
 import com.westmouthbay.fedleave.core.DatedBalanceResult
 import com.westmouthbay.fedleave.core.MonthViewResult
 import com.westmouthbay.fedleave.core.PayPeriodDetailResult
+import com.westmouthbay.fedleave.storage.StorageSnapshot
+import org.json.JSONObject
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -26,6 +28,49 @@ data class YearMetadata(
     val end: LocalDate,
     val periods: List<StoredPeriod>,
 )
+
+/**
+ * Parses leave-year metadata from the snapshot's `leave_years/<year>.json`
+ * files. Malformed entries are skipped, never thrown: presentation metadata
+ * must not crash the Calendar when a ledger carries unexpected shapes.
+ */
+internal fun parseYearMetadata(snapshot: StorageSnapshot): Map<Int, YearMetadata> {
+    val result = mutableMapOf<Int, YearMetadata>()
+    val yearFile = Regex("leave_years/(\\d+)\\.json")
+    for ((name, text) in snapshot.files) {
+        val match = yearFile.matchEntire(name) ?: continue
+        val year = match.groupValues[1].toIntOrNull() ?: continue
+        val json = runCatching { JSONObject(text) }.getOrNull() ?: continue
+        val start = runCatching { LocalDate.parse(json.optString("leave_year_start")) }.getOrNull()
+            ?: continue
+        val end = runCatching { LocalDate.parse(json.optString("leave_year_end")) }.getOrNull()
+            ?: continue
+        val periods = json.optJSONArray("pay_periods")?.let { array ->
+            (0 until array.length()).mapNotNull { index ->
+                val period = array.optJSONObject(index) ?: return@mapNotNull null
+                val periodStart =
+                    runCatching { LocalDate.parse(period.optString("start_date")) }.getOrNull()
+                        ?: return@mapNotNull null
+                val periodEnd =
+                    runCatching { LocalDate.parse(period.optString("end_date")) }.getOrNull()
+                        ?: return@mapNotNull null
+                StoredPeriod(
+                    number = if (period.has("pay_period_number") && !period.isNull("pay_period_number")) {
+                        runCatching { period.getInt("pay_period_number") }.getOrNull()
+                    } else {
+                        null
+                    },
+                    start = periodStart,
+                    end = periodEnd,
+                    payDate = period.optString("pay_date").takeIf { it.isNotEmpty() }
+                        ?.let { runCatching { LocalDate.parse(it) }.getOrNull() },
+                )
+            }
+        } ?: emptyList()
+        result[year] = YearMetadata(year, start, end, periods)
+    }
+    return result
+}
 
 /**
  * The full Calendar screen state. Month and balance results are paired with

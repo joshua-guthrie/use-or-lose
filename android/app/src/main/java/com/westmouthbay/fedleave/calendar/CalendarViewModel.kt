@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
-import org.json.JSONObject
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -46,7 +45,7 @@ class CalendarViewModel(
     val state: StateFlow<CalendarUiState> = _state.asStateFlow()
 
     /** Jobs launched by [launchRead]; appended on the action thread and drained by [awaitIdle]. */
-    private val trackedJobs = mutableListOf<Job>()
+    private val trackedJobs = java.util.Collections.synchronizedList(mutableListOf<Job>())
 
     private var snapshot: StorageSnapshot? = null
     private var years: Map<Int, YearMetadata> = emptyMap()
@@ -73,7 +72,7 @@ class CalendarViewModel(
                 return@launchRead
             }
             snapshot = ready.snapshot
-            years = parseYears(ready.snapshot)
+            years = parseYearMetadata(ready.snapshot)
             val today = timeSource.today()
             val month = YearMonth.from(today)
             _state.update {
@@ -91,20 +90,24 @@ class CalendarViewModel(
 
     /**
      * The local date advanced (clock tick or test hook). Today-following
-     * refreshes the cutoff and the displayed month when it contains the new
-     * day; an explicit confirmed cutoff stays fixed.
+     * refreshes the cutoff and follows the day into a new month only when the
+     * previous today's month was on screen; a browsed month is preserved.
+     * An explicit confirmed cutoff stays fixed when the clock changes.
      */
     fun onLocalDateAdvance(newToday: LocalDate) {
         val current = _state.value
         val newMonth = YearMonth.from(newToday)
-        _state.update { it.copy(today = newToday) }
         if (!current.followsToday) {
+            _state.update { it.copy(today = newToday) }
             return
         }
+        val previousTodayMonth = current.today?.let { YearMonth.from(it) }
+        val wasShowingTodayMonth = current.displayMonth == previousTodayMonth
         _state.update {
             it.copy(
+                today = newToday,
                 balanceDate = newToday,
-                displayMonth = if (current.displayMonth == newMonth) current.displayMonth else newMonth,
+                displayMonth = if (wasShowingTodayMonth) newMonth else it.displayMonth,
             )
         }
         launchRead {
@@ -443,6 +446,7 @@ class CalendarViewModel(
     private fun launchRead(block: suspend () -> Unit) {
         val job = scope.launch { block() }
         trackedJobs += job
+        job.invokeOnCompletion { trackedJobs.remove(job) }
     }
 
     /** Wait until every read launched so far has completed (test-only). */
@@ -453,50 +457,11 @@ class CalendarViewModel(
                 return
             }
             pending.joinAll()
-            trackedJobs.removeAll(pending.toSet())
         }
     }
 
     private fun Throwable.toCoreError(): CoreError = when (this) {
         is CoreError -> this
         else -> CoreError.Unexpected(message ?: javaClass.simpleName, this)
-    }
-
-    private fun parseYears(currentSnapshot: StorageSnapshot): Map<Int, YearMetadata> {
-        val result = mutableMapOf<Int, YearMetadata>()
-        val yearFile = Regex("leave_years/(\\d+)\\.json")
-        for ((name, text) in currentSnapshot.files) {
-            val match = yearFile.matchEntire(name) ?: continue
-            val year = match.groupValues[1].toInt()
-            val json = runCatching { JSONObject(text) }.getOrNull() ?: continue
-            val start = runCatching { LocalDate.parse(json.optString("leave_year_start")) }.getOrNull()
-                ?: continue
-            val end = runCatching { LocalDate.parse(json.optString("leave_year_end")) }.getOrNull()
-                ?: continue
-            val periods = json.optJSONArray("pay_periods")?.let { array ->
-                (0 until array.length()).mapNotNull { index ->
-                    val period = array.optJSONObject(index) ?: return@mapNotNull null
-                    val periodStart =
-                        runCatching { LocalDate.parse(period.optString("start_date")) }.getOrNull()
-                            ?: return@mapNotNull null
-                    val periodEnd =
-                        runCatching { LocalDate.parse(period.optString("end_date")) }.getOrNull()
-                            ?: return@mapNotNull null
-                    StoredPeriod(
-                        number = if (period.has("pay_period_number")) {
-                            period.getInt("pay_period_number")
-                        } else {
-                            null
-                        },
-                        start = periodStart,
-                        end = periodEnd,
-                        payDate = period.optString("pay_date").takeIf { it.isNotEmpty() }
-                            ?.let { runCatching { LocalDate.parse(it) }.getOrNull() },
-                    )
-                }
-            } ?: emptyList()
-            result[year] = YearMetadata(year, start, end, periods)
-        }
-        return result
     }
 }

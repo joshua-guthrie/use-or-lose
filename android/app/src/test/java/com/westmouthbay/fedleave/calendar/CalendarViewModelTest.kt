@@ -246,6 +246,31 @@ class CalendarViewModelTest {
     }
 
     @Test
+    fun localDateAdvancePreservesABrowsedMonth() = runBlocking {
+        val (_, coordinator) = publishedStore()
+        val bridge = standardBridge()
+        bridge.balancesByDate[LocalDate.parse("2026-01-17")] =
+            mapOf("annual" to 90.0, "sick" to 20.0)
+        val vm = viewModel(coordinator, bridge)
+        vm.onLaunch()
+        vm.awaitIdle()
+
+        vm.onSelectMonth(YearMonth.of(2026, 2))
+        vm.awaitIdle()
+        assertEquals(YearMonth.of(2026, 2), vm.state.value.displayMonth)
+        val januaryRequestsBefore = bridge.monthRequests.count { it.month == 1 }
+
+        vm.onLocalDateAdvance(LocalDate.parse("2026-01-17"))
+        vm.awaitIdle()
+
+        val state = vm.state.value
+        assertEquals(YearMonth.of(2026, 2), state.displayMonth)
+        assertEquals(LocalDate.parse("2026-01-17"), state.balanceDate)
+        assertEquals(90.0, state.balance?.balances?.get("annual")!!, 0.0)
+        assertEquals(januaryRequestsBefore, bridge.monthRequests.count { it.month == 1 })
+    }
+
+    @Test
     fun confirmedDateLeavesTodayFollowingAndCancelPreservesIt() = runBlocking {
         val (root, coordinator) = publishedStore()
         val bridge = standardBridge()
@@ -527,5 +552,44 @@ class CalendarViewModelTest {
         val state = vm.state.value
         assertTrue(state.balanceError is CoreError.Unexpected)
         assertTrue(state.monthError is CoreError.Unexpected)
+    }
+
+    @Test
+    fun malformedMetadataIsSkippedGracefully() {
+        val goodYear = resource("leave_years/2026.json")
+        val snapshot = StorageSnapshot(
+            generationId = "malformed",
+            files = mapOf(
+                "leave_years/2026.json" to goodYear,
+                // Oversized year digits that overflow Int.
+                "leave_years/99999999999999999999.json" to goodYear,
+                // A year whose bounds parse but whose periods are unusable.
+                "leave_years/2027.json" to """
+                    {
+                      "leave_year": 2027,
+                      "leave_year_start": "2027-01-10",
+                      "leave_year_end": "2028-01-13",
+                      "pay_periods": [
+                        {"start_date": "2027-01-10", "end_date": "2027-01-23",
+                         "pay_date": "nonsense", "pay_period_number": "one"},
+                        {"start_date": "broken", "end_date": "2027-02-06",
+                         "pay_period_number": 2}
+                      ]
+                    }
+                """.trimIndent(),
+                "leave_years/not-a-year.json" to goodYear,
+            ),
+        )
+        val parsed = parseYearMetadata(snapshot)
+        assertEquals(setOf(2026, 2027), parsed.keys)
+        assertEquals(26, parsed.getValue(2026).periods.size)
+        val year2027 = parsed.getValue(2027)
+        assertEquals(LocalDate.parse("2028-01-13"), year2027.end)
+        // Only the period with valid bounds survives; the string number and
+        // nonsense pay date degrade to null, and the broken-dates period is
+        // skipped.
+        assertEquals(1, year2027.periods.size)
+        assertNull(year2027.periods.single().number)
+        assertNull(year2027.periods.single().payDate)
     }
 }
