@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -624,6 +625,7 @@ private fun DayList(
         modifier = Modifier
             .fillMaxSize()
             .testTag("calendar_day_list"),
+        contentPadding = PaddingValues(bottom = 24.dp),
     ) {
         items(days, key = { it.date.toString() }) { day ->
             val markers = markersFor(
@@ -660,9 +662,9 @@ private fun DayList(
                 }
             }
             val body = if (bodyParts.isEmpty()) {
-                context.getString(R.string.day_no_entries) + " \u203A"
+                context.getString(R.string.day_no_entries)
             } else {
-                bodyParts.joinToString(". ") + " \u203A"
+                bodyParts.joinToString(". ")
             }
             Row(
                 modifier = Modifier
@@ -670,21 +672,38 @@ private fun DayList(
                     .clickable { onOpenDay(day.date) }
                     .semantics(mergeDescendants = true) { contentDescription = spoken }
                     .testTag("calendar_day_${day.date}")
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                verticalAlignment = Alignment.CenterVertically,
+                    .padding(vertical = 6.dp, horizontal = 12.dp),
             ) {
-                Text(
-                    text = day.date.format(
-                        DateTimeFormatter.ofPattern("EEEE, MMMM d", Locale.getDefault()),
-                    ),
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.weight(1f),
-                )
-                Text(
-                    text = body,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+                Surface(
+                    color = MaterialTheme.colorScheme.surfaceVariant,
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = day.date.format(
+                                    DateTimeFormatter.ofPattern("EEEE, MMMM d", Locale.getDefault()),
+                                ),
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurface,
+                            )
+                            Text(
+                                text = body,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        Text(
+                            text = "\u203A",
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
             }
         }
     }
