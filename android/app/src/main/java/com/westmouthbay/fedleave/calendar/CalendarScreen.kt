@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -34,10 +35,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -142,7 +146,7 @@ fun CalendarScreen(
                 .fillMaxWidth(),
         ) {
             when {
-                state.monthLoading && month == null -> {
+                state.monthLoading && (state.monthFor != state.displayMonth || month == null) -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center,
@@ -202,7 +206,8 @@ private fun BalanceCard(state: CalendarUiState) {
             }
             Spacer(Modifier.height(12.dp))
             when {
-                state.balanceLoading && state.balance == null -> {
+                state.balanceLoading &&
+                    (state.balanceFor != state.balanceDate || state.balance == null) -> {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -367,10 +372,17 @@ private fun MonthGrid(
     context: android.content.Context,
     onOpenDay: (LocalDate) -> Unit,
 ) {
+    // The grid restores its scroll position when the screen returns from the
+    // day route or the month picker.
+    var savedScroll by rememberSaveable { mutableIntStateOf(0) }
+    val gridScrollState = rememberScrollState(initial = savedScroll)
+    DisposableEffect(Unit) {
+        onDispose { savedScroll = gridScrollState.value }
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
+            .verticalScroll(gridScrollState)
             .padding(horizontal = 12.dp),
     ) {
         WeekdayHeader(settings.weekStart)
@@ -593,7 +605,22 @@ private fun DayList(
     onOpenDay: (LocalDate) -> Unit,
 ) {
     val days = month.days.filter { it.inDisplayMonth }
+    // The day list restores its position when the screen returns from the
+    // day route.
+    var savedIndex by rememberSaveable { mutableIntStateOf(0) }
+    var savedOffset by rememberSaveable { mutableIntStateOf(0) }
+    val listState = rememberLazyListState(
+        initialFirstVisibleItemIndex = savedIndex,
+        initialFirstVisibleItemScrollOffset = savedOffset,
+    )
+    DisposableEffect(Unit) {
+        onDispose {
+            savedIndex = listState.firstVisibleItemIndex
+            savedOffset = listState.firstVisibleItemScrollOffset
+        }
+    }
     LazyColumn(
+        state = listState,
         modifier = Modifier
             .fillMaxSize()
             .testTag("calendar_day_list"),
@@ -620,13 +647,22 @@ private fun DayList(
                 }
             }.joinToString(". ")
 
-            val body = when {
-                day.entries.isEmpty() ->
-                    context.getString(R.string.day_no_entries) + " \u203A"
-                else -> day.entries.joinToString(" \u00b7 ") { entry ->
-                    BalancePresentation.fullLabel(context, entry.category) + " \u00b7 " +
-                        BalancePresentation.entryValueText(context, entry)
-                } + " \u203A"
+            val bodyParts = buildList {
+                // Each row spells out its schedule events and day activity,
+                // as the CALENDAR-DAY-LIST board requires.
+                markers.forEach { add(it.spoken) }
+                day.entries.forEach { entry ->
+                    val direction = entry.direction ?: ""
+                    add(
+                        "${BalancePresentation.shortLabel(context, entry.category)} " +
+                            "${BalancePresentation.formatHours(entry.hours)} h $direction",
+                    )
+                }
+            }
+            val body = if (bodyParts.isEmpty()) {
+                context.getString(R.string.day_no_entries) + " \u203A"
+            } else {
+                bodyParts.joinToString(". ") + " \u203A"
             }
             Row(
                 modifier = Modifier

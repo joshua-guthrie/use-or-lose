@@ -62,12 +62,9 @@ fun FedLeaveApp(dependencies: AppDependencies) {
         calendarViewModel.onLaunch()
     }
 
-    // Returning to Calendar closes the read-only day route state.
-    LaunchedEffect(currentRoute) {
-        if (currentRoute == AppRoutes.CALENDAR) {
-            calendarViewModel.onCloseDay()
-        }
-    }
+    // The tapped day stays selected after Back so the Calendar restores its
+    // month, scroll context and focus on the tapped date; Menu > Today and
+    // the next day tap replace it.
 
     Scaffold(
         bottomBar = { FedLeaveBottomBar(currentRoute, navController::navigateToTab) },

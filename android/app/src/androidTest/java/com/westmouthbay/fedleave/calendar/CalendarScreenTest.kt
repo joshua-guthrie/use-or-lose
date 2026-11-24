@@ -172,7 +172,16 @@ class CalendarScreenTest : CalendarUiTestBase() {
         }
         waitForBalanceCard()
         composeRule.onNodeWithText("Thursday, January 1").assertIsDisplayed()
+        // Each row spells out its schedule events: January 1 carries the
+        // holiday, January 21 has no entries.
+        composeRule.onNodeWithText("Holiday, New Year's Day \u203A").assertIsDisplayed()
         composeRule.onAllNodesWithText("No entries \u203A").onFirst().assertIsDisplayed()
+        composeRule
+            .onNodeWithTag("calendar_day_list")
+            .performScrollToNode(hasTestTag("calendar_day_2026-01-24"))
+        composeRule
+            .onNodeWithText("Pay-period end, Period 1", substring = true)
+            .assertIsDisplayed()
         composeRule
             .onNodeWithTag("calendar_day_list")
             .performScrollToNode(hasTestTag("calendar_day_2026-01-22"))
