@@ -1,6 +1,6 @@
 # Chapter 01.07 · Menu structure and tap paths
 
-Use these screens for the owner's navigation review. The Reports entry point and direct Calendar Share are decided. Review the nested Settings labels and Back behavior before approving I01.
+Use these screens for the owner's navigation review. The Reports entry point and direct Calendar Share are decided. The owner approved these labels, routes, and Back behavior on November 23, 2026; see [checkpoint 29](../../passdowns/29-menu-review-approval.md).
 
 Open FedLeave on **Calendar**. The bottom bar reads **Calendar · Reports · Settings** in that order. **Reports is where you go for all analytics.** Tap **Reports** at the bottom and choose the chart or report you want. Tap **Settings** at the bottom for preferences, leave-year maintenance, backups, and Help. The upper-left **Menu** is a short list of Calendar commands. The upper-right **Share calendar PDF** button acts on the month shown in Calendar.
 
