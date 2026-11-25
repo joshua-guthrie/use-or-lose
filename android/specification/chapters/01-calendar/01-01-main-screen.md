@@ -14,12 +14,14 @@ The owner selected this layout with daily leave inside the month grid. Calendar 
 
 The balance example adds eight fictional values to the January 16 reference for layout review. The calculation and PDF fixtures keep their original amounts. The grid example enables automatic accrual display and adds one fictional future comp entry on January 24. The grid shows up to two activity lines and **+1** for the third. Tapping the day reveals all its activity. [Balance behavior and ordering](01-02-balances.md#preview-and-full-list) · [January calculation fixture](../../verification/acceptance-tests.md#calendar-balance-fixture)
 
+**Grid layout (spec 1.1).** The month grid fills the space between the month selector and the bottom bar: every day cell has the same height, computed from the available space and the number of week rows on the device. Cell content — day number, markers and activity — is top-anchored, and the extra height adds breathing room below. When a row's content cannot fit its computed height, the grid scrolls instead of clipping. The grid text keeps its base size regardless of the system font scale, so the at-a-glance calendar never reflows at large text.
+
 ![Month selector and full-width Calendar and balance-picker day lists for narrow screens or larger text](../../artwork/mockups/calendar-compact-month.png)
 
 | Callout | What happens |
 | --- | --- |
 | 1–2 | Set the calendar year and choose a month. The list scrolls to all twelve months. A month change preserves the selected balance cutoff. |
-| 3 | If seven readable 48 dp day targets cannot fit, display a full-width, scrollable list of dates for the month. Each row spells out schedule events and day activity. Tap any row to open **Edit day**, just as in the grid. The balance card and month selector stay above it. |
+| 3 | If seven readable 48 dp day targets cannot fit the screen width, display a full-width, scrollable list of dates for the month automatically. At any width, the small **Full list** control above the bottom bar opens the same list as a manual mode, and **Grid** returns to the month grid. Each row spells out schedule events and day activity. Tap any row to open **Edit day**, just as in the grid. The balance card and month selector stay above it. |
 | 4–5 | On the same compact or large-text profile, the picker lists each date with its schedule descriptions. Selecting a row or shortcut changes the pending date. Confirm applies it. Cancel preserves the committed date. |
 
 ## What opens when you tap a day

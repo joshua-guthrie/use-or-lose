@@ -235,6 +235,15 @@ class Screen:
         self.mark(item.get("note"), self.cursor + 18)
         self.cursor += 47
 
+    def toggle(self, item):
+        # The small Full list / Grid control above the bottom bar (spec 1.1).
+        label = item.get("text", "")
+        width = 7 * len(label) + 28
+        y = self.bottom - 78
+        self.box(self.inner_right - width, y, self.inner_right, y + 24, "#F0F4FC", 12)
+        self.text(self.inner_right - width // 2, y + 12, label, 11, PRIMARY, bold=True, anchor="mm")
+        self.mark(item.get("note"), y + 15)
+
     def menu_panel(self, item):
         top = self.top + 49
         right = self.left + min(248, self.width)

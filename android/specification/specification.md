@@ -1,5 +1,14 @@
 # FedLeave Android specification
 
+## Specification revisions
+
+Each change updates the governing chapter, mockup annotation, parity row and acceptance case together, then bumps the version here so revisions can be compared.
+
+| Version | Date | Change | Decision |
+| --- | --- | --- | --- |
+| 1.0 | November 23, 2026 | Approved baseline: menu review, Calendar main screen, implementation approval through I06. | Owner approvals through checkpoint 31 |
+| 1.1 | November 24, 2026 | Calendar grid revision: the day cells fill the space between the month selector and the bottom bar with one uniform cell height computed per device; the grid keeps its base font size regardless of the system font scale; the full-width day list becomes a manual **Full list** mode opened by a small control above the bottom bar (the automatic large-text switch is removed; the automatic narrow-width switch stays); the grid scrolls instead of clipping when a row cannot fit. | Owner review, November 24, 2026 |
+
 ## Product and reference build
 
 FedLeave for Android brings the desktop leave-accounting workflows in scope for the first release to a phone. The user can check a balance, inspect the calendar, and manage leave locally. The phone interface uses Android's Sharesheet for user-initiated sharing of reports, images, and compatible backups.
