@@ -75,7 +75,7 @@ Rebuild the pinned Android fixtures instead of editing them by hand:
 .venv/bin/python android/qa/fixtures/build_calendar_fixture.py
 ```
 
-The builder prints the fixture tree digest. It must stay `03e9e1757f73015b356b900703a13a88390e854f274c7bce78bd2f9f00c7aea9`; see [the manifest](qa/fixtures/calendar-2026.manifest.json). The builder also emits the marker overlap fixture under `qa/fixtures/marker-fixture/` (digest `d60bd8d0…`, manifest `qa/fixtures/calendar-markers.manifest.json`). Device evidence captures land in the app files dir during the connected suite; keep `android.injected.androidTest.leaveApksInstalledAfterRun=true` to pull them with adb.
+The builder prints the fixture tree digest. It must stay `03e9e1757f73015b356b900703a13a88390e854f274c7bce78bd2f9f00c7aea9`; see [the manifest](qa/fixtures/calendar-2026.manifest.json). The builder also emits the marker overlap fixture under `qa/fixtures/marker-fixture/` (digest `d60bd8d0…`, manifest `qa/fixtures/calendar-markers.manifest.json`). Device evidence captures land in the app files dir during the connected suite; keep `android.injected.androidTest.leaveApksInstalledAfterRun=true` and refresh them with `android/qa/pull-evidence.sh` after every run so the local evidence always matches the latest build.
 
 Release builds, signing, Play uploads and device release rehearsal belong to I19 and I20. Do not commit `local.properties`, keystores, APKs, AABs or machine-specific SDK paths. [Google Play delivery](specification/chapters/06-delivery/06-01-google-play.md)
 
