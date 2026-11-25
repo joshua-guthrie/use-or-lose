@@ -14,7 +14,7 @@ import com.westmouthbay.fedleave.storage.StorePaths
  * [create] must run on the main thread: Chaquopy's [Python.start] requires it.
  */
 class AppDependencies(
-    val bridge: CoreBridge,
+    val bridge: CoreRead,
     val store: StoreCoordinator,
     val timeSource: TimeSource,
     val displaySettings: CalendarDisplaySettings,

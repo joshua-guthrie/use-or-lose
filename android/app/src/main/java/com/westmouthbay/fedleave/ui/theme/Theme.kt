@@ -31,6 +31,9 @@ private val LightColors = lightColorScheme(
     surfaceVariant = Color(0xFFF4F7FC),
     onSurfaceVariant = Color(0xFF46536B),
     outline = Color(0xFFC5D2E6),
+    // Warning surfaces (the unavailable-state card from the mockups).
+    tertiaryContainer = Color(0xFFFFF1D6),
+    onTertiaryContainer = Color(0xFF6B4E00),
 )
 
 private val DarkColors = darkColorScheme(
@@ -52,6 +55,9 @@ private val DarkColors = darkColorScheme(
     surfaceVariant = Color(0xFF1A2436),
     onSurfaceVariant = Color(0xFFA9B6CC),
     outline = Color(0xFF39455E),
+    // Warning surfaces (the unavailable-state card from the mockups).
+    tertiaryContainer = Color(0xFF4A3A18),
+    onTertiaryContainer = Color(0xFFFFE3A3),
 )
 
 @Composable

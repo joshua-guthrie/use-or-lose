@@ -3,6 +3,7 @@ package com.westmouthbay.fedleave.calendar
 import android.graphics.Bitmap
 import android.os.Build
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.test.platform.app.InstrumentationRegistry
 import com.chaquo.python.Python
@@ -39,6 +40,15 @@ abstract class CalendarUiTestBase {
 
     protected open fun displaySettings(): CalendarDisplaySettings = CalendarDisplaySettings()
 
+    /** Subclasses can inject a fake bridge for layout and failure states. */
+    protected open fun createDependencies(context: android.content.Context): AppDependencies =
+        AppDependencies(
+            bridge = CoreBridge(Python.getInstance()),
+            store = StoreCoordinator(StorePaths.forContext(context)),
+            timeSource = CalendarDeveloperConfig.fixtureTimeSource,
+            displaySettings = displaySettings(),
+        )
+
     @Before
     open fun setUp() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
@@ -57,12 +67,7 @@ abstract class CalendarUiTestBase {
                 assetPrefix(),
             )
         }
-        dependencies = AppDependencies(
-            bridge = CoreBridge(Python.getInstance()),
-            store = StoreCoordinator(StorePaths.forContext(context)),
-            timeSource = CalendarDeveloperConfig.fixtureTimeSource,
-            displaySettings = displaySettings(),
-        )
+        dependencies = createDependencies(context)
     }
 
     protected fun setAppContent() {
@@ -77,6 +82,15 @@ abstract class CalendarUiTestBase {
     protected fun waitForBalanceCard() {
         composeRule.waitUntil(timeoutMillis = 20_000) {
             composeRule.onAllNodesWithText("90 h").fetchSemanticsNodes().isNotEmpty()
+        }
+    }
+
+    /** Wait until the balance date picker's month grid has rendered. */
+    protected fun waitForPickerGrid() {
+        composeRule.waitUntil(timeoutMillis = 20_000) {
+            composeRule.onAllNodes(
+                hasTestTag("balance_picker_day_2026-01-01"),
+            ).fetchSemanticsNodes().isNotEmpty()
         }
     }
 

@@ -33,6 +33,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.westmouthbay.fedleave.R
+import com.westmouthbay.fedleave.calendar.BalanceDatePicker
+import com.westmouthbay.fedleave.calendar.BalanceScreen
 import com.westmouthbay.fedleave.calendar.CalendarViewModel
 import com.westmouthbay.fedleave.calendar.DayScreen
 import com.westmouthbay.fedleave.calendar.MonthPicker
@@ -82,6 +84,24 @@ fun FedLeaveApp(dependencies: AppDependencies) {
                         navController.navigate(AppRoutes.day(date))
                     },
                     onOpenMonthPicker = { navController.navigate(AppRoutes.MONTH_PICKER) },
+                    onOpenBalances = { navController.navigate(AppRoutes.BALANCES) },
+                )
+            }
+            composable(AppRoutes.BALANCES) {
+                BalanceScreen(
+                    viewModel = calendarViewModel,
+                    onChooseDate = {
+                        calendarViewModel.onChooseDate()
+                        navController.navigate(AppRoutes.BALANCE_DATE_PICKER)
+                    },
+                    onBack = { navController.popBackStack() },
+                )
+            }
+            composable(AppRoutes.BALANCE_DATE_PICKER) {
+                BalanceDatePicker(
+                    viewModel = calendarViewModel,
+                    onConfirm = { navController.popBackStack() },
+                    onCancel = { navController.popBackStack() },
                 )
             }
             composable(

@@ -528,6 +528,62 @@ class CalendarViewModelTest {
     }
 
     @Test
+    fun pickerLoadsItsOwnMonthAndReAnchorsShortcuts() = runBlocking {
+        val (_, coordinator) = publishedStore()
+        val bridge = standardBridge()
+        val vm = viewModel(coordinator, bridge)
+        vm.onLaunch()
+        vm.awaitIdle()
+
+        vm.onChooseDate()
+        vm.awaitIdle()
+        var state = vm.state.value
+        assertEquals(YearMonth.of(2026, 1), state.pickerMonthFor)
+        assertEquals(jan16, state.pickerAnchor)
+
+        vm.onPickerMonthChanged(YearMonth.of(2026, 2))
+        vm.awaitIdle()
+        state = vm.state.value
+        assertEquals(YearMonth.of(2026, 2), state.pickerMonthFor)
+        // Navigating the picker re-anchors on the month's first day.
+        assertEquals(LocalDate.parse("2026-02-01"), state.pickerAnchor)
+        val reanchored = vm.nearbyPayPeriodEnds(state.pickerAnchor!!)
+        assertEquals(
+            listOf(LocalDate.parse("2026-02-07"), LocalDate.parse("2026-02-21")),
+            reanchored.map { it.end },
+        )
+    }
+
+    @Test
+    fun pickerShortcutKeepsTheAnchorStableAndConfirmCommits() = runBlocking {
+        val (_, coordinator) = publishedStore()
+        val bridge = standardBridge()
+        bridge.balancesByDate[feb7] = mapOf("annual" to 80.0, "sick" to 28.0)
+        val vm = viewModel(coordinator, bridge)
+        vm.onLaunch()
+        vm.awaitIdle()
+
+        vm.onChooseDate()
+        vm.awaitIdle()
+        vm.onPickerShortcutSelected(feb7)
+        vm.awaitIdle()
+        var state = vm.state.value
+        assertEquals(feb7, state.pickerDraft)
+        assertEquals(YearMonth.of(2026, 2), state.pickerMonth)
+        // The shortcut list stays anchored on the committed cutoff.
+        assertEquals(jan16, state.pickerAnchor)
+
+        vm.onConfirmPicker()
+        vm.awaitIdle()
+        state = vm.state.value
+        assertEquals(feb7, state.balanceDate)
+        assertFalse(state.followsToday)
+        assertEquals(80.0, state.balance?.balances?.get("annual")!!, 0.0)
+        assertNull(state.pickerDraft)
+        assertNull(state.pickerMonth)
+    }
+
+    @Test
     fun leaveYearEndComesFromTheSnapshot() = runBlocking {
         val (_, coordinator) = publishedStore()
         val bridge = standardBridge()

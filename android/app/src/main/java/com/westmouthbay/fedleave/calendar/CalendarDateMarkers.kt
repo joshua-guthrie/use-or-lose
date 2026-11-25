@@ -1,5 +1,6 @@
 package com.westmouthbay.fedleave.calendar
 
+import android.content.Context
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.LocalContentColor
@@ -13,6 +14,8 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
+import com.westmouthbay.fedleave.R
+import com.westmouthbay.fedleave.core.MonthDay
 
 /**
  * The four 9 x 9 dp schedule glyphs from the [date marker chapter](../../../../specification/chapters/01-calendar/01-04-date-markers.md),
@@ -132,3 +135,38 @@ data class DayMarker(
     val kind: MarkerKind,
     val spoken: String,
 )
+
+/**
+ * The markers for one day in table order, filtered by [settings]. The
+ * balance picker calls this with its own period data; the year-end label
+ * uses the covering leave year, not the calendar year.
+ */
+fun markersFor(
+    day: MonthDay,
+    settings: CalendarDisplaySettings,
+    periodNumber: Int?,
+    yearEndNumber: Int?,
+    context: Context,
+): List<DayMarker> = buildList {
+    if (settings.showHolidays && day.holidayName != null) {
+        add(
+            DayMarker(
+                MarkerKind.HOLIDAY,
+                "${context.getString(R.string.day_event_holiday)}, ${day.holidayName}",
+            ),
+        )
+    }
+    if (settings.showPaydays && day.isPayday) {
+        add(DayMarker(MarkerKind.PAYDAY, context.getString(R.string.day_event_payday)))
+    }
+    if (settings.showPayPeriodEnds && day.isPayPeriodEnd) {
+        val spoken = context.getString(R.string.day_event_period_end) +
+            (periodNumber?.let { ", " + context.getString(R.string.day_event_period_number, it) } ?: "")
+        add(DayMarker(MarkerKind.PERIOD_END, spoken))
+    }
+    if (yearEndNumber != null) {
+        val spoken = context.getString(R.string.day_event_year_end) + ", " +
+            context.getString(R.string.day_event_year_label, yearEndNumber)
+        add(DayMarker(MarkerKind.YEAR_END, spoken))
+    }
+}

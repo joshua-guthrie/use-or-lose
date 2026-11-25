@@ -12,6 +12,8 @@ object AppRoutes {
     const val CALENDAR = "calendar"
     const val DAY = "day/{date}"
     const val MONTH_PICKER = "month_picker"
+    const val BALANCES = "balances"
+    const val BALANCE_DATE_PICKER = "balance_date_picker"
     const val REPORTS = "reports"
     const val SETTINGS = "settings"
 

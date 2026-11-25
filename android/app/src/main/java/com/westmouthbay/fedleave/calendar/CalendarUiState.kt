@@ -87,6 +87,13 @@ data class CalendarUiState(
     /** Transient picker state; cleared on cancel, confirm and back. */
     val pickerDraft: LocalDate? = null,
     val pickerMonth: YearMonth? = null,
+    /** The shortcut anchor while the picker is open. */
+    val pickerAnchor: LocalDate? = null,
+    /** Month result for the picker's own displayed month. */
+    val pickerMonthFor: YearMonth? = null,
+    val pickerMonthResult: MonthViewResult? = null,
+    val pickerMonthLoading: Boolean = false,
+    val pickerMonthError: CoreError? = null,
     /** Month result keyed to the month it was requested for. */
     val monthFor: YearMonth? = null,
     val month: MonthViewResult? = null,

@@ -80,6 +80,7 @@ fun CalendarScreen(
     viewModel: CalendarViewModel,
     onOpenDay: (LocalDate) -> Unit,
     onOpenMonthPicker: () -> Unit,
+    onOpenBalances: () -> Unit,
 ) {
     val state by viewModel.state.collectAsState()
     var menuExpanded by remember { mutableStateOf(false) }
@@ -144,7 +145,7 @@ fun CalendarScreen(
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(horizontal = 16.dp),
         )
-        BalanceCard(state)
+        BalanceCard(state, onOpenBalances)
         MonthRow(
             month = state.displayMonth,
             onOpenMonthPicker = onOpenMonthPicker,
@@ -188,23 +189,57 @@ fun CalendarScreen(
 }
 
 @Composable
-private fun BalanceCard(state: CalendarUiState) {
+private fun BalanceCard(
+    state: CalendarUiState,
+    onOpen: () -> Unit,
+) {
     val context = LocalContext.current
+    val header = when {
+        state.balanceDate == null -> ""
+        state.followsToday ->
+            stringResource(R.string.calendar_as_of_today, state.balanceDate.format(CARD_DATE_FORMAT))
+        else -> state.balanceDate.format(CARD_DATE_FORMAT)
+    }
+    val rows = state.balance?.let {
+        BalancePresentation.visibleBalances(it.balances, it.parental)
+    } ?: emptyList()
+    val columns = BalancePresentation.previewColumns(
+        maxWidth = androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp.dp,
+        fontScale = LocalDensity.current.fontScale,
+    )
+    val (previewRows, hidden) = BalancePresentation.preview(rows, columns)
+    val spoken = buildString {
+        append(header)
+        previewRows.forEach { row ->
+            append(". ")
+            append(BalancePresentation.shortLabel(context, row.category))
+            append(" ")
+            append(BalancePresentation.valueText(context, row.value))
+        }
+        if (hidden > 0) {
+            append(". ")
+            append(
+                context.getString(
+                    R.string.calendar_view_all_balances,
+                    rows.size,
+                    hidden,
+                ),
+            )
+        }
+        append(". ")
+        append(context.getString(R.string.calendar_open_balances_action))
+    }
     Surface(
         color = MaterialTheme.colorScheme.primaryContainer,
         shape = RoundedCornerShape(12.dp),
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
+            .clickable(onClick = onOpen)
+            .semantics(mergeDescendants = true) { contentDescription = spoken }
             .testTag("calendar_balance_card"),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            val header = when {
-                state.balanceDate == null -> ""
-                state.followsToday ->
-                    stringResource(R.string.calendar_as_of_today, state.balanceDate.format(CARD_DATE_FORMAT))
-                else -> state.balanceDate.format(CARD_DATE_FORMAT)
-            }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = header,
@@ -212,7 +247,7 @@ private fun BalanceCard(state: CalendarUiState) {
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.weight(1f),
                 )
-                // The card opens Balances & date in I05-03; the chevron ships now.
+                // The card opens Balances & date.
                 Text(
                     text = "\u203A",
                     style = MaterialTheme.typography.titleLarge,
@@ -245,16 +280,27 @@ private fun BalanceCard(state: CalendarUiState) {
                     )
                 }
                 else -> {
-                    val rows = BalancePresentation.visibleBalances(state.balance!!.balances)
-                    rows.chunked(4).forEach { chunk ->
+                    previewRows.chunked(columns).forEach { chunk ->
                         Row(modifier = Modifier.fillMaxWidth()) {
                             chunk.forEach { row ->
                                 BalanceValueCell(context, row, Modifier.weight(1f))
                             }
-                            repeat(4 - chunk.size) {
+                            repeat(columns - chunk.size) {
                                 Spacer(Modifier.weight(1f))
                             }
                         }
+                    }
+                    if (hidden > 0) {
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            text = stringResource(
+                                R.string.calendar_view_all_balances,
+                                rows.size,
+                                hidden,
+                            ),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
                     }
                 }
             }
@@ -275,7 +321,7 @@ private fun BalanceValueCell(
             color = MaterialTheme.colorScheme.onPrimaryContainer,
         )
         Text(
-            text = stringResource(R.string.hours_value, BalancePresentation.formatHours(row.hours)),
+            text = BalancePresentation.valueText(context, row.value),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onPrimaryContainer,
         )
@@ -544,36 +590,6 @@ private fun WeekdayHeader(weekStart: DayOfWeek) {
                 modifier = Modifier.weight(1f),
             )
         }
-    }
-}
-
-private fun markersFor(
-    day: MonthDay,
-    settings: CalendarDisplaySettings,
-    periodNumber: Int?,
-    yearEndNumber: Int?,
-    context: android.content.Context,
-): List<DayMarker> = buildList {
-    if (settings.showHolidays && day.holidayName != null) {
-        add(
-            DayMarker(
-                MarkerKind.HOLIDAY,
-                "${context.getString(R.string.day_event_holiday)}, ${day.holidayName}",
-            ),
-        )
-    }
-    if (settings.showPaydays && day.isPayday) {
-        add(DayMarker(MarkerKind.PAYDAY, context.getString(R.string.day_event_payday)))
-    }
-    if (settings.showPayPeriodEnds && day.isPayPeriodEnd) {
-        val spoken = context.getString(R.string.day_event_period_end) +
-            (periodNumber?.let { ", " + context.getString(R.string.day_event_period_number, it) } ?: "")
-        add(DayMarker(MarkerKind.PERIOD_END, spoken))
-    }
-    if (yearEndNumber != null) {
-        val spoken = context.getString(R.string.day_event_year_end) + ", " +
-            context.getString(R.string.day_event_year_label, yearEndNumber)
-        add(DayMarker(MarkerKind.YEAR_END, spoken))
     }
 }
 

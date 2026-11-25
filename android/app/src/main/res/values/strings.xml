@@ -16,6 +16,29 @@
     <string name="calendar_full_list">Full list</string>
     <string name="calendar_grid">Grid</string>
 
+    <!-- Balances & date -->
+    <string name="balances_title">Balances &amp; date</string>
+    <string name="balances_as_of_today">As of today \u00b7 %1$s</string>
+    <string name="balances_as_of">As of %1$s</string>
+    <string name="balances_projected">Projected balance \u00b7 %1$s</string>
+    <string name="balances_requested_date">Requested date \u00b7 %1$s</string>
+    <string name="balances_count">%1$d balances</string>
+    <string name="balances_unavailable_title">Balance unavailable</string>
+    <string name="balances_unavailable_body">FedLeave could not read this date\'s leave year.</string>
+    <string name="balances_retry">Retry</string>
+    <string name="balances_projected_note">Includes dated leave and accruals through %1$s.</string>
+    <string name="period_card">Pay period %1$d \u00b7 Details %2$s</string>
+    <string name="period_details_open">open</string>
+    <string name="period_details_closed">closed</string>
+    <string name="period_range">%1$s\u2013%2$s \u00b7 Pay date %3$s.</string>
+    <string name="period_totals">%1$s earned \u00b7 %2$s used</string>
+    <string name="balance_date_title">Balance date</string>
+    <string name="balance_date_subtitle">Currently showing %1$s</string>
+    <string name="balance_picker_nearby_ends">Nearby pay-period ends</string>
+    <string name="balance_picker_show">Show %1$s</string>
+    <string name="previous_month">Previous month</string>
+    <string name="next_month">Next month</string>
+
     <!-- Menu -->
     <string name="menu_today">Today</string>
     <string name="menu_open">Menu</string>

@@ -57,6 +57,7 @@ class CalendarViewModel(
     private var monthRequestId = 0
     private var balanceRequestId = 0
     private var periodRequestId = 0
+    private var pickerMonthRequestId = 0
 
     // ---- lifecycle -------------------------------------------------------
 
@@ -154,8 +155,10 @@ class CalendarViewModel(
             it.copy(
                 pickerDraft = anchor,
                 pickerMonth = YearMonth.from(anchor),
+                pickerAnchor = anchor,
             )
         }
+        launchRead { loadPickerMonth(YearMonth.from(anchor)) }
     }
 
     /** Choosing a cell updates the pending draft only. */
@@ -165,16 +168,32 @@ class CalendarViewModel(
 
     /** A shortcut updates the draft and moves the picker month to it. */
     fun onPickerShortcutSelected(date: LocalDate) {
+        val month = YearMonth.from(date)
         _state.update {
             it.copy(
                 pickerDraft = date,
-                pickerMonth = YearMonth.from(date),
+                pickerMonth = month,
             )
+        }
+        if (_state.value.pickerMonthFor != month) {
+            launchRead { loadPickerMonth(month) }
         }
     }
 
+    /**
+     * Navigating the picker to another month re-anchors the shortcuts on
+     * that month's first day and loads the month's grid.
+     */
     fun onPickerMonthChanged(month: YearMonth) {
-        _state.update { it.copy(pickerMonth = month) }
+        _state.update {
+            it.copy(
+                pickerMonth = month,
+                pickerAnchor = month.atDay(1),
+            )
+        }
+        if (_state.value.pickerMonthFor != month) {
+            launchRead { loadPickerMonth(month) }
+        }
     }
 
     /**
@@ -189,6 +208,11 @@ class CalendarViewModel(
                 followsToday = false,
                 pickerDraft = null,
                 pickerMonth = null,
+                pickerAnchor = null,
+                pickerMonthFor = null,
+                pickerMonthResult = null,
+                pickerMonthLoading = false,
+                pickerMonthError = null,
                 balanceFor = null,
                 balance = null,
                 balanceLoading = true,
@@ -204,7 +228,17 @@ class CalendarViewModel(
 
     /** Cancel discards the draft and picker month; the result stays. */
     fun onCancelPicker() {
-        _state.update { it.copy(pickerDraft = null, pickerMonth = null) }
+        _state.update {
+            it.copy(
+                pickerDraft = null,
+                pickerMonth = null,
+                pickerAnchor = null,
+                pickerMonthFor = null,
+                pickerMonthResult = null,
+                pickerMonthLoading = false,
+                pickerMonthError = null,
+            )
+        }
     }
 
     // ---- menu ------------------------------------------------------------
@@ -216,6 +250,7 @@ class CalendarViewModel(
         monthRequestId++
         balanceRequestId++
         periodRequestId++
+        pickerMonthRequestId++
         _state.update {
             it.copy(
                 today = today,
@@ -225,6 +260,7 @@ class CalendarViewModel(
                 selectedDay = null,
                 pickerDraft = null,
                 pickerMonth = null,
+                pickerAnchor = null,
             )
         }
         launchRead {
@@ -342,6 +378,76 @@ class CalendarViewModel(
                         month = null,
                         monthLoading = false,
                         monthError = error.toCoreError(),
+                    )
+                }
+            },
+        )
+    }
+
+    private suspend fun loadPickerMonth(month: YearMonth) {
+        val id = ++pickerMonthRequestId
+        val currentSnapshot = snapshot
+        if (currentSnapshot == null) {
+            _state.update {
+                it.copy(
+                    pickerMonthLoading = false,
+                    pickerMonthError = CoreError.Unexpected("No store snapshot is open."),
+                )
+            }
+            return
+        }
+        val monthStart = month.atDay(1)
+        val monthEnd = month.atEndOfMonth()
+        val covering = years.values.firstOrNull { monthStart <= it.end && monthEnd >= it.start }
+        if (covering == null) {
+            _state.update {
+                it.copy(
+                    pickerMonthFor = null,
+                    pickerMonthResult = null,
+                    pickerMonthLoading = false,
+                    pickerMonthError = CoreError.Read(
+                        CoreError.LEAVE_YEAR_NOT_FOUND,
+                        "month",
+                        "No leave year covers ${month.atDay(1)}.",
+                    ),
+                )
+            }
+            return
+        }
+        _state.update { it.copy(pickerMonthLoading = true, pickerMonthError = null) }
+        val localDate = _state.value.today ?: timeSource.today()
+        val result = runCatching {
+            bridge.monthView(
+                currentSnapshot,
+                MonthViewRequest(
+                    year = covering.year,
+                    month = month.monthValue,
+                    calendarYear = month.year,
+                ),
+                localDate,
+            )
+        }
+        if (id != pickerMonthRequestId || _state.value.pickerMonth != month) {
+            return
+        }
+        result.fold(
+            onSuccess = { view ->
+                _state.update {
+                    it.copy(
+                        pickerMonthFor = month,
+                        pickerMonthResult = view,
+                        pickerMonthLoading = false,
+                        pickerMonthError = null,
+                    )
+                }
+            },
+            onFailure = { error ->
+                _state.update {
+                    it.copy(
+                        pickerMonthFor = month,
+                        pickerMonthResult = null,
+                        pickerMonthLoading = false,
+                        pickerMonthError = error.toCoreError(),
                     )
                 }
             },

@@ -1,15 +1,17 @@
 package com.westmouthbay.fedleave.calendar
 
 import android.content.Context
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.westmouthbay.fedleave.R
 import com.westmouthbay.fedleave.core.DayEntry
+import com.westmouthbay.fedleave.core.ParentalSummary
 
 /**
- * Pure presentation helpers for balance values, category labels and grid
- * display lines. I05-02 pulled this file forward from the I05-03 task list
- * because the card and the day route need the shared label maps now; I05-03
- * extends it with the hidden-count hint, capacity-based preview and the full
- * list rules.
+ * Pure presentation helpers for balance values, category labels, the card
+ * preview and the full list. I05-03 owns the hidden-count hint, the
+ * capacity-based preview and the PPL/FMLA rows; the label maps landed with
+ * I05-02.
  */
 object BalancePresentation {
 
@@ -19,23 +21,74 @@ object BalancePresentation {
         "restored_annual", "religious_comp", "ppl", "fmla",
     )
 
-    data class BalanceRow(val category: String, val hours: Double)
+    sealed interface BalanceValue {
+        data class Hours(val value: Double) : BalanceValue
+        data object Unavailable : BalanceValue
+    }
+
+    data class BalanceRow(val category: String, val value: BalanceValue)
 
     /**
      * The rows shown for a dated result: annual and sick are always reported
-     * (even at zero); other supported categories appear when nonzero, in the
-     * desktop order, followed by remaining nonzero categories by stable key.
+     * (even at zero); other supported categories appear when nonzero; PPL and
+     * FMLA remaining come from the parental summary and stay when reported
+     * (an exhausted grant keeps its zero, a missing value is Unavailable);
+     * remaining nonzero categories follow in stable key order.
      */
-    fun visibleBalances(balances: Map<String, Double>): List<BalanceRow> {
-        val ordered = CATEGORY_ORDER.mapNotNull { key ->
-            balances[key]?.let { BalanceRow(key, it) }
-        }.filter { it.category == "annual" || it.category == "sick" || it.hours != 0.0 }
-        val others = balances.keys
-            .filter { it !in CATEGORY_ORDER }
-            .sorted()
-            .mapNotNull { key -> balances[key]?.let { BalanceRow(key, it) } }
-            .filter { it.hours != 0.0 }
-        return ordered + others
+    fun visibleBalances(
+        balances: Map<String, Double>,
+        parental: ParentalSummary?,
+    ): List<BalanceRow> {
+        val rows = mutableListOf<BalanceRow>()
+        for (key in CATEGORY_ORDER) {
+            if (key == "ppl" || key == "fmla") {
+                continue
+            }
+            val value = balances[key] ?: continue
+            if (key != "annual" && key != "sick" && value == 0.0) {
+                continue
+            }
+            rows += BalanceRow(key, BalanceValue.Hours(value))
+        }
+        if (parental != null) {
+            rows += BalanceRow(
+                "ppl",
+                parental.pplAvailableHours?.let { BalanceValue.Hours(it) }
+                    ?: BalanceValue.Unavailable,
+            )
+            rows += BalanceRow(
+                "fmla",
+                parental.fmlaRemainingHours?.let { BalanceValue.Hours(it) }
+                    ?: BalanceValue.Unavailable,
+            )
+        }
+        for (key in balances.keys.filter { it !in CATEGORY_ORDER }.sorted()) {
+            val value = balances[key] ?: continue
+            if (value != 0.0) {
+                rows += BalanceRow(key, BalanceValue.Hours(value))
+            }
+        }
+        return rows
+    }
+
+    /**
+     * The preview columns for the balance card: four columns at the
+     * reference width and text scale (two rows of four), two columns on
+     * narrow screens or large text, matching the mockup boards.
+     */
+    fun previewColumns(maxWidth: Dp, fontScale: Float): Int =
+        if (maxWidth >= 320.dp && fontScale < 1.3f) 4 else 2
+
+    /** The card preview rows and how many reported balances stay hidden. */
+    fun preview(rows: List<BalanceRow>, columns: Int): Pair<List<BalanceRow>, Int> {
+        val visibleCount = columns * 2
+        val preview = rows.take(visibleCount)
+        return preview to (rows.size - preview.size).coerceAtLeast(0)
+    }
+
+    fun valueText(context: Context, value: BalanceValue): String = when (value) {
+        is BalanceValue.Hours -> context.getString(R.string.hours_value, formatHours(value.value))
+        BalanceValue.Unavailable -> context.getString(R.string.unavailable)
     }
 
     fun shortLabel(context: Context, category: String): String {
