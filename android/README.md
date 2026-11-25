@@ -10,8 +10,8 @@ The product specification, acceptance plan, orchestration rules and the first im
 | --- | --- |
 | Product specification and parity | Specification v1.1 (November 24, 2026: Calendar grid revision — uniform stretched cells, fixed-size grid text, manual Full list mode). Menu review approved November 23, 2026 |
 | Orchestration specification | Complete; OR01 pilot not started |
-| Implementation briefs | I01–I05 complete; I06-02 draft ready |
-| Android project | I05 complete — Calendar navigation and dated balances (I05-01 state/bridge, I05-02 screens/markers with the spec 1.1 grid, I05-03 balance detail and date selection) pass the mockup-verified visual loop plus 37 unit and 67 device tests; next is I06 open or create a leave year |
+| Implementation briefs | I01–I06 complete; I06-02 delivered within I06 |
+| Android project | I06 complete — open or create a leave year (welcome, method/start-of-year/Today setup, review, stale-safe publish, resume) passes the mockup-verified visual loop plus 47 unit and 80 device tests; next is I07 carryover |
 | Fixtures | Calendar 2026 store, golden outputs, malformed-store variants and the marker overlap fixture under `qa/` (builder emits both; digests `03e9e175…` and `d60bd8d0…`) |
 
 Keep this file current. Each milestone replaces planned commands and toolchain values with the tested values from its report.
