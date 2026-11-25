@@ -1,5 +1,6 @@
 package com.westmouthbay.fedleave.calendar
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -44,6 +45,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.westmouthbay.fedleave.R
 import com.westmouthbay.fedleave.core.MonthDay
+import com.westmouthbay.fedleave.core.MonthViewResult
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
@@ -60,12 +62,15 @@ private val SHOW_DATE_FORMAT: DateTimeFormatter =
     DateTimeFormatter.ofPattern("MMMM d", Locale.getDefault())
 private val PICKER_SPOKEN_DATE_FORMAT: DateTimeFormatter =
     DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy", Locale.getDefault())
+private val PICKER_ROW_DATE_FORMAT: DateTimeFormatter =
+    DateTimeFormatter.ofPattern("EEEE, MMMM d", Locale.getDefault())
 
 /**
  * The balance date picker: a month grid of selectable days with the schedule
  * markers (pay-period ends always shown), the nearby pay-period-end
  * shortcuts, and the confirm/cancel actions. Selecting a day or shortcut
- * only changes the pending draft; confirm commits it.
+ * only changes the pending draft; confirm commits it. On narrow screens the
+ * grid falls back to the full-width day list, as on the Calendar.
  */
 @Composable
 fun BalanceDatePicker(
@@ -80,6 +85,16 @@ fun BalanceDatePicker(
     val monthResult = state.pickerMonthResult
     val anchor = state.pickerAnchor ?: state.balanceDate
     val shortcuts = anchor?.let { viewModel.nearbyPayPeriodEnds(it) } ?: emptyList()
+    // The picker always identifies pay-period ends, even when the Calendar
+    // hides them; holiday and payday visibility follow the settings.
+    val pickerSettings = viewModel.displaySettings.copy(showPayPeriodEnds = true)
+
+    // System Back cancels the pending choice before leaving, so no transient
+    // draft survives the route.
+    BackHandler {
+        viewModel.onCancelPicker()
+        onCancel()
+    }
 
     Column(modifier = Modifier.fillMaxSize()) {
         Row(
@@ -126,7 +141,8 @@ fun BalanceDatePicker(
                 onNext = { pickerMonth?.let { viewModel.onPickerMonthChanged(it.plusMonths(1)) } },
             )
             Spacer(Modifier.height(8.dp))
-            if (monthResult == null && state.pickerMonthLoading) {
+            val staleMonth = state.pickerMonthFor != state.pickerMonth
+            if (monthResult == null && (state.pickerMonthLoading || staleMonth)) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -143,14 +159,29 @@ fun BalanceDatePicker(
                     modifier = Modifier.padding(vertical = 24.dp),
                 )
             } else {
-                PickerGrid(
-                    monthResult = monthResult,
-                    draft = draft,
-                    periodNumberFor = { date -> monthResult.payPeriods.firstOrNull { it.end == date }?.number },
-                    yearEndFor = { date -> viewModel.leaveYearEndFor(date) },
-                    yearNumberFor = { date -> viewModel.leaveYearNumberFor(date) },
-                    onSelect = { viewModel.onPickerDaySelected(it) },
-                )
+                BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                    if (maxWidth < 7.dp * 48) {
+                        PickerDayList(
+                            monthResult = monthResult,
+                            draft = draft,
+                            settings = pickerSettings,
+                            periodNumberFor = { date -> monthResult.payPeriods.firstOrNull { it.end == date }?.number },
+                            yearEndFor = { date -> viewModel.leaveYearEndFor(date) },
+                            yearNumberFor = { date -> viewModel.leaveYearNumberFor(date) },
+                            onSelect = { viewModel.onPickerDaySelected(it) },
+                        )
+                    } else {
+                        PickerGrid(
+                            monthResult = monthResult,
+                            draft = draft,
+                            settings = pickerSettings,
+                            periodNumberFor = { date -> monthResult.payPeriods.firstOrNull { it.end == date }?.number },
+                            yearEndFor = { date -> viewModel.leaveYearEndFor(date) },
+                            yearNumberFor = { date -> viewModel.leaveYearNumberFor(date) },
+                            onSelect = { viewModel.onPickerDaySelected(it) },
+                        )
+                    }
+                }
             }
             if (shortcuts.isNotEmpty()) {
                 Text(
@@ -244,122 +275,205 @@ private fun MonthHeader(
     }
 }
 
+private fun pickerSlots(
+    monthResult: MonthViewResult,
+    settings: CalendarDisplaySettings,
+): List<List<MonthDay?>> {
+    val inMonth = monthResult.days.filter { it.inDisplayMonth }
+    val leading = inMonth.firstOrNull()?.date?.dayOfWeek?.let { firstDay ->
+        (firstDay.value - settings.weekStart.value + 7) % 7
+    } ?: 0
+    val slots: List<MonthDay?> = List(leading) { null } + inMonth
+    return (slots + List((7 - slots.size % 7) % 7) { null }).chunked(7)
+}
+
 @Composable
 private fun PickerGrid(
-    monthResult: com.westmouthbay.fedleave.core.MonthViewResult,
+    monthResult: MonthViewResult,
     draft: LocalDate?,
+    settings: CalendarDisplaySettings,
     periodNumberFor: (LocalDate) -> Int?,
     yearEndFor: (LocalDate) -> LocalDate?,
     yearNumberFor: (LocalDate) -> Int?,
     onSelect: (LocalDate) -> Unit,
 ) {
     val context = LocalContext.current
-    val settings = CalendarDisplaySettings()
-    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-        val narrow = maxWidth < 7.dp * 48
-        val inMonth = monthResult.days.filter { it.inDisplayMonth }
-        val leading = inMonth.firstOrNull()?.date?.dayOfWeek?.let { firstDay ->
-            (firstDay.value - settings.weekStart.value + 7) % 7
-        } ?: 0
-        val slots: List<MonthDay?> = List(leading) { null } + inMonth
-        val padded = slots + List((7 - slots.size % 7) % 7) { null }
-        val rows = padded.chunked(7)
-        Column(modifier = Modifier.fillMaxWidth()) {
-            Row(modifier = Modifier.fillMaxWidth()) {
-                repeat(7) { index ->
-                    val day = settings.weekStart.plus(index.toLong())
-                    Text(
-                        text = day.getDisplayName(TextStyle.NARROW, Locale.getDefault()),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.weight(1f),
-                    )
-                }
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(modifier = Modifier.fillMaxWidth()) {
+            repeat(7) { index ->
+                val day = settings.weekStart.plus(index.toLong())
+                Text(
+                    text = day.getDisplayName(TextStyle.NARROW, Locale.getDefault()),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.weight(1f),
+                )
             }
-            rows.forEach { week ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 48.dp),
-                ) {
-                    week.forEach { day ->
-                        if (day == null) {
-                            Spacer(Modifier.weight(1f))
+        }
+        pickerSlots(monthResult, settings).forEach { week ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 48.dp),
+            ) {
+                week.forEach { day ->
+                    if (day == null) {
+                        Spacer(Modifier.weight(1f))
+                    } else {
+                        val yearEndNumber = if (yearEndFor(day.date) == day.date) {
+                            yearNumberFor(day.date)
                         } else {
-                            val yearEndNumber = if (yearEndFor(day.date) == day.date) {
-                                yearNumberFor(day.date)
-                            } else {
-                                null
+                            null
+                        }
+                        val markers = markersFor(
+                            day,
+                            settings,
+                            periodNumberFor(day.date),
+                            yearEndNumber,
+                            context,
+                        )
+                        val selected = day.date == draft
+                        val spoken = buildList {
+                            add(day.date.format(PICKER_SPOKEN_DATE_FORMAT))
+                            markers.forEach { add(it.spoken) }
+                            if (selected) {
+                                add(context.getString(R.string.balances_title))
                             }
-                            val markers = markersFor(
-                                day,
-                                settings,
-                                periodNumberFor(day.date),
-                                yearEndNumber,
-                                context,
-                            )
-                            val selected = day.date == draft
-                            val spoken = buildList {
-                                add(day.date.format(PICKER_SPOKEN_DATE_FORMAT))
-                                markers.forEach { add(it.spoken) }
-                                if (selected) {
-                                    add(context.getString(R.string.balances_title))
-                                }
-                            }.joinToString(". ")
-                            Column(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .fillMaxHeight()
-                                    .padding(1.dp)
-                                    .background(
-                                        if (selected) {
-                                            MaterialTheme.colorScheme.primary
-                                        } else {
-                                            androidx.compose.ui.graphics.Color.Transparent
-                                        },
-                                        RoundedCornerShape(8.dp),
-                                    )
-                                    .clickable { onSelect(day.date) }
-                                    .semantics(mergeDescendants = true) { contentDescription = spoken }
-                                    .testTag("balance_picker_day_${day.date}"),
-                                verticalArrangement = Arrangement.Top,
+                        }.joinToString(". ")
+                        Column(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight()
+                                .padding(1.dp)
+                                .background(
+                                    if (selected) {
+                                        MaterialTheme.colorScheme.primary
+                                    } else {
+                                        androidx.compose.ui.graphics.Color.Transparent
+                                    },
+                                    RoundedCornerShape(8.dp),
+                                )
+                                .clickable { onSelect(day.date) }
+                                .semantics(mergeDescendants = true) { contentDescription = spoken }
+                                .testTag("balance_picker_day_${day.date}"),
+                            verticalArrangement = Arrangement.Top,
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
+                                verticalAlignment = Alignment.CenterVertically,
                             ) {
+                                Text(
+                                    text = day.date.dayOfMonth.toString(),
+                                    style = MaterialTheme.typography.labelLarge,
+                                    fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+                                    color = if (selected) {
+                                        MaterialTheme.colorScheme.onPrimary
+                                    } else {
+                                        MaterialTheme.colorScheme.onSurface
+                                    },
+                                )
+                                markers.take(2).forEach { marker ->
+                                    Spacer(Modifier.width(2.dp))
+                                    PickerMarkerGlyph(marker.kind, selected)
+                                }
+                            }
+                            if (markers.size > 2) {
                                 Row(
-                                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
+                                    modifier = Modifier.padding(horizontal = 4.dp),
                                     verticalAlignment = Alignment.CenterVertically,
                                 ) {
-                                    Text(
-                                        text = day.date.dayOfMonth.toString(),
-                                        style = MaterialTheme.typography.labelLarge,
-                                        fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
-                                        color = if (selected) {
-                                            MaterialTheme.colorScheme.onPrimary
-                                        } else {
-                                            MaterialTheme.colorScheme.onSurface
-                                        },
-                                    )
-                                    markers.take(2).forEach { marker ->
-                                        Spacer(Modifier.width(2.dp))
-                                        PickerMarkerGlyph(marker.kind, selected)
-                                    }
-                                }
-                                if (markers.size > 2) {
-                                    Row(
-                                        modifier = Modifier.padding(horizontal = 4.dp),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                    ) {
-                                        markers.drop(2).forEachIndexed { index, marker ->
-                                            if (index > 0) {
-                                                Spacer(Modifier.width(2.dp))
-                                            }
-                                            PickerMarkerGlyph(marker.kind, selected)
+                                    markers.drop(2).forEachIndexed { index, marker ->
+                                        if (index > 0) {
+                                            Spacer(Modifier.width(2.dp))
                                         }
+                                        PickerMarkerGlyph(marker.kind, selected)
                                     }
                                 }
                             }
                         }
                     }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PickerDayList(
+    monthResult: MonthViewResult,
+    draft: LocalDate?,
+    settings: CalendarDisplaySettings,
+    periodNumberFor: (LocalDate) -> Int?,
+    yearEndFor: (LocalDate) -> LocalDate?,
+    yearNumberFor: (LocalDate) -> Int?,
+    onSelect: (LocalDate) -> Unit,
+) {
+    val context = LocalContext.current
+    val days = monthResult.days.filter { it.inDisplayMonth }
+    Column(modifier = Modifier.fillMaxWidth()) {
+        days.forEach { day ->
+            val yearEndNumber = if (yearEndFor(day.date) == day.date) {
+                yearNumberFor(day.date)
+            } else {
+                null
+            }
+            val markers = markersFor(
+                day,
+                settings,
+                periodNumberFor(day.date),
+                yearEndNumber,
+                context,
+            )
+            val selected = day.date == draft
+            val spoken = buildList {
+                add(day.date.format(PICKER_SPOKEN_DATE_FORMAT))
+                markers.forEach { add(it.spoken) }
+                if (selected) {
+                    add(context.getString(R.string.balances_title))
+                }
+            }.joinToString(". ")
+            Surface(
+                color = if (selected) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.colorScheme.surfaceVariant
+                },
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 3.dp)
+                    .clickable { onSelect(day.date) }
+                    .semantics(mergeDescendants = true) { contentDescription = spoken }
+                    .testTag("balance_picker_day_${day.date}"),
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = day.date.format(PICKER_ROW_DATE_FORMAT),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = if (selected) {
+                            MaterialTheme.colorScheme.onPrimary
+                        } else {
+                            MaterialTheme.colorScheme.onSurface
+                        },
+                        modifier = Modifier.weight(1f),
+                    )
+                    Text(
+                        text = if (markers.isEmpty()) {
+                            ""
+                        } else {
+                            markers.joinToString(". ") { it.spoken }
+                        },
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = if (selected) {
+                            MaterialTheme.colorScheme.onPrimary
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        },
+                    )
                 }
             }
         }

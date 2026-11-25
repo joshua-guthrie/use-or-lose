@@ -23,6 +23,10 @@
     <string name="balances_projected">Projected balance \u00b7 %1$s</string>
     <string name="balances_requested_date">Requested date \u00b7 %1$s</string>
     <string name="balances_count">%1$d balances</string>
+    <plurals name="balances_count_plural">
+        <item quantity="one">%1$d balance</item>
+        <item quantity="other">%1$d balances</item>
+    </plurals>
     <string name="balances_unavailable_title">Balance unavailable</string>
     <string name="balances_unavailable_body">FedLeave could not read this date\'s leave year.</string>
     <string name="balances_retry">Retry</string>

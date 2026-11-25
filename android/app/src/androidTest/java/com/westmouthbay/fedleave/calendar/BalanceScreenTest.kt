@@ -4,6 +4,8 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.foundation.layout.width
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
@@ -118,5 +120,27 @@ class BalanceScreenTest : CalendarUiTestBase() {
         openBalances()
         composeRule.onNodeWithContentDescription("Back to Calendar").performClick()
         composeRule.onNodeWithText("As of today \u00b7 Jan 16, 2026").assertIsDisplayed()
+    }
+
+    @Test
+    fun narrowWidthFallsBackToThePickerDayList() {
+        composeRule.setContent {
+            com.westmouthbay.fedleave.ui.theme.FedLeaveTheme {
+                androidx.compose.foundation.layout.Box(
+                    androidx.compose.ui.Modifier.width(300.dp),
+                ) {
+                    com.westmouthbay.fedleave.ui.FedLeaveApp(dependencies)
+                }
+            }
+        }
+        waitForBalanceCard()
+        composeRule.onNodeWithTag("calendar_balance_card").performClick()
+        composeRule.onNodeWithText("Choose date").performClick()
+        waitForPickerGrid()
+        // The full-width picker day list renders; its rows select the draft.
+        composeRule.onNodeWithTag("balance_picker_day_2026-01-13")
+            .performScrollTo()
+            .performClick()
+        composeRule.onNodeWithText("Show January 13").performScrollTo().assertIsDisplayed()
     }
 }

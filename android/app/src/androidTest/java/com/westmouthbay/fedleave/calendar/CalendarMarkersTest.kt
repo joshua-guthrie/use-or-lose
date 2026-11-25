@@ -91,8 +91,8 @@ class CalendarMarkersTest : CalendarUiTestBase() {
 
 /**
  * Display-flag injection: with holidays hidden, the main Calendar speaks no
- * holiday but keeps the pay-period end; the picker's forced period-end
- * behavior is I05-03's.
+ * holiday but keeps the pay-period end; with period ends hidden in the
+ * Calendar, the balance picker still identifies them.
  */
 class CalendarMarkerFlagsTest : CalendarUiTestBase() {
 
@@ -108,6 +108,37 @@ class CalendarMarkerFlagsTest : CalendarUiTestBase() {
             .assertIsDisplayed()
         composeRule
             .onNodeWithContentDescription("Saturday, January 24, 2026. Pay-period end, Period 1. 6 hours annual leave earned. 4 hours sick leave earned")
+            .assertIsDisplayed()
+    }
+}
+
+/**
+ * The picker always identifies pay-period ends, even when the Calendar
+ * hides them (T-CAL-MARK-01).
+ */
+class CalendarPickerFlagsTest : CalendarUiTestBase() {
+
+    override fun displaySettings(): CalendarDisplaySettings =
+        CalendarDisplaySettings(showPayPeriodEnds = false)
+
+    @Test
+    fun pickerStillMarksPeriodEndsWhenTheCalendarHidesThem() {
+        setAppContent()
+        waitForBalanceCard()
+        // The main Calendar hides the period-end marker on Jan 24.
+        composeRule
+            .onNodeWithContentDescription(
+                "Saturday, January 24, 2026. 6 hours annual leave earned. 4 hours sick leave earned",
+            )
+            .assertIsDisplayed()
+        // The balance picker still announces it.
+        composeRule.onNodeWithTag("calendar_balance_card").performClick()
+        composeRule.onNodeWithText("Choose date").performClick()
+        waitForPickerGrid()
+        composeRule
+            .onNodeWithContentDescription(
+                "Saturday, January 24, 2026. Pay-period end, Period 1",
+            )
             .assertIsDisplayed()
     }
 }

@@ -162,7 +162,11 @@ fun BalanceScreen(
                     }
                     if (state.followsToday) {
                         Text(
-                            text = context.getString(R.string.balances_count, rows.size),
+                            text = context.resources.getQuantityString(
+                                R.plurals.balances_count_plural,
+                                rows.size,
+                                rows.size,
+                            ),
                             style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(vertical = 4.dp),
