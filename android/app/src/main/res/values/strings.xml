@@ -43,6 +43,47 @@
     <string name="previous_month">Previous month</string>
     <string name="next_month">Next month</string>
 
+    <!-- Leave-year setup -->
+    <string name="welcome_title">Welcome to FedLeave</string>
+    <string name="welcome_subtitle">Set up a leave year to start recording leave.</string>
+    <string name="welcome_restore_card">Restore existing leave</string>
+    <string name="welcome_restore_body">Use a FedLeave backup from your computer or previous phone.</string>
+    <string name="welcome_restore">Restore backup</string>
+    <string name="restore_placeholder_note">Restore backup comes in a later build.</string>
+    <string name="welcome_setup">Set up leave year</string>
+    <string name="setup_title">Set up leave year</string>
+    <string name="setup_new_year">New leave year \u00b7 %1$s</string>
+    <string name="setup_first_period">First pay period starts</string>
+    <string name="setup_pay_periods">Pay periods</string>
+    <string name="setup_annual_accrual">Annual accrual</string>
+    <string name="setup_sick_accrual">Sick accrual</string>
+    <string name="setup_hours_per_period">%1$s h / period</string>
+    <string name="setup_which_balances">Which balances do you have?</string>
+    <string name="setup_start_choice">Balances at start of leave year</string>
+    <string name="setup_today_choice">Balances as of Today</string>
+    <string name="setup_start_title">Start-of-year balances</string>
+    <string name="setup_annual_opening">Annual opening</string>
+    <string name="setup_sick_opening">Sick opening</string>
+    <string name="setup_other_starting">Other starting balances</string>
+    <string name="setup_independent_card">Independent opening</string>
+    <string name="setup_independent_body">Earlier balances, earned dates and expiration history stay in their original year.</string>
+    <string name="setup_review_action">Review leave year</string>
+    <string name="setup_today_title">Balances as of Today</string>
+    <string name="setup_today_hint">Enter the hours you have on this date. Blank entries use 0 h.</string>
+    <string name="setup_other_balances">Other balances</string>
+    <string name="setup_review_title">Review %1$s leave year</string>
+    <string name="setup_review_range">%1$s \u2013 %2$s \u00b7 %3$d periods</string>
+    <string name="setup_create">Create leave year</string>
+    <string name="setup_back_balances">Back to balances</string>
+    <string name="setup_back_date">Back to balance date</string>
+    <string name="setup_back_form">Back</string>
+    <string name="setup_review_today_card">Balances as of %1$s</string>
+    <string name="setup_zero_window">%1$s through %2$s will start with 0 h and no leave entries.</string>
+    <string name="setup_next_accrual">Next accrual \u00b7 %1$s</string>
+    <string name="setup_next_accrual_body">Annual %1$s h \u00b7 Sick %2$s h</string>
+    <string name="setup_travel_comp_warning">Travel comp hours keep their balance; the earning date and expiration are unknown.</string>
+    <string name="setup_stale">The store changed. Review the year again.</string>
+
     <!-- Menu -->
     <string name="menu_today">Today</string>
     <string name="menu_open">Menu</string>

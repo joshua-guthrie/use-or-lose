@@ -75,6 +75,7 @@ class CalendarViewModel(
                     it.copy(
                         monthError = error,
                         balanceError = error,
+                        setupRequired = true,
                     )
                 }
                 return@launchRead
@@ -89,11 +90,87 @@ class CalendarViewModel(
                     displayMonth = month,
                     balanceDate = today,
                     followsToday = true,
+                    setupRequired = false,
                 )
             }
             loadMonth(month)
             loadBalance(today)
         }
+    }
+
+    /**
+     * After leave-year setup publishes a new generation, reopen the store
+     * and resume the reads (including the balance lookup that asked for the
+     * missing year).
+     */
+    fun refreshAfterSetup() {
+        launchRead {
+            val open = store.open()
+            val ready = open as? OpenResult.Ready
+            if (ready == null) {
+                val error = CoreError.Unexpected("Store did not open: ${open.javaClass.simpleName}.")
+                _state.update {
+                    it.copy(
+                        monthError = error,
+                        balanceError = error,
+                        setupRequired = true,
+                    )
+                }
+                return@launchRead
+            }
+            snapshot = ready.snapshot
+            years = parseYearMetadata(ready.snapshot)
+            val today = timeSource.today()
+            _state.update {
+                if (it.today == null) {
+                    // First use: the launch never initialized, so start fresh
+                    // on today.
+                    it.copy(
+                        today = today,
+                        displayMonth = YearMonth.from(today),
+                        balanceDate = today,
+                        followsToday = true,
+                        setupRequired = false,
+                    )
+                } else {
+                    // Resume the interrupted lookup for the committed cutoff.
+                    it.copy(setupRequired = false)
+                }
+            }
+            val month = _state.value.displayMonth ?: YearMonth.from(today)
+            val balance = _state.value.balanceDate ?: today
+            loadMonth(month)
+            loadBalance(balance)
+        }
+    }
+
+    /**
+     * The setup proposal for an uncovered [date]: the adjacent successor of
+     * the latest stored year, or the calendar year of the date plus the
+     * config defaults on a fresh store.
+     */
+    fun setupProposalFor(date: LocalDate): SetupProposal {
+        val metadata = years.values.sortedByDescending { it.end }.firstOrNull()
+        val config = snapshot?.files?.get("config.json")
+        val annualDefault = 6.0
+        val sickDefault = 4.0
+        var annual = annualDefault
+        var sick = sickDefault
+        if (config != null) {
+            val json = runCatching { org.json.JSONObject(config) }.getOrNull()
+            json?.optJSONObject("defaults")?.let { defaults ->
+                annual = defaults.optDouble("annual_leave_accrual_hours", annualDefault)
+                sick = defaults.optDouble("sick_leave_accrual_hours", sickDefault)
+            }
+        }
+        val successor = metadata?.end?.plusDays(1)
+        return SetupProposal(
+            year = successor?.year ?: date.year,
+            leaveYearStart = successor?.toString() ?: "",
+            payPeriods = 26,
+            annualAccrual = BalancePresentation.formatHours(annual),
+            sickAccrual = BalancePresentation.formatHours(sick),
+        )
     }
 
     /**

@@ -64,6 +64,7 @@ fun BalanceScreen(
     viewModel: CalendarViewModel,
     onChooseDate: () -> Unit,
     onBack: () -> Unit,
+    onSetUp: (LocalDate) -> Unit = {},
 ) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
@@ -149,6 +150,13 @@ fun BalanceScreen(
                     UnavailableCard(
                         onRetry = { viewModel.onRetryBalance() },
                         onChooseDate = onChooseDate,
+                        onSetUp = balanceDate?.let { date ->
+                            if (state.balanceError?.code == com.westmouthbay.fedleave.core.CoreError.LEAVE_YEAR_NOT_FOUND) {
+                                { onSetUp(date) }
+                            } else {
+                                null
+                            }
+                        },
                     )
                 }
                 else -> {
@@ -255,6 +263,7 @@ private fun BalanceRowPill(
 private fun UnavailableCard(
     onRetry: () -> Unit,
     onChooseDate: () -> Unit,
+    onSetUp: (() -> Unit)? = null,
 ) {
     Surface(
         color = MaterialTheme.colorScheme.tertiaryContainer,
@@ -287,6 +296,13 @@ private fun UnavailableCard(
         onClick = onChooseDate,
         modifier = Modifier.padding(vertical = 4.dp),
     )
+    if (onSetUp != null) {
+        SecondaryAction(
+            text = stringResource(R.string.welcome_setup),
+            onClick = onSetUp,
+            modifier = Modifier.padding(vertical = 4.dp).testTag("balances_setup_action"),
+        )
+    }
 }
 
 @Composable

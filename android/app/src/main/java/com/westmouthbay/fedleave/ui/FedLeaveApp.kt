@@ -17,6 +17,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,6 +40,9 @@ import com.westmouthbay.fedleave.calendar.CalendarViewModel
 import com.westmouthbay.fedleave.calendar.DayScreen
 import com.westmouthbay.fedleave.calendar.MonthPicker
 import com.westmouthbay.fedleave.calendar.CalendarScreen
+import com.westmouthbay.fedleave.calendar.SetupScreen
+import com.westmouthbay.fedleave.calendar.SetupViewModel
+import com.westmouthbay.fedleave.calendar.WelcomeScreen
 import com.westmouthbay.fedleave.core.AppDependencies
 import java.time.LocalDate
 
@@ -56,12 +60,24 @@ fun FedLeaveApp(dependencies: AppDependencies) {
         viewModelStoreOwner = activity,
         factory = CalendarViewModel.factory(dependencies),
     )
+    val setupViewModel: SetupViewModel = viewModel(
+        viewModelStoreOwner = activity,
+        factory = SetupViewModel.factory(dependencies),
+    )
+    val calendarState by calendarViewModel.state.collectAsState()
 
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
 
     LaunchedEffect(Unit) {
         calendarViewModel.onLaunch()
+    }
+
+    // A store that cannot open (first use) routes to the setup welcome.
+    LaunchedEffect(currentRoute, calendarState.setupRequired) {
+        if (currentRoute == AppRoutes.CALENDAR && calendarState.setupRequired) {
+            navController.navigate(AppRoutes.WELCOME) { launchSingleTop = true }
+        }
     }
 
     // The tapped day stays selected after Back so the Calendar restores its
@@ -95,6 +111,9 @@ fun FedLeaveApp(dependencies: AppDependencies) {
                         navController.navigate(AppRoutes.BALANCE_DATE_PICKER)
                     },
                     onBack = { navController.popBackStack() },
+                    onSetUp = { date ->
+                        navController.navigate(AppRoutes.setup(date.toString()))
+                    },
                 )
             }
             composable(AppRoutes.BALANCE_DATE_PICKER) {
@@ -102,6 +121,39 @@ fun FedLeaveApp(dependencies: AppDependencies) {
                     viewModel = calendarViewModel,
                     onConfirm = { navController.popBackStack() },
                     onCancel = { navController.popBackStack() },
+                )
+            }
+            composable(AppRoutes.WELCOME) {
+                WelcomeScreen(
+                    onOpenSetup = {
+                        val today = calendarViewModel.state.value.today ?: LocalDate.now()
+                        setupViewModel.begin(
+                            calendarViewModel.setupProposalFor(today),
+                            resumeDate = null,
+                        )
+                        navController.navigate(AppRoutes.setup(AppRoutes.SETUP_FOR_WELCOME))
+                    },
+                )
+            }
+            composable(
+                route = AppRoutes.SETUP,
+                arguments = listOf(navArgument(AppRoutes.SETUP_ARG) { type = NavType.StringType }),
+            ) { entry ->
+                val forDate = entry.arguments?.getString(AppRoutes.SETUP_ARG)
+                val resumeDate = forDate?.takeIf { it != AppRoutes.SETUP_FOR_WELCOME }
+                LaunchedEffect(forDate) {
+                    val target = runCatching { LocalDate.parse(forDate ?: "") }.getOrNull()
+                        ?: calendarViewModel.state.value.today
+                        ?: LocalDate.now()
+                    setupViewModel.begin(calendarViewModel.setupProposalFor(target), resumeDate)
+                }
+                SetupScreen(
+                    viewModel = setupViewModel,
+                    onExit = { navController.popBackStack() },
+                    onCreated = {
+                        calendarViewModel.refreshAfterSetup()
+                        navController.popBackStack(AppRoutes.CALENDAR, inclusive = false)
+                    },
                 )
             }
             composable(

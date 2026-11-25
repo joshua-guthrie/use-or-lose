@@ -1,8 +1,9 @@
 package com.westmouthbay.fedleave
 
-import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onNodeWithTag
+import androidx.test.platform.app.InstrumentationRegistry
+import com.westmouthbay.fedleave.storage.StorePaths
 import org.junit.Rule
 import org.junit.Test
 
@@ -12,7 +13,18 @@ class LaunchSmokeTest {
     val composeRule = createAndroidComposeRule<MainActivity>()
 
     @Test
-    fun launchesAndShowsTheCalendarScreen() {
-        composeRule.onNodeWithTag("calendar_screen").assertIsDisplayed()
+    fun launchesAndShowsTheAppEntry() {
+        // Other suites leave the store in arbitrary states; reset it so the
+        // smoke test exercises a clean launch (first use shows the welcome).
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        StorePaths.forContext(context).deleteRecursively()
+
+        // The app opens to either the Calendar or the first-use welcome.
+        composeRule.waitUntil(timeoutMillis = 60_000) {
+            composeRule.onAllNodes(hasTestTag("calendar_screen"))
+                .fetchSemanticsNodes().isNotEmpty() ||
+                composeRule.onAllNodes(hasTestTag("welcome_setup"))
+                    .fetchSemanticsNodes().isNotEmpty()
+        }
     }
 }

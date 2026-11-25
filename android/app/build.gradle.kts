@@ -25,6 +25,7 @@ val prepareBridgePython by tasks.registering(Sync::class) {
     }
     from(rootProject.file("bridge/src")) {
         include("fedleave_probe.py")
+        include("fedleave_creation.py")
     }
     into(bridgePythonSrc)
 }

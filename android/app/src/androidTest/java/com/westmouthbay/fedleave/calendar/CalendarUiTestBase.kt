@@ -40,6 +40,9 @@ abstract class CalendarUiTestBase {
 
     protected open fun displaySettings(): CalendarDisplaySettings = CalendarDisplaySettings()
 
+    /** First-use setup tests run against an empty store. */
+    protected open val importFixtureStore: Boolean = true
+
     /** Subclasses can inject a fake bridge for layout and failure states. */
     protected open fun createDependencies(context: android.content.Context): AppDependencies =
         AppDependencies(
@@ -58,14 +61,16 @@ abstract class CalendarUiTestBase {
             }
         }
         StorePaths.forContext(context).deleteRecursively()
-        val coordinator = StoreCoordinator(StorePaths.forContext(context))
-        runBlocking {
-            DeveloperFixture.importNamedAssets(
-                InstrumentationRegistry.getInstrumentation().context,
-                coordinator,
-                fixtureAssets(),
-                assetPrefix(),
-            )
+        if (importFixtureStore) {
+            val coordinator = StoreCoordinator(StorePaths.forContext(context))
+            runBlocking {
+                DeveloperFixture.importNamedAssets(
+                    InstrumentationRegistry.getInstrumentation().context,
+                    coordinator,
+                    fixtureAssets(),
+                    assetPrefix(),
+                )
+            }
         }
         dependencies = createDependencies(context)
     }
@@ -86,10 +91,10 @@ abstract class CalendarUiTestBase {
     }
 
     /** Wait until the balance date picker's month grid has rendered. */
-    protected fun waitForPickerGrid() {
+    protected fun waitForPickerGrid(day: String = "2026-01-01") {
         composeRule.waitUntil(timeoutMillis = 20_000) {
             composeRule.onAllNodes(
-                hasTestTag("balance_picker_day_2026-01-01"),
+                hasTestTag("balance_picker_day_$day"),
             ).fetchSemanticsNodes().isNotEmpty()
         }
     }

@@ -109,6 +109,8 @@ data class CalendarUiState(
     val period: PayPeriodDetailResult? = null,
     val periodLoading: Boolean = false,
     val periodError: CoreError? = null,
+    /** First use or a store that cannot open: route to the setup welcome. */
+    val setupRequired: Boolean = false,
 ) {
     /** True when the committed cutoff is later than today; a UI label only. */
     val isProjected: Boolean
