@@ -36,7 +36,9 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 private val SETUP_DATE_DISPLAY: DateTimeFormatter =
-    DateTimeFormatter.ofPattern("MMM d, yyyy", Locale.getDefault())
+    DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy", Locale.getDefault())
+private val SETUP_SHORT_NOTE_FORMAT: DateTimeFormatter =
+    DateTimeFormatter.ofPattern("MMM d", Locale.getDefault())
 private val SETUP_RANGE_FORMAT: DateTimeFormatter =
     DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.getDefault())
 private val SETUP_NOTE_FORMAT: DateTimeFormatter =
@@ -158,19 +160,21 @@ private fun MethodStep(viewModel: SetupViewModel, state: SetupUiState, onExit: (
         onChange = viewModel::onStartChanged,
         tag = "setup_start_date",
     )
+    PayPeriodRow(viewModel, state)
     SetupFieldRow(
         label = stringResource(R.string.setup_annual_accrual),
         value = state.annualAccrual,
         onChange = viewModel::onAnnualAccrualChanged,
         tag = "setup_accrual",
+        suffix = stringResource(R.string.setup_hours_per_period, "").trim(),
     )
     SetupFieldRow(
         label = stringResource(R.string.setup_sick_accrual),
         value = state.sickAccrual,
         onChange = viewModel::onSickAccrualChanged,
         tag = "setup_sick",
+        suffix = stringResource(R.string.setup_hours_per_period, "").trim(),
     )
-    PayPeriodRow(viewModel, state)
     Spacer(Modifier.height(12.dp))
     Text(
         text = stringResource(R.string.setup_which_balances),
@@ -230,6 +234,7 @@ private fun SetupFieldRow(
     value: String,
     onChange: (String) -> Unit,
     tag: String,
+    suffix: String? = null,
 ) {
     Row(
         modifier = Modifier
@@ -246,10 +251,21 @@ private fun SetupFieldRow(
             value = value,
             onValueChange = onChange,
             singleLine = true,
+            keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                imeAction = androidx.compose.ui.text.input.ImeAction.Done,
+            ),
             modifier = Modifier
                 .width(140.dp)
                 .testTag(tag),
         )
+        if (suffix != null) {
+            Text(
+                text = suffix,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(start = 4.dp),
+            )
+        }
     }
 }
 
@@ -277,18 +293,21 @@ private fun StartFormStep(viewModel: SetupViewModel, state: SetupUiState) {
         value = state.annualAccrual,
         onChange = viewModel::onAnnualAccrualChanged,
         tag = "setup_accrual",
+        suffix = stringResource(R.string.setup_hours_per_period, "").trim(),
     )
     SetupFieldRow(
         label = stringResource(R.string.setup_annual_opening),
         value = state.openings["annual"] ?: "",
         onChange = { viewModel.onOpeningChanged("annual", it) },
         tag = "setup_opening_annual",
+        suffix = "h",
     )
     SetupFieldRow(
         label = stringResource(R.string.setup_sick_opening),
         value = state.openings["sick"] ?: "",
         onChange = { viewModel.onOpeningChanged("sick", it) },
         tag = "setup_opening_sick",
+        suffix = "h",
     )
     SecondaryAction(
         text = stringResource(R.string.setup_other_starting),
@@ -361,18 +380,21 @@ private fun TodayFormStep(viewModel: SetupViewModel, state: SetupUiState) {
         value = state.todayTargets["annual"] ?: "",
         onChange = { viewModel.onTargetChanged("annual", it) },
         tag = "setup_today_annual",
+        suffix = "h",
     )
     SetupFieldRow(
         label = BalancePresentation.fullLabel(LocalContext.current, "sick"),
         value = state.todayTargets["sick"] ?: "",
         onChange = { viewModel.onTargetChanged("sick", it) },
         tag = "setup_today_sick",
+        suffix = "h",
     )
     SetupFieldRow(
         label = BalancePresentation.fullLabel(LocalContext.current, "credit"),
         value = state.todayTargets["credit"] ?: "",
         onChange = { viewModel.onTargetChanged("credit", it) },
         tag = "setup_today_credit",
+        suffix = "h",
     )
     SecondaryAction(
         text = stringResource(R.string.setup_other_balances),
@@ -486,15 +508,16 @@ private fun ReviewStep(
                     Text(
                         text = context.getString(
                             R.string.setup_zero_window,
-                            zeroStart.format(SETUP_NOTE_FORMAT),
-                            zeroEnd.format(SETUP_NOTE_FORMAT),
+                            zeroStart.format(SETUP_SHORT_NOTE_FORMAT),
+                            zeroEnd.format(SETUP_SHORT_NOTE_FORMAT),
                         ),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }
-            preview.openings.forEach { (category, hours) ->
+            state.todayTargets.forEach { (category, text) ->
+                val hours = text.trim().toDoubleOrNull() ?: return@forEach
                 ReviewRow(
                     label = BalancePresentation.fullLabel(context, category),
                     value = BalancePresentation.formatHours(hours),
@@ -512,7 +535,7 @@ private fun ReviewStep(
                         Text(
                             text = context.getString(
                                 R.string.setup_next_accrual,
-                                next.date.format(SETUP_NOTE_FORMAT),
+                                next.date.format(SETUP_SHORT_NOTE_FORMAT),
                             ),
                             style = MaterialTheme.typography.titleMedium,
                         )
@@ -538,7 +561,11 @@ private fun ReviewStep(
         modifier = Modifier.padding(vertical = 4.dp).testTag("setup_create"),
     )
     SecondaryAction(
-        text = stringResource(R.string.setup_back_form),
+        text = if (state.previewKind == SetupKind.TODAY) {
+            stringResource(R.string.setup_back_balances)
+        } else {
+            stringResource(R.string.setup_back_form)
+        },
         onClick = viewModel::onBackToForm,
         modifier = Modifier.padding(vertical = 4.dp),
     )
@@ -546,21 +573,27 @@ private fun ReviewStep(
 
 @Composable
 private fun ReviewRow(label: String, value: String) {
-    Row(
+    Surface(
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        shape = RoundedCornerShape(8.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
+            .padding(vertical = 3.dp),
     ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.weight(1f),
-        )
-        Text(
-            text = "$value h",
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.weight(1f),
+            )
+            Text(
+                text = "$value h",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
     }
 }

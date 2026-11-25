@@ -162,9 +162,11 @@ class SetupResumeTest : CalendarUiTestBase() {
         }
         composeRule.onNodeWithTag("setup_create").performClick()
         // The Calendar resumes the balance lookup for January 10, 2027 on
-        // the created year (card header shows the committed cutoff).
+        // the created year (card header shows the committed cutoff; the
+        // values render once the resumed read lands).
         composeRule.waitUntil(timeoutMillis = 30_000) {
-            composeRule.onAllNodesWithText("Jan 10, 2027").fetchSemanticsNodes().isNotEmpty()
+            composeRule.onAllNodesWithText("Jan 10, 2027").fetchSemanticsNodes().isNotEmpty() &&
+                composeRule.onAllNodesWithText("Annual").fetchSemanticsNodes().isNotEmpty()
         }
         composeRule.onNodeWithText("Annual").assertIsDisplayed()
     }
