@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,10 +22,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.CircularProgressIndicator
@@ -36,6 +38,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -55,6 +58,8 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.westmouthbay.fedleave.R
@@ -78,6 +83,10 @@ fun CalendarScreen(
 ) {
     val state by viewModel.state.collectAsState()
     var menuExpanded by remember { mutableStateOf(false) }
+    // Manual "full list" mode: the user switches between the grid and the
+    // full-width day list with the small toggle above the bottom bar. The
+    // grid no longer switches itself on the system font scale.
+    var fullListMode by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
 
     Column(
@@ -162,6 +171,7 @@ fun CalendarScreen(
                     selectedDay = state.selectedDay,
                     today = state.today,
                     settings = viewModel.displaySettings,
+                    fullListMode = fullListMode,
                     periodNumberFor = { date -> month.payPeriods.firstOrNull { it.end == date }?.number },
                     yearEndFor = { date -> viewModel.leaveYearEndFor(date) },
                     yearNumberFor = { date -> viewModel.leaveYearNumberFor(date) },
@@ -170,6 +180,10 @@ fun CalendarScreen(
                 )
             }
         }
+        FullListToggle(
+            fullListMode = fullListMode,
+            onToggle = { fullListMode = !fullListMode },
+        )
     }
 }
 
@@ -322,6 +336,7 @@ private fun CalendarGridOrList(
     selectedDay: LocalDate?,
     today: LocalDate?,
     settings: CalendarDisplaySettings,
+    fullListMode: Boolean,
     periodNumberFor: (LocalDate) -> Int?,
     yearEndFor: (LocalDate) -> LocalDate?,
     yearNumberFor: (LocalDate) -> Int?,
@@ -329,11 +344,9 @@ private fun CalendarGridOrList(
     onOpenDay: (LocalDate) -> Unit,
 ) {
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-        // The grid needs seven readable 48 dp targets AND a font scale that
-        // keeps the cell annotations legible; otherwise the full-width day
-        // list keeps every date and amount intact.
-        val fontScale = LocalDensity.current.fontScale
-        if (maxWidth < 7.dp * 48 || fontScale >= 1.3f) {
+        // The full-width day list appears in manual mode or when seven
+        // readable 48 dp targets physically cannot fit the screen width.
+        if (fullListMode || maxWidth < 7.dp * 48) {
             DayList(
                 month = month,
                 settings = settings,
@@ -350,6 +363,7 @@ private fun CalendarGridOrList(
                 selectedDay = selectedDay,
                 today = today,
                 settings = settings,
+                maxHeight = maxHeight,
                 periodNumberFor = periodNumberFor,
                 yearEndFor = yearEndFor,
                 yearNumberFor = yearNumberFor,
@@ -367,6 +381,7 @@ private fun MonthGrid(
     selectedDay: LocalDate?,
     today: LocalDate?,
     settings: CalendarDisplaySettings,
+    maxHeight: Dp,
     periodNumberFor: (LocalDate) -> Int?,
     yearEndFor: (LocalDate) -> LocalDate?,
     yearNumberFor: (LocalDate) -> Int?,
@@ -380,13 +395,13 @@ private fun MonthGrid(
     DisposableEffect(Unit) {
         onDispose { savedScroll = gridScrollState.value }
     }
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(gridScrollState)
-            .padding(horizontal = 12.dp),
+    // The grid keeps its base font size regardless of the system font-scale
+    // setting: the at-a-glance calendar must not clip or reflow at large
+    // text. Everything else in the app keeps scaling.
+    val density = LocalDensity.current
+    CompositionLocalProvider(
+        LocalDensity provides Density(density.density, fontScale = 1f),
     ) {
-        WeekdayHeader(settings.weekStart)
         // The mockups render only the days of the displayed month, with
         // blank cells for the leading and trailing adjacent dates.
         val inMonth = month.days.filter { it.inDisplayMonth }
@@ -396,38 +411,121 @@ private fun MonthGrid(
         val slots: List<MonthDay?> =
             List(leading) { null } + inMonth
         val paddedSlots = slots + List((7 - slots.size % 7) % 7) { null }
-        paddedSlots.chunked(7).forEach { week ->
-            Row(modifier = Modifier.fillMaxWidth()) {
-                week.forEach { day ->
-                    if (day == null) {
-                        Spacer(Modifier.weight(1f))
-                    } else {
-                        val yearEndNumber = if (yearEndFor(day.date) == day.date) {
-                            yearNumberFor(day.date)
-                        } else {
-                            null
-                        }
-                        DayCell(
-                            day = day,
-                            isSelected = day.date == selectedDay,
-                            isToday = day.date == today,
-                            markers = markersFor(
-                                day,
-                                settings,
-                                periodNumberFor(day.date),
-                                yearEndNumber,
-                                context,
-                            ),
-                            context = context,
-                            onClick = { onOpenDay(day.date) },
-                            modifier = Modifier.weight(1f),
-                        )
-                    }
+        val rows = paddedSlots.chunked(7)
+
+        val headerHeight = 20.dp
+        val fitsWithoutScroll =
+            rows.isNotEmpty() && maxHeight > headerHeight + MIN_ROW_HEIGHT * rows.size
+        if (fitsWithoutScroll) {
+            // The grid fills the space between the month selector and the
+            // bottom bar: every row — and every day cell — is exactly the
+            // same height, computed per device. Content is top-anchored.
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 12.dp),
+            ) {
+                WeekdayHeader(settings.weekStart)
+                rows.forEach { week ->
+                    GridWeekRow(
+                        week = week,
+                        settings = settings,
+                        selectedDay = selectedDay,
+                        today = today,
+                        periodNumberFor = periodNumberFor,
+                        yearEndFor = yearEndFor,
+                        yearNumberFor = yearNumberFor,
+                        context = context,
+                        onOpenDay = onOpenDay,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                    )
+                }
+            }
+        } else {
+            // Short screens or a very tall month: the rows keep their
+            // minimum height and the grid scrolls instead of clipping.
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(gridScrollState)
+                    .padding(horizontal = 12.dp),
+            ) {
+                WeekdayHeader(settings.weekStart)
+                rows.forEach { week ->
+                    GridWeekRow(
+                        week = week,
+                        settings = settings,
+                        selectedDay = selectedDay,
+                        today = today,
+                        periodNumberFor = periodNumberFor,
+                        yearEndFor = yearEndFor,
+                        yearNumberFor = yearNumberFor,
+                        context = context,
+                        onOpenDay = onOpenDay,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = MIN_ROW_HEIGHT),
+                    )
                 }
             }
         }
     }
 }
+
+/** One grid week: seven equal-width cells, content top-anchored. */
+@Composable
+private fun GridWeekRow(
+    week: List<MonthDay?>,
+    settings: CalendarDisplaySettings,
+    selectedDay: LocalDate?,
+    today: LocalDate?,
+    periodNumberFor: (LocalDate) -> Int?,
+    yearEndFor: (LocalDate) -> LocalDate?,
+    yearNumberFor: (LocalDate) -> Int?,
+    context: android.content.Context,
+    onOpenDay: (LocalDate) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(modifier = modifier) {
+        week.forEach { day ->
+            if (day == null) {
+                Spacer(Modifier.weight(1f))
+            } else {
+                val yearEndNumber = if (yearEndFor(day.date) == day.date) {
+                    yearNumberFor(day.date)
+                } else {
+                    null
+                }
+                DayCell(
+                    day = day,
+                    isSelected = day.date == selectedDay,
+                    isToday = day.date == today,
+                    markers = markersFor(
+                        day,
+                        settings,
+                        periodNumberFor(day.date),
+                        yearEndNumber,
+                        context,
+                    ),
+                    context = context,
+                    onClick = { onOpenDay(day.date) },
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Minimum height a grid row needs for its bounded content (day number, up to
+ * two marker rows, two activity lines and the overflow count). Used as the
+ * fill-vs-scroll threshold and the scroll-branch row minimum.
+ */
+private val MIN_ROW_HEIGHT = 56.dp
 
 @Composable
 private fun WeekdayHeader(weekStart: DayOfWeek) {
@@ -520,7 +618,6 @@ private fun DayCell(
 
     Column(
         modifier = modifier
-            .heightIn(min = 48.dp)
             .background(fill, RoundedCornerShape(8.dp))
             .border(if (highlighted) 2.dp else 1.dp, borderColor, RoundedCornerShape(8.dp))
             .clickable(onClick = onClick)
@@ -581,6 +678,53 @@ private fun DayCell(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 4.dp),
             )
+        }
+    }
+}
+
+@Composable
+private fun FullListToggle(
+    fullListMode: Boolean,
+    onToggle: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 2.dp),
+        horizontalArrangement = Arrangement.End,
+    ) {
+        Surface(
+            color = MaterialTheme.colorScheme.surfaceVariant,
+            shape = RoundedCornerShape(14.dp),
+            modifier = Modifier
+                .clickable(onClick = onToggle)
+                .testTag("calendar_full_list_toggle"),
+        ) {
+            Row(
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    imageVector = if (fullListMode) {
+                        Icons.Filled.DateRange
+                    } else {
+                        Icons.AutoMirrored.Filled.List
+                    },
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(14.dp),
+                )
+                Spacer(Modifier.width(4.dp))
+                Text(
+                    text = if (fullListMode) {
+                        stringResource(R.string.calendar_grid)
+                    } else {
+                        stringResource(R.string.calendar_full_list)
+                    },
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
         }
     }
 }

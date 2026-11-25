@@ -162,6 +162,23 @@ class CalendarScreenTest : CalendarUiTestBase() {
     }
 
     @Test
+    fun fullListToggleSwitchesBetweenGridAndList() {
+        setAppContent()
+        waitForBalanceCard()
+        // The grid is the default.
+        composeRule.onNodeWithText("Sun").assertIsDisplayed()
+        composeRule.onNodeWithTag("calendar_full_list_toggle").performClick()
+        composeRule.waitUntil(timeoutMillis = 20_000) {
+            composeRule.onAllNodesWithText("Thursday, January 1").fetchSemanticsNodes().isNotEmpty()
+        }
+        // The day list is on; the toggle now offers the grid.
+        composeRule.onNodeWithTag("calendar_full_list_toggle").performClick()
+        composeRule.waitUntil(timeoutMillis = 20_000) {
+            composeRule.onAllNodesWithText("Sun").fetchSemanticsNodes().isNotEmpty()
+        }
+    }
+
+    @Test
     fun narrowWidthFallsBackToTheDayList() {
         composeRule.setContent {
             FedLeaveTheme {

@@ -62,6 +62,18 @@ class CalendarVisualCaptureTest : CalendarUiTestBase() {
 
     @OptIn(ExperimentalTestApi::class)
     @Test
+    fun captureFullListMode() {
+        setAppContent()
+        waitForBalanceCard()
+        composeRule.onNodeWithTag("calendar_full_list_toggle").performClick()
+        composeRule.waitUntil(timeoutMillis = 20_000) {
+            composeRule.onAllNodesWithText("Thursday, January 1").fetchSemanticsNodes().isNotEmpty()
+        }
+        capture("calendar-full-list")
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
     fun captureCalendarMainDark() {
         composeRule.setContent {
             FedLeaveTheme(darkTheme = true) {
