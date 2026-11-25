@@ -11,9 +11,11 @@ of its own. The final store publish remains the Kotlin I04 writer.
 from __future__ import annotations
 
 import json
+import math
 from copy import deepcopy
 
 from fedleave.cross_year import AccountingError
+from fedleave.expirations import EPSILON
 from fedleave.ledger import (
     accrual_hours_for_date,
     calculate_balances,
@@ -155,6 +157,8 @@ def _number(value, description: str) -> float:
         number = float(value)
     except (TypeError, ValueError) as exc:
         raise AccountingError("INVALID_HOURS", f"{description} must be a number") from exc
+    if not math.isfinite(number):
+        raise AccountingError("INVALID_HOURS", f"{description} must be finite")
     return number
 
 
@@ -236,7 +240,7 @@ def _manual_ledger_pure(
         raise AccountingError("INVALID_HOURS", "Time increment must be positive")
     for category, value in {**balances, "annual_accrual": annual_accrual}.items():
         hours = _number(value, category)
-        if hours < 0 or abs(hours / increment - round(hours / increment)) > 1e-9:
+        if hours < 0 or abs(hours / increment - round(hours / increment)) > EPSILON:
             raise AccountingError("INVALID_HOURS", f"{category} must be nonnegative in increments of {increment}")
     first = __import__("datetime").date.fromisoformat(start)
     count = (
@@ -287,13 +291,15 @@ def _manual_create(body: dict) -> dict:
     config = _config(body)
     balances = _balances(body)
 
+    build_config = deepcopy(config) if config is not None else {"defaults": deepcopy(_DEFAULT_DEFAULTS)}
+    build_config.setdefault("defaults", {})["sick_leave_accrual_hours"] = sick_accrual
     ledger = _manual_ledger_pure(
         year,
         start,
         annual_accrual,
         balances,
         pay_periods=pay_periods,
-        config=config,
+        config=build_config,
     )
     files = {f"leave_years/{year}.json": json.dumps(ledger, sort_keys=True)}
     if config is None:

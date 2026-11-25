@@ -71,8 +71,10 @@ class SetupViewModel(
 
     /** Enter the flow from the welcome screen (resumeDate null) or an uncovered date. */
     fun begin(proposal: SetupProposal, resumeDate: String?) {
+        // A fresh entry resets everything, including a prior published year:
+        // consecutive missing years are created one flow at a time.
         _state.update {
-            it.copy(
+            SetupUiState(
                 step = SetupStep.METHOD,
                 year = proposal.year.toString(),
                 leaveYearStart = proposal.leaveYearStart,
@@ -154,10 +156,8 @@ class SetupViewModel(
             }
             return
         }
-        val kind = when (state.step) {
-            SetupStep.TODAY_FORM -> SetupKind.TODAY
-            else -> SetupKind.MANUAL
-        }
+        val kind = state.previewKind
+            ?: if (state.step == SetupStep.TODAY_FORM) SetupKind.TODAY else SetupKind.MANUAL
         val hours = parseHours(if (kind == SetupKind.TODAY) state.todayTargets else state.openings)
         if (hours == null) {
             _state.update {
@@ -239,6 +239,19 @@ class SetupViewModel(
         _state.update { it.copy(loading = true, error = null) }
         launchRead {
             val opened = store.open()
+            if (opened is OpenResult.Recoverable) {
+                _state.update {
+                    it.copy(
+                        loading = false,
+                        error = CoreError.Read(
+                            "STORE_UNAVAILABLE",
+                            "store",
+                            "The existing data needs review before a new year can be created.",
+                        ),
+                    )
+                }
+                return@launchRead
+            }
             val snapshot = opened as? OpenResult.Ready
             val candidate = StoreCandidate()
             // A generation is the complete store: carry the existing files

@@ -340,4 +340,83 @@ class SetupViewModelTest {
         assertEquals("INVALID_REQUEST", vm.state.value.error?.code)
         assertTrue(bridge.requests.isEmpty())
     }
+
+    @Test
+    fun todayMidnightRolloverRePreviewsAsToday() = runBlocking {
+        val root = tmp.newFolder("store")
+        val coordinator = StoreCoordinator(root)
+        val bridge = FakeCreation()
+        var today = "2026-02-10"
+        val vm = SetupViewModel(
+            creation = bridge,
+            store = coordinator,
+            timeSource = TimeSource { LocalDate.parse(today) },
+            providedScope = CoroutineScope(Dispatchers.Unconfined + SupervisorJob()),
+        )
+        vm.begin(proposal(), resumeDate = null)
+        vm.onChooseToday()
+        vm.onTargetChanged("annual", "80")
+        vm.onPreview()
+        vm.awaitIdle()
+        assertEquals("today", bridge.requests.last().first)
+
+        today = "2026-02-11"
+        vm.onConfirm()
+        vm.awaitIdle()
+
+        assertTrue(vm.state.value.stale)
+        // The rollover re-preview keeps the Today kind and its targets.
+        assertEquals("today", bridge.requests.last().first)
+    }
+
+    @Test
+    fun reEnteringSetupAfterPublishStartsClean() = runBlocking {
+        val root = tmp.newFolder("store")
+        val coordinator = StoreCoordinator(root)
+        val bridge = FakeCreation().apply { includeConfig = true }
+        val vm = viewModel(coordinator, bridge)
+        vm.begin(proposal(), resumeDate = null)
+        vm.onChooseStartOfYear()
+        vm.onPreview()
+        vm.awaitIdle()
+        vm.onConfirm()
+        vm.awaitIdle()
+        assertTrue(vm.state.value.published)
+
+        vm.begin(proposal(), resumeDate = null)
+        val state = vm.state.value
+        assertFalse(state.published)
+        assertEquals(SetupStep.METHOD, state.step)
+        assertNull(state.preview)
+    }
+
+    @Test
+    fun recoverableStoreBlocksPublishAndPreservesTheGenerations() = runBlocking {
+        val root = tmp.newFolder("store")
+        val coordinator = StoreCoordinator(root)
+        // Publish a valid generation, then corrupt the pointer.
+        val existing = StoreCandidate()
+        existing.put("config.json", "{\"schema_version\":1,\"defaults\":{}}")
+        existing.put("leave_years/2026.json", testLedger(2026, "2026-01-11"))
+        assertTrue(
+            runBlocking { coordinator.publish(existing, null, "base") } is PublishResult.Published,
+        )
+        val pointer = File(root, "active.json")
+        pointer.writeText("{ not json")
+
+        val bridge = FakeCreation()
+        val vm = viewModel(coordinator, bridge)
+        vm.begin(proposal(), resumeDate = null)
+        vm.onChooseStartOfYear()
+        vm.onPreview()
+        vm.awaitIdle()
+        vm.onConfirm()
+        vm.awaitIdle()
+
+        assertEquals("STORE_UNAVAILABLE", vm.state.value.error?.code)
+        assertFalse(vm.state.value.published)
+        // The complete recoverable generation survives.
+        assertTrue(File(root, "generations").exists())
+        assertTrue(File(root, "generations").listFiles()?.isNotEmpty() == true)
+    }
 }
