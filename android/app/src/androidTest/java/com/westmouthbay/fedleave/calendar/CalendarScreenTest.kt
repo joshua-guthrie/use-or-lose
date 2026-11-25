@@ -11,6 +11,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.unit.dp
 import com.westmouthbay.fedleave.ui.FedLeaveApp
@@ -104,6 +105,16 @@ class CalendarScreenTest : CalendarUiTestBase() {
         composeRule.onNodeWithText("February").performClick()
         composeRule.onNodeWithText("February 2026").assertIsDisplayed()
         composeRule.onNodeWithText("90 h").assertIsDisplayed()
+    }
+
+    @Test
+    fun monthPickerListScrollsToDecemberWithTheCancelPinned() {
+        setAppContent()
+        waitForBalanceCard()
+        composeRule.onNodeWithTag("calendar_month_selector").performClick()
+        // The twelve months scroll under the pinned Cancel pill.
+        composeRule.onNodeWithText("December").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithText("Cancel").assertIsDisplayed()
     }
 
     @Test
