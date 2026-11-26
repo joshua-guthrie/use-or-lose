@@ -25,7 +25,7 @@
       ]},
       {"id": "RESTORE-PICKER", "title": "Open a backup", "subtitle": "Android file picker · illustrative", "items": [
         {"type": "row", "text": "Location", "value": "Downloads"},
-        {"type": "card", "text": "fedleave_backup.json", "body": "JSON file · Nov 20", "note": 5},
+        {"type": "card", "text": "useorlose_backup.json", "body": "JSON file · Nov 20", "note": 5},
         {"type": "action", "text": "Open"},
         {"type": "action", "text": "Cancel", "emphasis": false}
       ]}
@@ -36,7 +36,7 @@
     "title": "Review a backup before changing data",
     "subtitle": "Show the files affected, explain conflicts, and recover from interruptions.",
     "screens": [
-      {"id": "RESTORE-REVIEW", "title": "Review restore", "subtitle": "fedleave_backup.json", "items": [
+      {"id": "RESTORE-REVIEW", "title": "Review restore", "subtitle": "useorlose_backup.json", "items": [
         {"type": "card", "text": "Leave years 2026 and 2027", "body": "2026 matches an existing year. 2027 is new.", "note": 1},
         {"type": "row", "text": "Matching record IDs", "value": "3"},
         {"type": "row", "text": "Mode", "value": "Merge", "note": 2},

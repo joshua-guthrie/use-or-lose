@@ -37,10 +37,10 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest -q --cov=fedleave --cov=fedleave_gui --cov=annual_leave_chart --cov=sick_leave_chart --cov=fedleave_month_report_graphic --cov-branch --cov-report=term-missing --cov-report=xml
+          pytest -q --cov=useorlose --cov=useorlose_gui --cov=annual_leave_chart --cov=sick_leave_chart --cov=useorlose_month_report_graphic --cov-branch --cov-report=term-missing --cov-report=xml
 
       - name: Generate strict CLI to MCP parity inventory
-        run: python -m fedleave.mcp --inventory > mcp-inventory.json
+        run: python -m useorlose.mcp --inventory > mcp-inventory.json
 
       - name: Record tested runtime dependencies
         run: python scripts/lib/common/dependency_inventory.py --runtime-only --output source-dependencies.json --requirements source-dependencies.txt

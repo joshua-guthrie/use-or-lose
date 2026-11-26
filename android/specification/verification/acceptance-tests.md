@@ -32,16 +32,16 @@ Use these examples on Linux with the desktop CLI on your path. The environment v
 
 ```bash
 fixture_dir="$(mktemp -d)"
-fedleave init --year 2026 --leave-year-start 2026-01-11 --pay-periods 26 \
+use-or-lose init --year 2026 --leave-year-start 2026-01-11 --pay-periods 26 \
   --annual-accrual 6 --annual-start 100 --sick-start 20 --data-dir "$fixture_dir"
-fedleave add --year 2026 --date 2026-01-13 --category annual --used 8 --status approved --data-dir "$fixture_dir"
-fedleave add --year 2026 --date 2026-01-16 --category annual --used 2 --status approved --data-dir "$fixture_dir"
-fedleave add --year 2026 --date 2026-01-22 --category annual --used 4 --status planned --data-dir "$fixture_dir"
-fedleave add --year 2026 --date 2026-01-25 --category annual --used 3 --status planned --data-dir "$fixture_dir"
-fedleave balance --year 2026 --as-of 2026-01-24 --json --data-dir "$fixture_dir"
-fedleave pay-period --year 2026 --date 2026-01-24 --json --data-dir "$fixture_dir"
-fedleave month --year 2026 --month 1 --json --data-dir "$fixture_dir"
-fedleave balance --as-of 2027-01-04 --json --data-dir "$fixture_dir"
+use-or-lose add --year 2026 --date 2026-01-13 --category annual --used 8 --status approved --data-dir "$fixture_dir"
+use-or-lose add --year 2026 --date 2026-01-16 --category annual --used 2 --status approved --data-dir "$fixture_dir"
+use-or-lose add --year 2026 --date 2026-01-22 --category annual --used 4 --status planned --data-dir "$fixture_dir"
+use-or-lose add --year 2026 --date 2026-01-25 --category annual --used 3 --status planned --data-dir "$fixture_dir"
+use-or-lose balance --year 2026 --as-of 2026-01-24 --json --data-dir "$fixture_dir"
+use-or-lose pay-period --year 2026 --date 2026-01-24 --json --data-dir "$fixture_dir"
+use-or-lose month --year 2026 --month 1 --json --data-dir "$fixture_dir"
+use-or-lose balance --as-of 2027-01-04 --json --data-dir "$fixture_dir"
 ```
 
 Substitute each date in the expected-results table for the balance command. The month output provides period totals and date markers on any day the commands are run. Its Today field uses the runner's real date. Freeze the calculation clock to January 16 to compare that field directly. The desktop reference checks verified the dated values, inferred leave year, frozen Today snapshot, matching period close, and distinct payday and period-end markers. JSON store hashes matched before and after the dated and period reads.
