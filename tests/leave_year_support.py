@@ -4,8 +4,8 @@ import hashlib
 import json
 from datetime import date, timedelta
 
-from fedleave.config import Config
-from fedleave.payperiods import generate_pay_periods
+from useorlose.config import Config
+from useorlose.payperiods import generate_pay_periods
 
 
 def tx(id, day, category, direction, hours, **extra):

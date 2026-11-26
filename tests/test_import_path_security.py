@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 import typer
 
-from fedleave.commands.data import import_data
+from useorlose.commands.data import import_data
 
 
 @pytest.mark.parametrize("name", ["C:outside", "D:outside", "file:stream", "../escape", "..\\escape"])

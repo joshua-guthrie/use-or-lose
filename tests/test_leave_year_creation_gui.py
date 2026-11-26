@@ -8,9 +8,9 @@ from pathlib import Path
 import pytest
 from PySide6.QtWidgets import QDialog, QDialogButtonBox, QMessageBox
 
-from fedleave_gui.backend import BackendError, BackendOptions, FedleaveBackend
-from fedleave_gui.main_window import MANUAL_YEAR_WARNING, MainWindow, StartYearDialog
 from leave_year_support import store, tree
+from useorlose_gui.backend import BackendError, BackendOptions, UseOrLoseBackend
+from useorlose_gui.main_window import MANUAL_YEAR_WARNING, MainWindow, StartYearDialog
 
 
 class Backend:
@@ -98,7 +98,7 @@ def test_manual_confirmation_warning_before_cli_write(qtbot, monkeypatch, tmp_pa
     dialog.start.setText("2027-01-10")
     dialog.annual.setValue(12.25)
     dialog.exec = lambda: QDialog.Accepted
-    monkeypatch.setattr("fedleave_gui.main_window.StartYearDialog", lambda *args, **kwargs: dialog)
+    monkeypatch.setattr("useorlose_gui.main_window.StartYearDialog", lambda *args, **kwargs: dialog)
     messages = []
 
     def question(parent, title, text):
@@ -125,7 +125,7 @@ def test_GUI_014_carryover_confirmation_submits_only_reviewed_cli_mode(qtbot, mo
     qtbot.addWidget(window)
     window.backend = backend
     dialog.exec = lambda: QDialog.Accepted
-    monkeypatch.setattr("fedleave_gui.main_window.StartYearDialog", lambda *args, **kwargs: dialog)
+    monkeypatch.setattr("useorlose_gui.main_window.StartYearDialog", lambda *args, **kwargs: dialog)
     monkeypatch.setattr(QMessageBox, "question", lambda *args: QMessageBox.Yes)
     window.new_leave_year()
     assert backend.calls[-1] == (
@@ -179,9 +179,9 @@ def test_GUI_018_019_020_close_and_mode_change_during_slow_preview(qtbot):
 
 def test_GUI_021_INT_001_selected_real_backend_preview_apply(qtbot, tmp_path):
     store(tmp_path, balances={"annual": 280, "credit": 30, "sick": 600})
-    executable = Path(sysconfig.get_path("scripts")) / ("fedleave.exe" if os.name == "nt" else "fedleave")
+    executable = Path(sysconfig.get_path("scripts")) / ("use-or-lose.exe" if os.name == "nt" else "use-or-lose")
     assert executable.is_file(), f"Installed test CLI missing: {executable}"
-    backend = FedleaveBackend(BackendOptions(fedleave_path=str(executable), data_dir=str(tmp_path)))
+    backend = UseOrLoseBackend(BackendOptions(useorlose_path=str(executable), data_dir=str(tmp_path)))
     before = tree(tmp_path)
     dialog = ready_carryover(qtbot, backend)
     assert tree(tmp_path) == before
@@ -220,7 +220,7 @@ def test_GUI_023_keyboard_mode_source_and_preview(qtbot):
 
 
 def test_reconciliation_GUI_reviews_full_chain_before_apply(qtbot, monkeypatch):
-    from fedleave_gui.main_window import CarryoverReconciliationDialog
+    from useorlose_gui.main_window import CarryoverReconciliationDialog
 
     class Reconciler(Backend):
         def reconcile_carryover(self, year, **options):
@@ -252,7 +252,7 @@ def test_reconciliation_GUI_reviews_full_chain_before_apply(qtbot, monkeypatch):
     window.year = 2027
     window.backend = backend
     dialog.exec = lambda: QDialog.Accepted
-    monkeypatch.setattr("fedleave_gui.main_window.CarryoverReconciliationDialog", lambda *args, **kwargs: dialog)
+    monkeypatch.setattr("useorlose_gui.main_window.CarryoverReconciliationDialog", lambda *args, **kwargs: dialog)
     window.reconcile_carryover()
     assert backend.calls[-1] == (2027, {"preview": False, "expected_fingerprint": "reviewed-chain"})
     dialog.reject()
@@ -266,14 +266,14 @@ def _fixed_date(monkeypatch, value):
         def today(cls):
             return value
 
-    monkeypatch.setattr("fedleave_gui.main_window.date", Clock)
+    monkeypatch.setattr("useorlose_gui.main_window.date", Clock)
 
 
 def _calendar_with_real_backend(qtbot, tmp_path):
-    from fedleave_gui.settings import GuiSettings
+    from useorlose_gui.settings import GuiSettings
 
-    executable = Path(sysconfig.get_path("scripts")) / ("fedleave.exe" if os.name == "nt" else "fedleave")
-    window = MainWindow(GuiSettings(data_dir=str(tmp_path), fedleave_path=str(executable)))
+    executable = Path(sysconfig.get_path("scripts")) / ("use-or-lose.exe" if os.name == "nt" else "use-or-lose")
+    window = MainWindow(GuiSettings(data_dir=str(tmp_path), useorlose_path=str(executable)))
     qtbot.addWidget(window)
     return window
 
@@ -415,8 +415,8 @@ def test_confirmed_future_year_resumes_the_original_calendar_edit(qtbot, monkeyp
 
     monkeypatch.setattr(QMessageBox, "question", lambda *_args: QMessageBox.Yes)
     monkeypatch.setattr(StartYearDialog, "exec", review)
-    monkeypatch.setattr("fedleave_gui.main_window.DayEditDialog", Edit)
-    monkeypatch.setattr("fedleave_gui.main_window.SaveDayPreviewDialog", Review)
+    monkeypatch.setattr("useorlose_gui.main_window.DayEditDialog", Edit)
+    monkeypatch.setattr("useorlose_gui.main_window.SaveDayPreviewDialog", Review)
     window.edit_day(row)
 
     assert (window.year, window.month, window.balance_as_of) == (2027, 2, date(2026, 12, 15))

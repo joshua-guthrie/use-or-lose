@@ -4,13 +4,13 @@ import json
 import pytest
 from typer.testing import CliRunner
 
-from fedleave.cli import app
-from fedleave.config import init_config
-from fedleave.holidays import download_ics, generate_opm_holidays
-from fedleave.mcp.catalog import discover
-from fedleave.mcp.execution import Executor
-from fedleave.mcp.policy import Policy
 from test_mcp_execution import call
+from useorlose.cli import app
+from useorlose.config import init_config
+from useorlose.holidays import download_ics, generate_opm_holidays
+from useorlose.mcp.catalog import discover
+from useorlose.mcp.execution import Executor
+from useorlose.mcp.policy import Policy
 
 CALENDAR = b"BEGIN:VCALENDAR\r\nVERSION:2.0\r\nBEGIN:VEVENT\r\nDTSTART;VALUE=DATE:20260704\r\nSUMMARY:Holiday\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
 
@@ -35,7 +35,7 @@ def test_invalid_download_urls_never_open_a_resource(monkeypatch, url):
         opened.append(args)
         return io.BytesIO(CALENDAR)
 
-    monkeypatch.setattr("fedleave.holidays.urllib.request.urlopen", opener)
+    monkeypatch.setattr("useorlose.holidays.urllib.request.urlopen", opener)
     with pytest.raises(ValueError):
         download_ics(url)
     assert opened == []
@@ -48,7 +48,7 @@ def test_valid_url_is_normalized_at_download_and_initialization(monkeypatch, tmp
         opened.append(url)
         return io.BytesIO(CALENDAR)
 
-    monkeypatch.setattr("fedleave.holidays.urllib.request.urlopen", opener)
+    monkeypatch.setattr("useorlose.holidays.urllib.request.urlopen", opener)
     init_config(
         2026,
         "2026-01-11",
@@ -67,7 +67,7 @@ def test_valid_url_is_normalized_at_download_and_initialization(monkeypatch, tmp
     "body", [b"SYNTHETIC_PRIVATE_MARKER", CALENDAR.replace(b"DTSTART;VALUE=DATE:20260704\r\n", b"")]
 )
 def test_calendar_parse_errors_are_controlled_without_source_contents(monkeypatch, tmp_path, body, json_output):
-    monkeypatch.setattr("fedleave.holidays.urllib.request.urlopen", lambda *a, **k: io.BytesIO(body))
+    monkeypatch.setattr("useorlose.holidays.urllib.request.urlopen", lambda *a, **k: io.BytesIO(body))
     result = CliRunner().invoke(
         app,
         [
@@ -123,7 +123,7 @@ def test_invalid_unused_url_retains_offline_initialization(tmp_path):
 
 def test_invalid_remote_calendar_helper_hides_parser_input(monkeypatch):
     monkeypatch.setattr(
-        "fedleave.holidays.urllib.request.urlopen", lambda *a, **k: io.BytesIO(b"SYNTHETIC_PRIVATE_MARKER")
+        "useorlose.holidays.urllib.request.urlopen", lambda *a, **k: io.BytesIO(b"SYNTHETIC_PRIVATE_MARKER")
     )
     with pytest.raises(ValueError, match="^Invalid holiday calendar data$"):
         generate_opm_holidays(2026, "https://example.com/a.ics")

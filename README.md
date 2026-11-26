@@ -1,16 +1,16 @@
-# fedleave
+# Use or Lose
 
 Federal leave and time tracker.
 
-Official project website: [https://www.westmouthbay.com/fedleave-application/](https://www.westmouthbay.com/fedleave-application/)
+Official project website: [https://www.westmouthbay.com/UseOrLose-application/](https://www.westmouthbay.com/UseOrLose-application/)
 
 Author: Joshua Guthrie
 
 <p align="center">
-  <img src="assets/fedleave-logo.png" alt="Use or Lose logo" width="640">
+  <img src="assets/useorlose-logo.png" alt="Use or Lose logo" width="640">
 </p>
 
-The main application is `fedleave`, a command-line leave ledger and the source of truth for every read, write, balance, and report operation. The desktop calendar, analytics interface, chart generators, yearly comparisons, and month report began as examples of applications that can be built on the CLI. They became useful in their own right, so they are included and supported as companion applications while continuing to use `fedleave` as their backend.
+The main application is `use-or-lose`, a command-line leave ledger and the source of truth for every read, write, balance, and report operation. The desktop calendar, analytics interface, chart generators, yearly comparisons, and month report began as examples of applications that can be built on the CLI. They became useful in their own right, so they are included and supported as companion applications while continuing to use `use-or-lose` as their backend.
 
 Note:  In-case you're wondering... it was a 100% at home project.  None of it was done on company time!   It was also my first experiemnt into vibe coding.  So far, I'm impressed.
 
@@ -35,7 +35,7 @@ incomplete older ledger. Legacy `init` remains manual by default, with no prompt
 and no generic no-carryover warning. `--manual` is an optional explicit synonym:
 
 ```bash
-fedleave init --year 2027 --leave-year-start 2027-01-10 --annual-start 120 --sick-start 600 --travel-comp-start 40 --data-dir /path/to/data --json
+use-or-lose init --year 2027 --leave-year-start 2027-01-10 --annual-start 120 --sick-start 600 --travel-comp-start 40 --data-dir /path/to/data --json
 ```
 
 Manual mode never reads an older year, even if one exists or is corrupt. Its
@@ -63,8 +63,8 @@ creates nothing. Ordinary manual CLI commands do not display that warning.
 Select the immediately previous leave-year identifier explicitly. Preview first:
 
 ```bash
-fedleave init --from-year 2026 --year 2027 --preview --json --data-dir /path/to/data
-fedleave init --from-year 2026 --year 2027 --expected-fingerprint PREVIEW_FINGERPRINT --json --data-dir /path/to/data
+use-or-lose init --from-year 2026 --year 2027 --preview --json --data-dir /path/to/data
+use-or-lose init --from-year 2026 --year 2027 --expected-fingerprint PREVIEW_FINGERPRINT --json --data-dir /path/to/data
 ```
 
 Replace `PREVIEW_FINGERPRINT` with the value returned by the first command.
@@ -140,11 +140,11 @@ August 31, 2027; unused hours become unavailable September 1. There is no
 automatic award, payout, separate event record, or service-obligation tracker.
 
 ```bash
-fedleave add --year 2026 --date 2026-09-01 --category ppl --earned 480 --data-dir /path/to/data
-fedleave add --year 2026 --date 2026-10-01 --category ppl --used 8 --data-dir /path/to/data
-fedleave add --year 2026 --date 2026-10-15 --category fmla --used 8 --data-dir /path/to/data
-fedleave balance --year 2027 --as-of 2027-03-01 --json --data-dir /path/to/data
-fedleave expirations --year 2027 --category ppl --json --data-dir /path/to/data
+use-or-lose add --year 2026 --date 2026-09-01 --category ppl --earned 480 --data-dir /path/to/data
+use-or-lose add --year 2026 --date 2026-10-01 --category ppl --used 8 --data-dir /path/to/data
+use-or-lose add --year 2026 --date 2026-10-15 --category fmla --used 8 --data-dir /path/to/data
+use-or-lose balance --year 2027 --as-of 2027-03-01 --json --data-dir /path/to/data
+use-or-lose expirations --year 2027 --category ppl --json --data-dir /path/to/data
 ```
 
 PPL use consumes FMLA automatically. Enter manual `fmla used` only for
@@ -204,8 +204,8 @@ instead of a falsely verified balance. Use Calendar’s **Tools > Reconcile Carr
 full dependent chain through the selected CLI, or use the CLI commands directly:
 
 ```bash
-fedleave carryover-reconcile --year 2027 --preview --json --data-dir /path/to/data
-fedleave carryover-reconcile --year 2027 --expected-fingerprint PREVIEW_FINGERPRINT --json --data-dir /path/to/data
+use-or-lose carryover-reconcile --year 2027 --preview --json --data-dir /path/to/data
+use-or-lose carryover-reconcile --year 2027 --expected-fingerprint PREVIEW_FINGERPRINT --json --data-dir /path/to/data
 ```
 
 Reconciliation preserves genuine destination transactions and unknown additive
@@ -219,8 +219,8 @@ unknown ancestry and are never automatically attached to an older file.
 For legacy duplicated opening representations, an explicit repair is available:
 
 ```bash
-fedleave carryover-reconcile --year 2027 --repair-openings --preview --json --data-dir /path/to/data
-fedleave carryover-reconcile --year 2027 --repair-openings --json --data-dir /path/to/data
+use-or-lose carryover-reconcile --year 2027 --repair-openings --preview --json --data-dir /path/to/data
+use-or-lose carryover-reconcile --year 2027 --repair-openings --json --data-dir /path/to/data
 ```
 
 Revised existing files receive backups. Multi-year apply uses a recoverable
@@ -229,7 +229,7 @@ ledgers where possible. An interruption leaves `RECOVERY_REQUIRED` rather than
 claiming success. Restore the original state before re-previewing:
 
 ```bash
-fedleave carryover-reconcile --year 2027 --recover --json --data-dir /path/to/data
+use-or-lose carryover-reconcile --year 2027 --recover --json --data-dir /path/to/data
 ```
 
 Troubleshoot `DESTINATION_EXISTS` with reconciliation for a linked year, not
@@ -300,7 +300,7 @@ curl -fsSL https://raw.githubusercontent.com/joshua-guthrie/use-or-lose/master/i
 The bootstrap downloads the prebuilt archive and SHA-256 checksum from the
 current stable GitHub release, verifies it, reads the exact build version
 embedded in the archive, and then installs into
-`/opt/fedleave/releases/<version>`. `/opt/fedleave/current` is switched only
+`/opt/use-or-lose/releases/<version>`. `/opt/use-or-lose/current` is switched only
 after validation, and commands are linked beneath `/usr/local/bin`. The archive
 contains its own Python runtime; the destination does not need Python, `pip`, a
 virtual environment, Git, or build tools. When attached to a terminal, the
@@ -315,17 +315,17 @@ remain unchanged; committed-file URLs are listed in
 
 ## AI assistants and automation through MCP
 
-Both installers include **`fedleave-mcp`**, a local Model Context Protocol
+Both installers include **`use-or-lose-mcp`**, a local Model Context Protocol
 server. It is a general-purpose interface to the full CLI for authorized
 autonomous agents, assistants, and IDEs. Agents can discover every Use or Lose CLI
 command, inspect balances and reports, modify/delete records, import/export
 backups, apply rollover, and select alternate datastores. The tools and
 their typed arguments are generated from the CLI, so they follow CLI upgrades.
-All calculations and file updates still run through `fedleave`.
+All calculations and file updates still run through `use-or-lose`.
 
-Configure your MCP client to launch `fedleave-mcp` over **stdio**. On Windows
-the executable is `C:\Program Files\Use or Lose\fedleave-mcp.exe`; on Linux use
-`/usr/local/bin/fedleave-mcp`. The client starts and stops it on demand. There is
+Configure your MCP client to launch `use-or-lose-mcp` over **stdio**. On Windows
+the executable is `C:\Program Files\UseOrLose\use-or-lose-mcp.exe`; on Linux use
+`/usr/local/bin/use-or-lose-mcp`. The client starts and stops it on demand. There is
 no background service, network listener, separate Python installation, or
 OpenClaw dependency.
 
@@ -337,7 +337,7 @@ For example, a Linux client using `mcpServers` can connect with:
 ```json
 {
   "mcpServers": {
-    "fedleave": {"command": "/usr/local/bin/fedleave-mcp", "args": []}
+    "use-or-lose-mcp": {"command": "/usr/local/bin/use-or-lose-mcp", "args": []}
   }
 }
 ```
@@ -395,7 +395,7 @@ Linux interactive installation:
 
 ```bash
 git clone https://github.com/joshua-guthrie/use-or-lose.git
-cd fedleave
+cd use-or-lose
 chmod +x scripts/LinuxInstall.sh
 ./scripts/LinuxInstall.sh
 ```
@@ -404,12 +404,12 @@ Windows interactive installation:
 
 ```bat
 git clone https://github.com/joshua-guthrie/use-or-lose.git
-cd fedleave
+cd use-or-lose
 scripts\WindowsInstall.bat
 ```
 
 After the Windows build completes, answer `y` to install the contents of
-`dist\fedleave-Windows` in `C:\Program Files\fedleave` and create Use or Lose
+`dist\use-or-lose-Windows` in `C:\Program Files\UseOrLose` and create Use or Lose
 Calendar shortcuts on the public Desktop and all-users Start Menu. Windows
 will display its normal administrator approval prompt if the terminal is not
 already elevated. Answering `n` leaves the completed bundle in `dist` without
@@ -441,8 +441,8 @@ The installer creates command launchers using the exact names from `project.scri
 On Linux these wrappers are installed in `/usr/local/bin`.
 On Windows these launchers are in the packaged output and keep the same names with `.exe`.
 
-- `fedleave`
-- `fedleave-mcp`
+- `use-or-lose`
+- `use-or-lose-mcp`
 - `UseOrLoseCalendar`
 - `UseOrLoseAnalytics`
 - `AnnualLeaveChartForTheYear`
@@ -458,15 +458,15 @@ On Windows these launchers are in the packaged output and keep the same names wi
 - `TravelCompYearlyComparison`
 - `TimeOffAwardYearlyComparison`
 - `OvertimeYearlyComparison`
-- `fedleaveMonthReportGraphic`
+- `UseOrLoseMonthReportGraphic`
 
-Important: command names are case-sensitive on Linux. For example, `fedleave` and `UseOrLoseCalendar` are different commands.
+Important: command names are case-sensitive on Linux. For example, `use-or-lose` and `UseOrLoseCalendar` are different commands.
 
 ## Commands
 
-Run `fedleave --help` after installation.
+Run `use-or-lose --help` after installation.
 
-Use `fedleave --version` to verify the installed backend version.
+Use `use-or-lose --version` to verify the installed backend version.
 
 Date options accept either an ISO date such as `2026-03-10` or the keyword `today`. The `balance` command also accepts `leave-year-end` for `--as-of` and `--project-to`.
 
@@ -475,84 +475,84 @@ Date options accept either an ISO date such as `2026-03-10` or the keyword `toda
 Initialize a leave year. The leave year start date should be the first day of pay period 1 for that leave year. Annual leave accrual is configured per pay period; sick leave accrues at 4 hours per pay period. Initialization creates the automatic annual and sick leave accrual transactions for the full leave year so future balances and charts can use them immediately.
 
 ```bash
-fedleave init --year 2026 --leave-year-start 2026-01-11 --annual-accrual 6 --annual-start 120 --sick-start 180
+use-or-lose init --year 2026 --leave-year-start 2026-01-11 --annual-accrual 6 --annual-start 120 --sick-start 180
 ```
 
 Record leave usage and overtime as it happens:
 
 ```bash
-fedleave add --date 2026-03-10 --category annual --used 4 --description "Medical appointment"
-fedleave add --date 2026-03-12 --category overtime --worked 3 --description "Release support"
-fedleave add --year 2026 --date 2026-03-10 --category annual --used 3 --status reconciled --authoritative --description "Actual leave used"
-fedleave set-day --date 2026-07-08 --annual -5 --credit 2 --authoritative --json
+use-or-lose add --date 2026-03-10 --category annual --used 4 --description "Medical appointment"
+use-or-lose add --date 2026-03-12 --category overtime --worked 3 --description "Release support"
+use-or-lose add --year 2026 --date 2026-03-10 --category annual --used 3 --status reconciled --authoritative --description "Actual leave used"
+use-or-lose set-day --date 2026-07-08 --annual -5 --credit 2 --authoritative --json
 ```
 
 Check balances. If no date is supplied, balances default to today and the leave year is inferred from today. Older data files that are missing automatic accrual rows are computed in memory through the balance date without modifying the ledger.
 
 ```bash
-fedleave balance
-fedleave balance --year 2026 --as-of 2026-06-01
-fedleave balance --year 2026 --as-of leave-year-end
-fedleave use-or-lose --year 2026
+use-or-lose balance
+use-or-lose balance --year 2026 --as-of 2026-06-01
+use-or-lose balance --year 2026 --as-of leave-year-end
+use-or-lose use-or-lose --year 2026
 ```
 
 Check what was earned, used, and worked during the pay period containing a date:
 
 ```bash
-fedleave pay-period --year 2026 --date 2026-06-01
-fedleave pay-period --year 2026 --date 2026-06-01 --daily
-fedleave pay-periods --year 2026
-fedleave month --year 2026 --month 6 --json
+use-or-lose pay-period --year 2026 --date 2026-06-01
+use-or-lose pay-period --year 2026 --date 2026-06-01 --daily
+use-or-lose pay-periods --year 2026
+use-or-lose month --year 2026 --month 6 --json
 ```
 
 Export or restore data:
 
 ```bash
-fedleave export-data --output fedleave_backup.json
-fedleave import-data --input fedleave_backup.json --data-dir /path/to/new_data
+use-or-lose export-data --output useorlose_backup.json
+use-or-lose import-data --input useorlose_backup.json --data-dir /path/to/new_data
 ```
 
 For an existing datastore, preview **Merge** before applying:
 
 ```bash
-fedleave import-data --input fedleave_backup.json --merge --dry-run --json
-fedleave import-data --input fedleave_backup.json --merge --expected-fingerprint REVIEWED_HASH
+use-or-lose import-data --input useorlose_backup.json --merge --dry-run --json
+use-or-lose import-data --input useorlose_backup.json --merge --expected-fingerprint REVIEWED_HASH
 ```
 
-The preview does no writes. Its JSON includes `status`, `preview_fingerprint`, `changes`, `affected_years`, `warnings` and `conflicts`. A ready preview exits zero. A conflict exits 2, identifies the affected year and date where applicable, and preserves both copies. A missing backup exits 1 and an unreadable JSON file exits 3. Use `--overwrite` in place of `--merge` to review and explicitly replace only the files included in the backup. Use or Lose keeps pre-replacement copies in the datastore's backups directory. If an import is interrupted and Use or Lose reports `RECOVERY_REQUIRED`, run `fedleave import-data --recover` using the same data directory to restore the prior complete store.
+The preview does no writes. Its JSON includes `status`, `preview_fingerprint`, `changes`, `affected_years`, `warnings` and `conflicts`. A ready preview exits zero. A conflict exits 2, identifies the affected year and date where applicable, and preserves both copies. A missing backup exits 1 and an unreadable JSON file exits 3. Use `--overwrite` in place of `--merge` to review and explicitly replace only the files included in the backup. Use or Lose keeps pre-replacement copies in the datastore's backups directory. If an import is interrupted and Use or Lose reports `RECOVERY_REQUIRED`, run `use-or-lose import-data --recover` using the same data directory to restore the prior complete store.
 
 Validate and normalize stored JSON data:
 
 ```bash
-fedleave validate --data-dir ~/.local/share/fedleave --apply
+use-or-lose validate --data-dir ~/.local/share/use-or-lose --apply
 ```
 
 Older leave-year files are migrated automatically. Voided transactions and stored audit-history fields are removed from the active data file on startup or when a custom data store is loaded; the normal pre-write backup is created first.
 
 ## GUI Application: Use or Lose Calendar
 
-Use or Lose Calendar is a cross-platform PySide6 desktop GUI for the `fedleave` backend. It displays the current month, calendar day values, pay days, pay-period endings, pay-period summaries, and as-of-today balances using `fedleave month --json`.
+Use or Lose Calendar is a cross-platform PySide6 desktop GUI for the `use-or-lose` backend. It displays the current month, calendar day values, pay days, pay-period endings, pay-period summaries, and as-of-today balances using `use-or-lose month --json`.
 
-The GUI does not read or edit leave JSON files directly. Reads and writes go through the selected `fedleave` executable. Day edits call `fedleave set-day --authoritative --json`, then the month is reloaded from the backend.
+The GUI does not read or edit leave JSON files directly. Reads and writes go through the selected `use-or-lose` executable. Day edits call `use-or-lose set-day --authoritative --json`, then the month is reloaded from the backend.
 
-Calendar uses the stored start and end dates to find the ledger for a day. When Today or a selected future action needs a missing ledger, Calendar offers setup and resumes the original action after confirmed creation. The setup suggests the adjacent predecessor when carryover is available. Browsing a month performs a read. CLI callers create years explicitly with `fedleave init` or `fedleave rollover`. The desktop **Import Use or Lose Data** dialog previews Merge or Replace and explains blocking conflicts before offering a separate Replace review.
+Calendar uses the stored start and end dates to find the ledger for a day. When Today or a selected future action needs a missing ledger, Calendar offers setup and resumes the original action after confirmed creation. The setup suggests the adjacent predecessor when carryover is available. Browsing a month performs a read. CLI callers create years explicitly with `use-or-lose init` or `use-or-lose rollover`. The desktop **Import Use or Lose Data** dialog previews Merge or Replace and explains blocking conflicts before offering a separate Replace review.
 
-In packaged builds, the GUI looks for `fedleave` in the sibling `fedleave` application directory inside the same platform tree, or in any explicit backend path you configure.
-On Windows, select the installed `fedleave.exe` as a custom backend. Batch (`.bat`/`.cmd`) backends are rejected because Windows can interpret their arguments through a shell. Linux executable scripts remain supported.
+In packaged builds, the GUI looks for `use-or-lose` in the sibling `use-or-lose` application directory inside the same platform tree, or in any explicit backend path you configure.
+On Windows, select the installed `use-or-lose.exe` as a custom backend. Batch (`.bat`/`.cmd`) backends are rejected because Windows can interpret their arguments through a shell. Linux executable scripts remain supported.
 
 Screenshots:
 
-![Use or Lose Calendar main window](examples/fedleave-calendar-main-screen.png)
+![Use or Lose Calendar main window](examples/useorlose-calendar-main-screen.png)
 
-![Use or Lose Calendar day editor](examples/fedleave-calendar-edit-leave.png)
+![Use or Lose Calendar day editor](examples/useorlose-calendar-edit-leave.png)
 
-![Use or Lose Calendar preferences](examples/fedleave-calendar-preferences.png)
+![Use or Lose Calendar preferences](examples/useorlose-calendar-preferences.png)
 
-![Use or Lose Calendar force balance dialog](examples/fedleave-calendar-force-balance.png)
+![Use or Lose Calendar force balance dialog](examples/useorlose-calendar-force-balance.png)
 
-![Use or Lose Calendar expiring leave dialog](examples/fedleave-calendar-expiring-leave.png)
+![Use or Lose Calendar expiring leave dialog](examples/useorlose-calendar-expiring-leave.png)
 
-![Use or Lose Calendar transactions dialog](examples/fedleave-calendar-transactions.png)
+![Use or Lose Calendar transactions dialog](examples/useorlose-calendar-transactions.png)
 
 Current GUI features:
 
@@ -567,7 +567,7 @@ Current GUI features:
 - Leave chart windows include Save PNG, Save PDF, and Print actions
 - Preferences for backend path, optional data directory, display toggles, font size, PDF folder, and automatic update checks
 - Help and About dialogs
-- Print preview, printer output, and PDF export now use the same landscape month-report graphic layout as `fedleaveMonthReportGraphic`
+- Print preview, printer output, and PDF export now use the same landscape month-report graphic layout as `UseOrLoseMonthReportGraphic`
 - Zero values suppressed in day cells, tables, and reports
 
 Run from source:
@@ -591,19 +591,19 @@ Build-only mode (useful for CI or local packaging validation):
 
 ```bash
 ./scripts/LinuxInstall.sh --unattended --build-only --verbose
-./dist/fedleave-Ubuntu/UseOrLoseCalendar
+./dist/use-or-lose-Ubuntu/UseOrLoseCalendar
 ```
 
 ```bat
 scripts\WindowsInstall.bat --unattended --build-only --verbose
-dist\fedleave-Windows\UseOrLoseCalendar.exe
+dist\use-or-lose-Windows\UseOrLoseCalendar.exe
 ```
 
 The consolidated scripts build one suite per platform under `dist/`. All 17
 application executables are at the suite root and use one shared `_internal`
 runtime directory. Python, Qt, Pillow, and the other packaged dependencies are
 therefore stored once instead of being duplicated in every companion app. The
-GUI uses the sibling `fedleave` executable as its backend.
+GUI uses the sibling `use-or-lose` executable as its backend.
 Use `--offline` with the Linux build-only command when all dependencies are
 already installed in the build virtual environment.
 
@@ -641,9 +641,9 @@ Build and package Linux:
 
 ```bash
 ./scripts/LinuxInstall.sh --unattended --build-only --verbose
-python installer/package.py validate-bundle --platform linux --bundle-dir dist/fedleave-Ubuntu
+python installer/package.py validate-bundle --platform linux --bundle-dir dist/use-or-lose-Ubuntu
 python installer/package.py linux-archive \
-  --bundle-dir dist/fedleave-Ubuntu \
+  --bundle-dir dist/use-or-lose-Ubuntu \
   --output-dir artifacts \
   --version "$(python installer/package.py version)"
 shellcheck installer/linux/install.sh
@@ -653,7 +653,7 @@ Build Windows applications from `cmd.exe`:
 
 ```bat
 scripts\WindowsInstall.bat --unattended --build-only --verbose
-python installer\package.py validate-bundle --platform windows --bundle-dir dist\fedleave-Windows
+python installer\package.py validate-bundle --platform windows --bundle-dir dist\use-or-lose-Windows
 ```
 
 After installing NSIS, compile the Windows installer from `cmd.exe`:
@@ -662,7 +662,7 @@ After installing NSIS, compile the Windows installer from `cmd.exe`:
 for /f %V in ('python installer\package.py version') do set VERSION=%V
 for /f %V in ('python installer\package.py numeric-version') do set NUMERIC_VERSION=%V
 mkdir artifacts
-makensis /DVERSION=%VERSION% /DNUMERIC_VERSION=%NUMERIC_VERSION% /DSOURCE_DIR=%CD%\dist\fedleave-Windows /DOUTPUT_DIR=%CD%\artifacts installer\windows\Use or Lose.nsi
+makensis /DVERSION=%VERSION% /DNUMERIC_VERSION=%NUMERIC_VERSION% /DSOURCE_DIR=%CD%\dist\use-or-lose-Windows /DOUTPUT_DIR=%CD%\artifacts installer\windows\Use or Lose.nsi
 python installer\package.py checksum artifacts\UseOrLose-Setup-%VERSION%-Windows-x64.exe
 ```
 
@@ -682,11 +682,11 @@ requested, and installer binaries never enter the repository — only the tiny
 
 ## CLI Detailed Help
 
-This section provides complete usage examples and command syntax for the `fedleave` CLI.
+This section provides complete usage examples and command syntax for the `use-or-lose` CLI.
 
 Usage:
 
-	fedleave COMMAND [OPTIONS]
+	use-or-lose COMMAND [OPTIONS]
 
 Commands and common options:
 
@@ -694,7 +694,7 @@ Commands and common options:
 		Create a new leave year using independent manual balances or explicit prior-year carryover.
 
 		Syntax:
-			fedleave init --year YEAR --leave-year-start YYYY-MM-DD|today [--annual-accrual FLOAT] [--annual-start FLOAT] [--sick-start FLOAT] [--comp-start FLOAT] [--credit-start FLOAT] [--travel-comp-start FLOAT] [--holiday-source python_holidays|opm_ics] [--holiday-ics-url URL] [--data-dir PATH]
+			use-or-lose init --year YEAR --leave-year-start YYYY-MM-DD|today [--annual-accrual FLOAT] [--annual-start FLOAT] [--sick-start FLOAT] [--comp-start FLOAT] [--credit-start FLOAT] [--travel-comp-start FLOAT] [--holiday-source python_holidays|opm_ics] [--holiday-ics-url URL] [--data-dir PATH]
 
 		Defaults:
 			--annual-accrual 6.0
@@ -708,27 +708,27 @@ Commands and common options:
 			--restored-annual-start 0.0
 			--holiday-source python_holidays
 			--holiday-ics-url https://www.opm.gov/policy-data-oversight/pay-leave/federal-holidays/holidays.ics
-			--data-dir ~/.local/share/fedleave
+			--data-dir ~/.local/share/use-or-lose
 
 		Notes:
 			- If `config.json`, a leave-year file, or the holiday cache already exists, `init` preserves the existing file and creates any missing ones.
 
 		Example:
-			fedleave init --year 2026 --leave-year-start 2026-01-11 --annual-accrual 6 --annual-start 120 --sick-start 180 --data-dir ~/.local/share/fedleave
+			use-or-lose init --year 2026 --leave-year-start 2026-01-11 --annual-accrual 6 --annual-start 120 --sick-start 180 --data-dir ~/.local/share/use-or-lose
 
 		Optional OPM ICS holiday import:
-			fedleave init --year 2026 --leave-year-start 2026-01-11 --annual-accrual 6 --annual-start 120 --sick-start 180 --holiday-source opm_ics --holiday-ics-url https://www.opm.gov/policy-data-oversight/pay-leave/federal-holidays/holidays.ics --data-dir ~/.local/share/fedleave
+			use-or-lose init --year 2026 --leave-year-start 2026-01-11 --annual-accrual 6 --annual-start 120 --sick-start 180 --holiday-source opm_ics --holiday-ics-url https://www.opm.gov/policy-data-oversight/pay-leave/federal-holidays/holidays.ics --data-dir ~/.local/share/use-or-lose
 
 	add
 		Add a transaction to a leave year ledger.
 
 		Syntax:
-			fedleave add [--year YEAR] --date YYYY-MM-DD|today --category CATEGORY (--earned HOURS | --used HOURS | --worked HOURS | --adjusted HOURS) [--description TEXT] [--status STATUS] [--source SOURCE] [--authoritative] [--json] [--show-transaction-ids] [--data-dir PATH]
+			use-or-lose add [--year YEAR] --date YYYY-MM-DD|today --category CATEGORY (--earned HOURS | --used HOURS | --worked HOURS | --adjusted HOURS) [--description TEXT] [--status STATUS] [--source SOURCE] [--authoritative] [--json] [--show-transaction-ids] [--data-dir PATH]
 
 		Defaults:
 			--status planned
 			--source manual
-			--data-dir ~/.local/share/fedleave
+			--data-dir ~/.local/share/use-or-lose
 
 		Notes:
 			- `--year` is optional; if omitted, the leave year is inferred from the transaction date using each leave-year file's `leave_year_start` and `leave_year_end`.
@@ -740,15 +740,15 @@ Commands and common options:
 			- Valid categories include: annual, sick, overtime, comp, credit, travel_comp, admin, lwop, military, court, religious_comp, time_off_award, excused, holiday, flex, other, restored_annual, ppl, fmla.
 
 		Examples:
-			fedleave add --date 2026-03-10 --category annual --used 4 --description "Medical appointment"
-			fedleave add --date 2026-03-12 --category overtime --worked 3
-			fedleave add --year 2026 --date 2026-03-10 --category annual --used 3 --status reconciled --authoritative --description "Actual leave used"
+			use-or-lose add --date 2026-03-10 --category annual --used 4 --description "Medical appointment"
+			use-or-lose add --date 2026-03-12 --category overtime --worked 3
+			use-or-lose add --year 2026 --date 2026-03-10 --category annual --used 3 --status reconciled --authoritative --description "Actual leave used"
 
 	accrual-change
 		Change automatic annual or sick leave accrual hours per pay period from an effective date forward.
 
 		Syntax:
-			fedleave accrual-change [--year YEAR] --as-of YYYY-MM-DD|today --category annual|sick --hours HOURS [--reason TEXT] [--json] [--data-dir PATH]
+			use-or-lose accrual-change [--year YEAR] --as-of YYYY-MM-DD|today --category annual|sick --hours HOURS [--reason TEXT] [--json] [--data-dir PATH]
 
 		Notes:
 			- `--year` is optional; if omitted, the leave year is inferred from `--as-of`.
@@ -758,19 +758,19 @@ Commands and common options:
 			- Use this when an employee moves from one accrual tier to another mid-year, such as annual leave changing from 4 to 6 hours per pay period.
 
 		Example:
-			fedleave accrual-change --year 2026 --as-of 2026-07-12 --category annual --hours 6 --reason "15-year service accrual"
+			use-or-lose accrual-change --year 2026 --as-of 2026-07-12 --category annual --hours 6 --reason "15-year service accrual"
 
 	force-balance
 		Force one category to an exact balance as of a date by recording an auditable adjustment.
 
 		Syntax:
-			fedleave force-balance --date YYYY-MM-DD|today --category CATEGORY --hours HOURS --comment TEXT [--json] [--data-dir PATH]
+			use-or-lose force-balance --date YYYY-MM-DD|today --category CATEGORY --hours HOURS --comment TEXT [--json] [--data-dir PATH]
 
 	expirations
 		Show individually tracked expiring-leave lots and reminder totals.
 
 		Syntax:
-			fedleave expirations [--year YEAR] [--within-pay-periods N] [--category comp|travel_comp|restored_annual|time_off_award|ppl] [--as-of YYYY-MM-DD] [--json] [--data-dir PATH]
+			use-or-lose expirations [--year YEAR] [--within-pay-periods N] [--category comp|travel_comp|restored_annual|time_off_award|ppl] [--as-of YYYY-MM-DD] [--json] [--data-dir PATH]
 
 		Notes:
 			- Uses consume the lot with the earliest expiration first and retain `earned_transaction_id` links.
@@ -782,19 +782,19 @@ Commands and common options:
 		Extend an eligible earned lot and record the reason.
 
 		Syntax:
-			fedleave expiration-extend --id TRANSACTION_ID --new-date YYYY-MM-DD --reason TEXT [--json] [--data-dir PATH]
+			use-or-lose expiration-extend --id TRANSACTION_ID --new-date YYYY-MM-DD --reason TEXT [--json] [--data-dir PATH]
 
 	check-for-updates
 		Check the last successfully published installer build and report whether it differs from the installed build.
 
 		Syntax:
-			fedleave check-for-updates [--json]
+			use-or-lose check-for-updates [--json]
 
 	reconcile
 		Add or update a transaction from a payroll, clocking, or recurring reconciliation source.
 
 		Syntax:
-			fedleave reconcile --date YYYY-MM-DD|today --category CATEGORY --direction DIRECTION --hours HOURS --reason TEXT [--status STATUS] [--source SOURCE] [--id TRANSACTION_ID] [--json] [--data-dir PATH]
+			use-or-lose reconcile --date YYYY-MM-DD|today --category CATEGORY --direction DIRECTION --hours HOURS --reason TEXT [--status STATUS] [--source SOURCE] [--id TRANSACTION_ID] [--json] [--data-dir PATH]
 
 		Defaults:
 			--status reconciled
@@ -808,13 +808,13 @@ Commands and common options:
 			- `--json` emits a machine-readable result for automation.
 
 		Example:
-			fedleave reconcile --date 2026-03-10 --category credit --direction earned --hours 1.5 --status reconciled --source clocking-report --reason "March clocking report"
+			use-or-lose reconcile --date 2026-03-10 --category credit --direction earned --hours 1.5 --status reconciled --source clocking-report --reason "March clocking report"
 
 	starting-balance
 		Set a leave year's starting balance for one category.
 
 		Syntax:
-			fedleave starting-balance set --year YEAR --category CATEGORY --hours HOURS --reason TEXT [--data-dir PATH]
+			use-or-lose starting-balance set --year YEAR --category CATEGORY --hours HOURS --reason TEXT [--data-dir PATH]
 
 		Notes:
 			- The command updates `starting_balances[CATEGORY]` in the leave-year JSON.
@@ -823,19 +823,19 @@ Commands and common options:
 			- Existing JSON backups are created before the leave-year file is rewritten.
 
 		Example:
-			fedleave starting-balance set --year 2026 --category annual --hours 193.6 --reason "Corrected imported starting balance"
+			use-or-lose starting-balance set --year 2026 --category annual --hours 193.6 --reason "Corrected imported starting balance"
 
 	export-data
 		Export config, leave year files, and holiday cache to a portable JSON archive.
 
 		Syntax:
-			fedleave export-data --output PATH [--data-dir PATH]
+			use-or-lose export-data --output PATH [--data-dir PATH]
 
 	import-data
 		Import an archive created by `export-data` or a single leave-year backup JSON file.
 
 		Syntax:
-			fedleave import-data --input PATH [--merge | --overwrite] [--data-dir PATH]
+			use-or-lose import-data --input PATH [--merge | --overwrite] [--data-dir PATH]
 
 		Notes:
 			- Existing files are preserved by default.
@@ -847,10 +847,10 @@ Commands and common options:
 		Import a FRC-E WMS HTTP Leave Report from HTML.
 
 		Syntax:
-			fedleave import-wms-http --input PATH [--data-dir PATH]
+			use-or-lose import-wms-http --input PATH [--data-dir PATH]
 
 		Notes:
-			- The importer reads the WMS clocking HTML report directly and maps each supported WMS leave code through a single rule table in `fedleave/wms_import.py`.
+			- The importer reads the WMS clocking HTML report directly and maps each supported WMS leave code through a single rule table in `useorlose/wms_import.py`.
 			- Matching transactions in the target leave year are replaced authoritatively; automatic accrual transactions and unrelated transaction categories are left alone.
 			- If the report belongs to a leave year that does not yet exist, Use or Lose creates that leave year file before importing the transactions.
 			- Unsupported leave codes raise an error so new WMS leave types can be added explicitly rather than silently misfiled.
@@ -860,7 +860,7 @@ Commands and common options:
 		List active transactions for a leave year.
 
 		Syntax:
-			fedleave list --year YEAR [--json] [--show-transaction-ids] [--data-dir PATH]
+			use-or-lose list --year YEAR [--json] [--show-transaction-ids] [--data-dir PATH]
 
 		Notes:
 			- Transaction IDs are hidden by default in human-readable output. Use `--show-transaction-ids` or `--ShowTransactionIDs` when you need them for correction or deletion.
@@ -870,7 +870,7 @@ Commands and common options:
 		List backend-recognized leave years and visible leave categories.
 
 		Syntax:
-			fedleave years [--json] [--data-dir PATH]
+			use-or-lose years [--json] [--data-dir PATH]
 
 		Notes:
 			- The GUI uses this command instead of inspecting leave-year files directly.
@@ -880,7 +880,7 @@ Commands and common options:
 		Authoritatively set signed leave values for one day.
 
 		Syntax:
-			fedleave set-day --date YYYY-MM-DD|today --authoritative [--json] [--data-dir PATH] [--annual HOURS] [--sick HOURS] [--credit HOURS] [--comp HOURS] [--travel-comp HOURS] [--overtime HOURS] [--admin HOURS] [--lwop HOURS] [--military HOURS] [--court HOURS] [--religious-comp HOURS] [--time-off-award HOURS] [--excused HOURS] [--holiday HOURS] [--flex HOURS] [--other HOURS] [--restored-annual HOURS]
+			use-or-lose set-day --date YYYY-MM-DD|today --authoritative [--json] [--data-dir PATH] [--annual HOURS] [--sick HOURS] [--credit HOURS] [--comp HOURS] [--travel-comp HOURS] [--overtime HOURS] [--admin HOURS] [--lwop HOURS] [--military HOURS] [--court HOURS] [--religious-comp HOURS] [--time-off-award HOURS] [--excused HOURS] [--holiday HOURS] [--flex HOURS] [--other HOURS] [--restored-annual HOURS]
 
 		Notes:
 			- This command is intended for GUI and automation use.
@@ -893,7 +893,7 @@ Commands and common options:
 	Show leave balances for a year, optionally as of a given date, projected to a future date, and/or with use-or-lose calculations.
 
 	Syntax:
-		fedleave balance [--year YEAR] [--as-of YYYY-MM-DD|today|leave-year-end] [--project] [--project-to YYYY-MM-DD|today|leave-year-end] [--use-or-lose] [--json] [--data-dir PATH]
+		use-or-lose balance [--year YEAR] [--as-of YYYY-MM-DD|today|leave-year-end] [--project] [--project-to YYYY-MM-DD|today|leave-year-end] [--use-or-lose] [--json] [--data-dir PATH]
 
 	Notes:
 		- `--year YEAR` is optional. If omitted, the leave year is inferred from `--as-of`; when `--as-of` is omitted or set to `leave-year-end`, it is inferred from today.
@@ -910,7 +910,7 @@ Commands and common options:
     Compare one leave category across every leave year that has data.
 
     Syntax:
-      fedleave compare-leave-balances --category CATEGORY [--as-of YYYY-MM-DD|today] [--json] [--data-dir PATH]
+      use-or-lose compare-leave-balances --category CATEGORY [--as-of YYYY-MM-DD|today] [--json] [--data-dir PATH]
 
     Notes:
       - `--category` selects the leave type to compare across all years with data.
@@ -919,25 +919,25 @@ Commands and common options:
       - `--json` emits the year/value series and axis metadata used by the GUI comparison charts.
 
     Example:
-      fedleave compare-leave-balances --category annual --as-of 2026-07-14 --json
+      use-or-lose compare-leave-balances --category annual --as-of 2026-07-14 --json
 
 	use-or-lose
 		Show year-end annual carryover and use-or-lose for a leave year.
 
 		Syntax:
-			fedleave use-or-lose [--year YEAR] [--json] [--data-dir PATH]
+			use-or-lose use-or-lose [--year YEAR] [--json] [--data-dir PATH]
 
 		Notes:
 			- `--year YEAR` is optional. If omitted, the current leave year is inferred from today.
 			- The command always computes the leave year’s final day projection.
-			- `--json` emits the same projected balance payload used by `fedleave balance --use-or-lose`.
-			- `fedleave use-or-loose` is accepted as a compatibility alias.
+			- `--json` emits the same projected balance payload used by `use-or-lose balance --use-or-lose`.
+			- `use-or-lose use-or-loose` is accepted as a compatibility alias.
 
 	pay-period
 		Show earned, used, net leave, overtime worked, optional daily activity, and ending balances for the pay period containing a date.
 
 		Syntax:
-			fedleave pay-period --year YEAR --date YYYY-MM-DD|today [--daily] [--json] [--data-dir PATH]
+			use-or-lose pay-period --year YEAR --date YYYY-MM-DD|today [--daily] [--json] [--data-dir PATH]
 
 		Notes:
 			- Current leave-year files already contain automatic annual and sick accrual rows. Older files are resolved in memory for the containing pay period before totals are calculated.
@@ -949,7 +949,7 @@ Commands and common options:
 		Show earned, used, worked totals, and ending balances for every pay period in the leave year.
 
 		Syntax:
-			fedleave pay-periods --year YEAR [--json] [--data-dir PATH]
+			use-or-lose pay-periods --year YEAR [--json] [--data-dir PATH]
 
 		Notes:
 			- Current leave-year files already contain automatic annual and sick accrual rows. Older files are resolved in memory through the final pay period accrual date before totals are calculated.
@@ -959,7 +959,7 @@ Commands and common options:
 		Show calendar days, leave entries, holidays, display lines, and pay-period totals for one month.
 
 		Syntax:
-			fedleave month --year YEAR --month MONTH [--json] [--data-dir PATH]
+			use-or-lose month --year YEAR --month MONTH [--json] [--data-dir PATH]
 
 		Notes:
 			- `--month` is a number from 1 to 12.
@@ -971,7 +971,7 @@ activity
 	Show earned, used, and net leave activity for one day.
 
 	Syntax:
-		fedleave activity --year YEAR --date YYYY-MM-DD|today [--json] [--data-dir PATH]
+		use-or-lose activity --year YEAR --date YYYY-MM-DD|today [--json] [--data-dir PATH]
 
 	Notes:
 		- `--json` emits earned, used, and net activity mappings for the date.
@@ -993,7 +993,7 @@ For the full project specification and rules, see the project documentation or t
 
 ## Companion Applications
 
-`fedleave` is the main application. Every application in this section is a
+`use-or-lose` is the main application. Every application in this section is a
 companion built on its CLI contract; none maintains a separate leave database.
 These programs began as examples of how scripts and GUIs could consume the
 backend, then proved useful enough to ship with the project.
@@ -1040,32 +1040,32 @@ diagnostics in the user interface.
 Summary provides the headline leave-use, overtime, comp-time, credit-hour, and
 data-quality measures for the selected leave year:
 
-![Use or Lose Analytics summary](examples/fedleave-analytics-main.png)
+![Use or Lose Analytics summary](examples/useorlose-analytics-main.png)
 
 Seasonality compares leave use and work patterns by month, weekday, and pay
 period, with a chart and the exact values shown together:
 
-![Use or Lose Analytics seasonality](examples/fedleave-analytics-seasonality.png)
+![Use or Lose Analytics seasonality](examples/useorlose-analytics-seasonality.png)
 
 Calendar Heatmap shows when leave was used or time was earned. Its selector only
 offers leave types and directions that have non-zero data. Choose **Year at a
 Glance** for the continuous week-column heatmap, or **Monthly Calendars** to see
 the whole leave year as separate month-by-month calendar grids:
 
-![Use or Lose Analytics calendar heatmap](examples/fedleave-analytics-calendar-heatmap.png)
+![Use or Lose Analytics calendar heatmap](examples/useorlose-analytics-calendar-heatmap.png)
 
 Overtime, Comp, and Credit explains earned, used, paid-out, forfeited, expired,
 and outstanding hours, including monthly charts and supporting tables:
 
-![Use or Lose Analytics overtime, comp, and credit analysis](examples/fedleave-analytics-overtime-comp-credit.png)
+![Use or Lose Analytics overtime, comp, and credit analysis](examples/useorlose-analytics-overtime-comp-credit.png)
 
 Double-click a table row to inspect the transactions supporting that result:
 
-![Use or Lose Analytics supporting-transactions dialog](examples/fedleave-analytics-supporting-transactions.png)
+![Use or Lose Analytics supporting-transactions dialog](examples/useorlose-analytics-supporting-transactions.png)
 
 ```bash
-UseOrLoseAnalytics --backend /path/to/fedleave --year 2026 \
-    --data-dir /path/to/fedleave-data --pdf-folder /path/to/reports
+UseOrLoseAnalytics --backend /path/to/use-or-lose --year 2026 \
+    --data-dir /path/to/use-or-lose-data --pdf-folder /path/to/reports
 ```
 
 #### Cumulative Usage
@@ -1214,7 +1214,7 @@ controls and data; the new Leave Type selector applies only to Seasonality.
 
 ### Companion Application: AnnualLeaveChartForTheYear
 
-A companion application that generates a PNG chart of annual leave balances throughout the leave year. It polls data from the `fedleave` application and renders a visual representation with:
+A companion application that generates a PNG chart of annual leave balances throughout the leave year. It polls data from the `use-or-lose` application and renders a visual representation with:
 
 - Annual leave balance line chart
 - Pay period markers on the X-axis
@@ -1238,21 +1238,21 @@ AnnualLeaveChartForTheYear --year 2026 --outputFile chart.png --resolution 3220
 - `--year YYYY`: Leave year (required if no current leave year can be inferred)
 - `--outputFile PATH`: Output PNG file path (required; must end with `.png`)
 - `--resolution PIXELS`: Image width in pixels; height is scaled maintaining aspect ratio (default: 1610). Common values: 1610 (standard), 3220 (double resolution), 805 (half resolution)
-- `--data-dir PATH`: Optional fedleave data directory override. If omitted, the chart app uses the same default data directory as `fedleave`: `~/.local/share/fedleave` on Linux/macOS, or `%LOCALAPPDATA%\fedleave` on Windows.
+- `--data-dir PATH`: Optional use-or-lose data directory override. If omitted, the chart app uses the same default data directory as `use-or-lose`: `~/.local/share/use-or-lose` on Linux/macOS, or `%LOCALAPPDATA%\UseOrLose` on Windows.
 
 ### Requirements
 
-The `AnnualLeaveChartForTheYear` application requires `fedleave` to be in one of the following locations:
+The `AnnualLeaveChartForTheYear` application requires `use-or-lose` to be in one of the following locations:
 
 1. Same directory as the executable
 2. In the system PATH
 3. Beside the companion executable in the shared distribution suite
 
-If `fedleave` cannot be found, the application exits with a helpful error explaining that the current Use or Lose suite and its companion applications must remain together.
+If `use-or-lose` cannot be found, the application exits with a helpful error explaining that the current Use or Lose suite and its companion applications must remain together.
 
 ### Companion Application: SickLeaveChartForTheYear
 
-A companion application that generates a PNG chart of sick leave balances throughout the leave year. Like AnnualLeaveChartForTheYear, it polls data from the `fedleave` application and renders a visual representation with:
+A companion application that generates a PNG chart of sick leave balances throughout the leave year. Like AnnualLeaveChartForTheYear, it polls data from the `use-or-lose` application and renders a visual representation with:
 
 - Sick leave balance line chart
 - Pay period markers on the X-axis
@@ -1275,17 +1275,17 @@ SickLeaveChartForTheYear --year 2026 --outputFile sick_chart.png --resolution 32
 - `--year YYYY`: Leave year (required if no current leave year can be inferred)
 - `--outputFile PATH`: Output PNG file path (required; must end with `.png`)
 - `--resolution PIXELS`: Image width in pixels; height is scaled maintaining aspect ratio (default: 1610). Common values: 1610 (standard), 3220 (double resolution), 805 (half resolution)
-- `--data-dir PATH`: Optional fedleave data directory override. If omitted, the chart app uses the same default data directory as `fedleave`: `~/.local/share/fedleave` on Linux/macOS, or `%LOCALAPPDATA%\fedleave` on Windows.
+- `--data-dir PATH`: Optional use-or-lose data directory override. If omitted, the chart app uses the same default data directory as `use-or-lose`: `~/.local/share/use-or-lose` on Linux/macOS, or `%LOCALAPPDATA%\UseOrLose` on Windows.
 
 ### Requirements
 
-The `SickLeaveChartForTheYear` application requires `fedleave` to be in one of the following locations:
+The `SickLeaveChartForTheYear` application requires `use-or-lose` to be in one of the following locations:
 
 1. Same directory as the executable
 2. In the system PATH
 3. Beside the companion executable in the shared distribution suite
 
-If `fedleave` cannot be found, the application exits with a helpful error explaining that the current Use or Lose suite and its companion applications must remain together.
+If `use-or-lose` cannot be found, the application exits with a helpful error explaining that the current Use or Lose suite and its companion applications must remain together.
 
 ### Companion Application: CreditHoursChartForTheYear
 
@@ -1307,17 +1307,17 @@ CreditHoursChartForTheYear --year 2026 --outputFile credit_hours_chart.png --res
 - `--year YYYY`: Leave year (required if no current leave year can be inferred)
 - `--outputFile PATH`: Output PNG file path (required; must end with `.png`)
 - `--resolution PIXELS`: Image width in pixels; height is scaled maintaining aspect ratio (default: 1610). Common values: 1610 (standard), 3220 (double resolution), 805 (half resolution)
-- `--data-dir PATH`: Optional fedleave data directory override. If omitted, the chart app uses the same default data directory as `fedleave`: `~/.local/share/fedleave` on Linux/macOS, or `%LOCALAPPDATA%\fedleave` on Windows.
+- `--data-dir PATH`: Optional use-or-lose data directory override. If omitted, the chart app uses the same default data directory as `use-or-lose`: `~/.local/share/use-or-lose` on Linux/macOS, or `%LOCALAPPDATA%\UseOrLose` on Windows.
 
 ### Requirements
 
-The `CreditHoursChartForTheYear` application requires `fedleave` to be in one of the following locations:
+The `CreditHoursChartForTheYear` application requires `use-or-lose` to be in one of the following locations:
 
 1. Same directory as the executable
 2. In the system PATH
 3. Beside the companion executable in the shared distribution suite
 
-If `fedleave` cannot be found, the application exits with a helpful error explaining that the current Use or Lose suite and its companion applications must remain together.
+If `use-or-lose` cannot be found, the application exits with a helpful error explaining that the current Use or Lose suite and its companion applications must remain together.
 
 ### Companion Application: CompTimeChartForTheYear
 
@@ -1339,17 +1339,17 @@ CompTimeChartForTheYear --year 2026 --outputFile comp_time_chart.png --resolutio
 - `--year YYYY`: Leave year (required if no current leave year can be inferred)
 - `--outputFile PATH`: Output PNG file path (required; must end with `.png`)
 - `--resolution PIXELS`: Image width in pixels; height is scaled maintaining aspect ratio (default: 1610). Common values: 1610 (standard), 3220 (double resolution), 805 (half resolution)
-- `--data-dir PATH`: Optional fedleave data directory override. If omitted, the chart app uses the same default data directory as `fedleave`: `~/.local/share/fedleave` on Linux/macOS, or `%LOCALAPPDATA%\fedleave` on Windows.
+- `--data-dir PATH`: Optional use-or-lose data directory override. If omitted, the chart app uses the same default data directory as `use-or-lose`: `~/.local/share/use-or-lose` on Linux/macOS, or `%LOCALAPPDATA%\UseOrLose` on Windows.
 
 ### Requirements
 
-The `CompTimeChartForTheYear` application requires `fedleave` to be in one of the following locations:
+The `CompTimeChartForTheYear` application requires `use-or-lose` to be in one of the following locations:
 
 1. Same directory as the executable
 2. In the system PATH
 3. Beside the companion executable in the shared distribution suite
 
-If `fedleave` cannot be found, the application exits with a helpful error explaining that the current Use or Lose suite and its companion applications must remain together.
+If `use-or-lose` cannot be found, the application exits with a helpful error explaining that the current Use or Lose suite and its companion applications must remain together.
 
 ### Companion Application: TravelCompChartForTheYear
 
@@ -1371,17 +1371,17 @@ TravelCompChartForTheYear --year 2026 --outputFile travel_comp_chart.png --resol
 - `--year YYYY`: Leave year (required if no current leave year can be inferred)
 - `--outputFile PATH`: Output PNG file path (required; must end with `.png`)
 - `--resolution PIXELS`: Image width in pixels; height is scaled maintaining aspect ratio (default: 1610). Common values: 1610 (standard), 3220 (double resolution), 805 (half resolution)
-- `--data-dir PATH`: Optional fedleave data directory override. If omitted, the chart app uses the same default data directory as `fedleave`: `~/.local/share/fedleave` on Linux/macOS, or `%LOCALAPPDATA%\fedleave` on Windows.
+- `--data-dir PATH`: Optional use-or-lose data directory override. If omitted, the chart app uses the same default data directory as `use-or-lose`: `~/.local/share/use-or-lose` on Linux/macOS, or `%LOCALAPPDATA%\UseOrLose` on Windows.
 
 ### Requirements
 
-The `TravelCompChartForTheYear` application requires `fedleave` to be in one of the following locations:
+The `TravelCompChartForTheYear` application requires `use-or-lose` to be in one of the following locations:
 
 1. Same directory as the executable
 2. In the system PATH
 3. Beside the companion executable in the shared distribution suite
 
-If `fedleave` cannot be found, the application exits with a helpful error explaining that the current Use or Lose suite and its companion applications must remain together.
+If `use-or-lose` cannot be found, the application exits with a helpful error explaining that the current Use or Lose suite and its companion applications must remain together.
 
 ### Companion Application: TimeOffAwardChartForTheYear
 
@@ -1403,17 +1403,17 @@ TimeOffAwardChartForTheYear --year 2026 --outputFile time_off_award_chart.png --
 - `--year YYYY`: Leave year (required if no current leave year can be inferred)
 - `--outputFile PATH`: Output PNG file path (required; must end with `.png`)
 - `--resolution PIXELS`: Image width in pixels; height is scaled maintaining aspect ratio (default: 1610). Common values: 1610 (standard), 3220 (double resolution), 805 (half resolution)
-- `--data-dir PATH`: Optional fedleave data directory override. If omitted, the chart app uses the same default data directory as `fedleave`: `~/.local/share/fedleave` on Linux/macOS, or `%LOCALAPPDATA%\fedleave` on Windows.
+- `--data-dir PATH`: Optional use-or-lose data directory override. If omitted, the chart app uses the same default data directory as `use-or-lose`: `~/.local/share/use-or-lose` on Linux/macOS, or `%LOCALAPPDATA%\UseOrLose` on Windows.
 
 ### Requirements
 
-The `TimeOffAwardChartForTheYear` application requires `fedleave` to be in one of the following locations:
+The `TimeOffAwardChartForTheYear` application requires `use-or-lose` to be in one of the following locations:
 
 1. Same directory as the executable
 2. In the system PATH
 3. Beside the companion executable in the shared distribution suite
 
-If `fedleave` cannot be found, the application exits with a helpful error explaining that the current Use or Lose suite and its companion applications must remain together.
+If `use-or-lose` cannot be found, the application exits with a helpful error explaining that the current Use or Lose suite and its companion applications must remain together.
 
 ## Yearly Comparison Companion Applications
 
@@ -1424,7 +1424,7 @@ Shared options:
 - `--as-of YYYY-MM-DD|today`: Comparison date; defaults to today.
 - `--outputFile PATH`: Output PNG file path (required; must end with `.png`)
 - `--resolution PIXELS`: Image width in pixels; height is scaled maintaining aspect ratio (default: 1610). Common values: 1610 (standard), 3220 (double resolution), 805 (half resolution)
-- `--data-dir PATH`: Optional fedleave data directory override.
+- `--data-dir PATH`: Optional use-or-lose data directory override.
 
 The yearly comparison charts round their Y-axis up to the nearest 10 hours for most categories and to the nearest 50 hours for annual and sick leave.
 
@@ -1526,9 +1526,9 @@ Usage:
 OvertimeYearlyComparison --as-of 2026-07-14 --outputFile overtime_yearly_comparison.png
 ```
 
-### Companion Application: fedleaveMonthReportGraphic
+### Companion Application: UseOrLoseMonthReportGraphic
 
-A companion application that generates a landscape 16:9 graphical month report. It treats `fedleave` as the data source, calls the public CLI commands, and does not read leave-year data files directly. PNG is the primary output format and SVG is also supported.
+A companion application that generates a landscape 16:9 graphical month report. It treats `use-or-lose` as the data source, calls the public CLI commands, and does not read leave-year data files directly. PNG is the primary output format and SVG is also supported.
 
 The report includes:
 
@@ -1537,7 +1537,7 @@ The report includes:
 - As-of-today balance table with use-or-lose values
 - Leave category abbreviation table covering all supported leave types
 
-The report queries `fedleave use-or-lose` directly for the year-end projection used in the balance table. That keeps the use-or-lose value independent from the month payload’s projected balance field.
+The report queries `use-or-lose use-or-lose` directly for the year-end projection used in the balance table. That keeps the use-or-lose value independent from the month payload’s projected balance field.
 
 Transaction IDs, descriptions, sources, statuses, and data file paths are intentionally omitted from the report.
 
@@ -1548,9 +1548,9 @@ Sample output:
 ### Usage
 
 ```bash
-fedleaveMonthReportGraphic --year 2026 --month July --outputFile july-report.png
-fedleaveMonthReportGraphic --year 2026 --month 7 --outputFile july-report.svg
-fedleaveMonthReportGraphic --outputFile current-month.png --resolution 3840
+UseOrLoseMonthReportGraphic --year 2026 --month July --outputFile july-report.png
+UseOrLoseMonthReportGraphic --year 2026 --month 7 --outputFile july-report.svg
+UseOrLoseMonthReportGraphic --outputFile current-month.png --resolution 3840
 ```
 
 If both `--year` and `--month` are omitted, the current local year and month are used. If either one is provided, both are required.
@@ -1561,25 +1561,25 @@ If both `--year` and `--month` are omitted, the current local year and month are
 - `--year YYYY`: Calendar year to report
 - `--month MONTH`: Month number (`1` through `12`) or full English month name such as `July`
 - `--resolution PIXELS`: Output image width in pixels; height is 16:9 landscape (default: 1920, minimum: 800, maximum: 7680)
-- `--data-dir PATH`: Optional `fedleave` data directory override
-- `--fedleave PATH`: Explicit path to the `fedleave` executable
+- `--data-dir PATH`: Optional `use-or-lose` data directory override
+- `--use-or-lose PATH`: Explicit path to the `use-or-lose` executable
 - `--overwrite`: Replace an existing output file
 - `--verbose`: Print diagnostic information after rendering
 - `--quiet`: Suppress non-error output
 
 ### Requirements
 
-The `fedleaveMonthReportGraphic` application requires `fedleave` to be available in one of these locations:
+The `UseOrLoseMonthReportGraphic` application requires `use-or-lose` to be available in one of these locations:
 
 1. Same directory as the executable
 2. In the system PATH
 3. Beside the companion executable in the shared distribution suite
 
-If `fedleave` cannot be found, pass `--fedleave PATH` or install/build the main `fedleave` executable.
+If `use-or-lose` cannot be found, pass `--use-or-lose PATH` or install/build the main `use-or-lose` executable.
 
 ### Pay Days
 
-New leave-year files store a `pay_date` on each pay period. Existing leave-year files remain supported; when `pay_date` is missing, fedleave infers it as six days after the pay period end date, which matches the every-other-Friday pay date for the standard Sunday-through-Saturday biweekly pay periods generated from the OPM leave-year schedule. OPM notes that some agency payroll systems use different pay-period schedules, so manually edited or imported data may provide explicit `pay_date` values when needed.
+New leave-year files store a `pay_date` on each pay period. Existing leave-year files remain supported; when `pay_date` is missing, use-or-lose infers it as six days after the pay period end date, which matches the every-other-Friday pay date for the standard Sunday-through-Saturday biweekly pay periods generated from the OPM leave-year schedule. OPM notes that some agency payroll systems use different pay-period schedules, so manually edited or imported data may provide explicit `pay_date` values when needed.
 
 ## JSON Output Reference
 
@@ -1725,7 +1725,7 @@ The pay period object comes from the leave-year file's `pay_periods` list.
 Command:
 
 ```bash
-fedleave add --year 2026 --date 2026-03-10 --category annual --used 4 --description "Medical appointment" --json
+use-or-lose add --year 2026 --date 2026-03-10 --category annual --used 4 --description "Medical appointment" --json
 ```
 
 Success output:
@@ -1769,7 +1769,7 @@ Fields:
 Command:
 
 ```bash
-fedleave reconcile --date 2026-03-10 --category credit --direction earned --hours 1.5 --reason "March clocking report" --json
+use-or-lose reconcile --date 2026-03-10 --category credit --direction earned --hours 1.5 --reason "March clocking report" --json
 ```
 
 Success output when a transaction is added:
@@ -1841,7 +1841,7 @@ When `action` is `updated`, the existing transaction is updated in place. Prior 
 Command:
 
 ```bash
-fedleave correct --id 20260310-001 --hours 3 --reason "Only used 3 hours" --json
+use-or-lose correct --id 20260310-001 --hours 3 --reason "Only used 3 hours" --json
 ```
 
 Success output:
@@ -1874,7 +1874,7 @@ Success output:
 Preview command:
 
 ```bash
-fedleave correct --id 20260310-001 --hours 3 --reason "Only used 3 hours" --preview --json
+use-or-lose correct --id 20260310-001 --hours 3 --reason "Only used 3 hours" --preview --json
 ```
 
 Preview output:
@@ -1909,7 +1909,7 @@ Fields:
 Command:
 
 ```bash
-fedleave void --id 20260310-002 --reason "Entered in error" --json
+use-or-lose void --id 20260310-002 --reason "Entered in error" --json
 ```
 
 Success output:
@@ -1923,7 +1923,7 @@ Success output:
     "20260310-002"
   ],
   "reason": "Entered in error",
-  "file": "/home/user/.local/share/fedleave/leave_years/2026.json"
+  "file": "/home/user/.local/share/use-or-lose/leave_years/2026.json"
 }
 ```
 
@@ -1941,7 +1941,7 @@ Fields:
 Command:
 
 ```bash
-fedleave balance --year 2026 --as-of 2026-03-10 --json
+use-or-lose balance --year 2026 --as-of 2026-03-10 --json
 ```
 
 Success output:
@@ -1968,8 +1968,8 @@ Success output:
 Use-or-lose command:
 
 ```bash
-fedleave balance --year 2026 --use-or-lose --json
-fedleave use-or-lose --year 2026 --json
+use-or-lose balance --year 2026 --use-or-lose --json
+use-or-lose use-or-lose --year 2026 --json
 ```
 
 Both commands return the same payload schema. The dedicated `use-or-lose` command always projects to the leave year end and is the path used by the month report graphic and GUI.
@@ -1979,7 +1979,7 @@ Both commands return the same payload schema. The dedicated `use-or-lose` comman
 Command:
 
 ```bash
-fedleave use-or-lose --year 2026 --json
+use-or-lose use-or-lose --year 2026 --json
 ```
 
 Success output:
@@ -2020,7 +2020,7 @@ Fields:
 Command:
 
 ```bash
-fedleave pay-period --year 2026 --date 2026-01-20 --daily --json
+use-or-lose pay-period --year 2026 --date 2026-01-20 --daily --json
 ```
 
 Success output:
@@ -2086,7 +2086,7 @@ Fields:
 Command:
 
 ```bash
-fedleave pay-periods --year 2026 --json
+use-or-lose pay-periods --year 2026 --json
 ```
 
 Success output:
@@ -2148,7 +2148,7 @@ Fields:
 Command:
 
 ```bash
-fedleave month --year 2026 --month 7 --json
+use-or-lose month --year 2026 --month 7 --json
 ```
 
 Selected output:
@@ -2227,14 +2227,14 @@ Fields:
 - `automatic_accruals_posted`: Number of automatic annual/sick accrual transactions computed in memory before producing the month.
 - `automatic_accruals_posted_through`: Calendar display end date used for automatic accrual posting.
 
-The `fedleaveMonthReportGraphic` companion application consumes this payload directly. For compatibility with older `fedleave` executables, it can still calculate balances with separate `balance --json` calls when the enriched balance fields are missing.
+The `UseOrLoseMonthReportGraphic` companion application consumes this payload directly. For compatibility with older `use-or-lose` executables, it can still calculate balances with separate `balance --json` calls when the enriched balance fields are missing.
 
 ### `activity --json`
 
 Command:
 
 ```bash
-fedleave activity --year 2026 --date 2026-03-10 --json
+use-or-lose activity --year 2026 --date 2026-03-10 --json
 ```
 
 Success output when activity exists:
@@ -2285,7 +2285,7 @@ Fields:
 Command:
 
 ```bash
-fedleave validate --json
+use-or-lose validate --json
 ```
 
 Success output with no issues:
@@ -2354,7 +2354,7 @@ Exit behavior:
 
 ### `rollover --json`
 
-`fedleave rollover --from-year 2026 --to-year 2027 --preview --json` returns the
+`use-or-lose rollover --from-year 2026 --to-year 2027 --preview --json` returns the
 same accounting preview as `init --from-year 2026 --year 2027 --preview --json`.
 See [Creating a New Leave Year](#creating-a-new-leave-year) for preview fields,
 category policies, dates, fingerprints, create-only apply and reconciliation.
@@ -2371,7 +2371,7 @@ import subprocess
 
 result = subprocess.run(
     [
-        "fedleave",
+        "use-or-lose",
         "balance",
         "--year",
         "2026",
@@ -2392,7 +2392,7 @@ posted = payload["automatic_accruals_posted"]
 Shell example:
 
 ```bash
-fedleave balance --year 2026 --as-of 2026-03-10 --json | jq '.balances.annual'
+use-or-lose balance --year 2026 --as-of 2026-03-10 --json | jq '.balances.annual'
 ```
 
 Error-handling example:
@@ -2402,7 +2402,7 @@ import json
 import subprocess
 
 result = subprocess.run(
-    ["fedleave", "validate", "--json"],
+    ["use-or-lose", "validate", "--json"],
     capture_output=True,
     text=True,
 )
@@ -2426,66 +2426,66 @@ else:
 
 Correction (in place):
 
-	fedleave correct --id TRANSACTION_ID --hours HOURS --reason "TEXT" [--json] [--show-transaction-ids] --data-dir /path/to/data
+	use-or-lose correct --id TRANSACTION_ID --hours HOURS --reason "TEXT" [--json] [--show-transaction-ids] --data-dir /path/to/data
 
 	Example:
-		fedleave correct --id 20260310-001 --hours 3 --reason "Only used 3 hours"
+		use-or-lose correct --id 20260310-001 --hours 3 --reason "Only used 3 hours"
 
 Alternatively, you can correct by transaction date and type (more human-friendly):
 
-	fedleave correct --search-date YYYY-MM-DD|today --search-type CATEGORY --hours HOURS --reason "TEXT" [--show-transaction-ids] --data-dir /path/to/data
+	use-or-lose correct --search-date YYYY-MM-DD|today --search-type CATEGORY --hours HOURS --reason "TEXT" [--show-transaction-ids] --data-dir /path/to/data
 
 	Example:
-		fedleave correct --search-date 2026-06-01 --search-type annual --hours 3 --reason "Adjust entry" --data-dir ./.data
+		use-or-lose correct --search-date 2026-06-01 --search-type annual --hours 3 --reason "Adjust entry" --data-dir ./.data
 
 Delete a transaction (legacy `void` command name):
 
-	fedleave void --id TRANSACTION_ID --reason "TEXT" [--json] [--show-transaction-ids] --data-dir /path/to/data
+	use-or-lose void --id TRANSACTION_ID --reason "TEXT" [--json] [--show-transaction-ids] --data-dir /path/to/data
 
 	Example:
-		fedleave void --id 20260310-002 --reason "Entered in error"
+		use-or-lose void --id 20260310-002 --reason "Entered in error"
 
 Rollover preview/apply:
 
-	fedleave rollover --from-year 2026 --to-year 2027 --preview [--json] --data-dir /path/to/data
+	use-or-lose rollover --from-year 2026 --to-year 2027 --preview [--json] --data-dir /path/to/data
 
 Validation:
 
-	fedleave validate [--apply] [--json] --data-dir /path/to/data
+	use-or-lose validate [--apply] [--json] --data-dir /path/to/data
 
 Holiday commands:
 
-	fedleave holidays generate --year 2026 [--source python_holidays|opm_ics] --data-dir /path/to/data
-	fedleave holidays import-ics --year 2026 --file opm-holidays.ics --data-dir /path/to/data
-	fedleave holidays list --year 2026 --data-dir /path/to/data
+	use-or-lose holidays generate --year 2026 [--source python_holidays|opm_ics] --data-dir /path/to/data
+	use-or-lose holidays import-ics --year 2026 --file opm-holidays.ics --data-dir /path/to/data
+	use-or-lose holidays list --year 2026 --data-dir /path/to/data
 
 Export/import:
 
-	fedleave export-data --output fedleave_backup.json --data-dir /path/to/data
-	fedleave import-data --input fedleave_backup.json --data-dir /path/to/new_data
-	fedleave import-data --input fedleave_backup.json --merge --data-dir /path/to/data
-	fedleave import-data --input fedleave_backup.json --overwrite --data-dir /path/to/data
+	use-or-lose export-data --output useorlose_backup.json --data-dir /path/to/data
+	use-or-lose import-data --input useorlose_backup.json --data-dir /path/to/new_data
+	use-or-lose import-data --input useorlose_backup.json --merge --data-dir /path/to/data
+	use-or-lose import-data --input useorlose_backup.json --overwrite --data-dir /path/to/data
 
 Daily and as-of queries:
 
 	# Current balance as of today
-	fedleave balance --data-dir /path/to/data
+	use-or-lose balance --data-dir /path/to/data
 
 	# Balance as of a specific date
-	fedleave balance --year 2026 --as-of 2026-06-01 --data-dir /path/to/data
-	fedleave balance --year 2026 --as-of leave-year-end --data-dir /path/to/data
+	use-or-lose balance --year 2026 --as-of 2026-06-01 --data-dir /path/to/data
+	use-or-lose balance --year 2026 --as-of leave-year-end --data-dir /path/to/data
 
 	# Leave earned/used and overtime worked for the pay period containing a date
-	fedleave pay-period --year 2026 --date 2026-06-01 --data-dir /path/to/data
-	fedleave pay-period --year 2026 --date 2026-06-01 --daily --data-dir /path/to/data
+	use-or-lose pay-period --year 2026 --date 2026-06-01 --data-dir /path/to/data
+	use-or-lose pay-period --year 2026 --date 2026-06-01 --daily --data-dir /path/to/data
 
 	# Leave earned/used and ending balances for every pay period in a year
-	fedleave pay-periods --year 2026 --data-dir /path/to/data
+	use-or-lose pay-periods --year 2026 --data-dir /path/to/data
 
 	# Project end-of-year balance including automatic annual/sick accrual
-	fedleave balance --year 2026 --use-or-lose --data-dir /path/to/data
+	use-or-lose balance --year 2026 --use-or-lose --data-dir /path/to/data
 
 	# Project balance to a custom date
-	fedleave balance --year 2026 --project-to 2026-12-15 --data-dir /path/to/data
+	use-or-lose balance --year 2026 --project-to 2026-12-15 --data-dir /path/to/data
 
-	fedleave activity --year 2026 --date 2026-01-11 --data-dir /path/to/data
+	use-or-lose activity --year 2026 --date 2026-01-11 --data-dir /path/to/data

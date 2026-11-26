@@ -1,16 +1,16 @@
 from pathlib import Path
 from types import SimpleNamespace
 
-from fedleave_gui.backend import BackendError
-from fedleave_gui.main_window import MainWindow, QMessageBox
+from useorlose_gui.backend import BackendError
+from useorlose_gui.main_window import MainWindow, QMessageBox
 
 
 class _WorkingBackend:
     def version(self) -> str:
-        return "fedleave 0.2.0"
+        return "useorlose 0.2.0"
 
     def executable_path(self) -> Path:
-        return Path("/opt/fedleave/fedleave")
+        return Path("/opt/useorlose/useorlose")
 
 
 class _FailingBackend:
@@ -30,8 +30,8 @@ def test_about_backend_displays_version_and_executable(monkeypatch):
     MainWindow.about_backend(window)
 
     assert captured == {
-        "title": "About fedleave Backend",
-        "text": f"fedleave 0.2.0\n\nExecutable: {Path('/opt/fedleave/fedleave')}",
+        "title": "About useorlose Backend",
+        "text": f"useorlose 0.2.0\n\nExecutable: {Path('/opt/useorlose/useorlose')}",
     }
 
 
@@ -46,5 +46,5 @@ def test_about_backend_displays_backend_error(monkeypatch):
 
     MainWindow.about_backend(window)
 
-    assert captured["title"] == "About fedleave Backend"
+    assert captured["title"] == "About useorlose Backend"
     assert "version command failed" in captured["text"]

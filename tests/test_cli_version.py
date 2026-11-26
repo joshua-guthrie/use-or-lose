@@ -3,19 +3,19 @@ import sys
 
 from typer.testing import CliRunner
 
-from fedleave import __version__
-from fedleave.cli import app
+from useorlose import __version__
+from useorlose.cli import app
 
 
 def test_version_option_reports_package_version():
     result = CliRunner().invoke(app, ["--version"])
 
     assert result.exit_code == 0
-    assert result.stdout.strip() == f"fedleave {__version__}"
+    assert result.stdout.strip() == f"useorlose {__version__}"
 
 
 def test_cli_startup_preserves_legacy_files_during_readonly_commands(tmp_path, monkeypatch):
-    data_dir = tmp_path / "xdg" / "fedleave"
+    data_dir = tmp_path / "xdg" / "use-or-lose"
     year_dir = data_dir / "leave_years"
     year_dir.mkdir(parents=True)
     year_file = year_dir / "2026.json"

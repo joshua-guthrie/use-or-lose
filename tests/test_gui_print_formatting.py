@@ -14,9 +14,9 @@ from PySide6.QtPrintSupport import QPrinter
 from PySide6.QtSvg import QSvgRenderer
 from PySide6.QtWidgets import QApplication, QFileDialog, QMessageBox
 
-from fedleave.ledger import TRANSACTION_CATEGORIES
-from fedleave_gui.main_window import MainWindow
-from fedleave_month_report_graphic.report import CATEGORY_LABELS, render_svg
+from useorlose.ledger import TRANSACTION_CATEGORIES
+from useorlose_gui.main_window import MainWindow
+from useorlose_month_report_graphic.report import CATEGORY_LABELS, render_svg
 
 
 def _application() -> QApplication:
@@ -107,7 +107,7 @@ def test_save_pdf_delegates_to_print_document(monkeypatch, tmp_path):
     assert isinstance(printer, QPrinter)
     staged = Path(printer.outputFileName())
     assert staged.suffix == ".pdf"
-    assert staged.parent.name.startswith(".fedleave-export-")
+    assert staged.parent.name.startswith(".useorlose-export-")
     assert staged.parent.parent == tmp_path
     assert (tmp_path / "month.pdf").exists()
     assert printer.outputFormat() == QPrinter.PdfFormat

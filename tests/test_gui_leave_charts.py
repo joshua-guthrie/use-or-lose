@@ -8,9 +8,9 @@ from PySide6.QtGui import QPixmap
 from PySide6.QtPrintSupport import QPrinter
 from PySide6.QtWidgets import QApplication, QFileDialog
 
-from fedleave_gui.chart_windows import LeaveChartDialog
-from fedleave_gui.main_window import MainWindow
-from fedleave_gui.settings import GuiSettings
+from useorlose_gui.chart_windows import LeaveChartDialog
+from useorlose_gui.main_window import MainWindow
+from useorlose_gui.settings import GuiSettings
 
 
 def _application() -> QApplication:
@@ -67,7 +67,7 @@ def test_yearly_leave_comparison_submenu_is_disabled_with_one_leave_year(monkeyp
     leave_years = tmp_path / "leave_years"
     leave_years.mkdir()
     (leave_years / "2026.json").write_text("{}", encoding="utf-8")
-    monkeypatch.setattr("fedleave_gui.main_window.load_settings", lambda: GuiSettings(data_dir=str(tmp_path)))
+    monkeypatch.setattr("useorlose_gui.main_window.load_settings", lambda: GuiSettings(data_dir=str(tmp_path)))
     monkeypatch.setattr(MainWindow, "refresh", lambda self: None)
 
     window = MainWindow()

@@ -24,7 +24,7 @@ def _create_shortcut(shortcut_path: Path, target_path: Path, working_directory: 
             "",
         ]
     )
-    with tempfile.TemporaryDirectory(prefix="fedleave-shortcut-") as temp_dir:
+    with tempfile.TemporaryDirectory(prefix="useorlose-shortcut-") as temp_dir:
         script_path = Path(temp_dir) / "create-shortcut.vbs"
         script_path.write_text(script_text, encoding="utf-8")
         result = subprocess.run(
@@ -59,7 +59,7 @@ def install_system(
     program_files = Path(os.environ.get("ProgramFiles", r"C:\Program Files"))
     program_data = Path(os.environ.get("ProgramData", r"C:\ProgramData"))
     public_profile = Path(os.environ.get("PUBLIC", r"C:\Users\Public"))
-    target = install_dir or program_files / "fedleave"
+    target = install_dir or program_files / "useorlose"
     desktop = desktop_dir or public_profile / "Desktop"
     start_menu = start_menu_dir or program_data / "Microsoft" / "Windows" / "Start Menu" / "Programs" / "UseOrLose"
     staging = target.with_name(f"{target.name}.staging")

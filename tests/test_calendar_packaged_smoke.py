@@ -7,11 +7,11 @@ import sysconfig
 from datetime import date
 from pathlib import Path
 
-from fedleave_gui.app import main
+from useorlose_gui.app import main
 
 
 def test_calendar_smoke_renders_real_cli_snapshot_without_writing(qapp, tmp_path, monkeypatch):
-    backend = Path(sysconfig.get_path("scripts")) / ("fedleave.exe" if os.name == "nt" else "fedleave")
+    backend = Path(sysconfig.get_path("scripts")) / ("use-or-lose.exe" if os.name == "nt" else "use-or-lose")
     data = tmp_path / "isolated data"
     year = date.today().year
     subprocess.run(

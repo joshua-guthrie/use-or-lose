@@ -7,12 +7,12 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from fedleave.cli import app
-from fedleave.cross_year import manual_ledger
-from fedleave.import_storage import JOURNAL, publish_import
-from fedleave.importing import ImportPlan, plan_import
-from fedleave.storage import atomic_write_json, load_json
 from leave_year_support import save, store, tree, tx
+from useorlose.cli import app
+from useorlose.cross_year import manual_ledger
+from useorlose.import_storage import JOURNAL, publish_import
+from useorlose.importing import ImportPlan, plan_import
+from useorlose.storage import atomic_write_json, load_json
 
 YEAR = "leave_years/2026.json"
 
@@ -178,7 +178,7 @@ def test_failed_import_restores_byte_exact_files_and_removes_new_members(tmp_pat
         real_write(path, payload, **kwargs)
 
     with monkeypatch.context() as scoped:
-        scoped.setattr("fedleave.import_storage.atomic_write_json", fail_on_last_write)
+        scoped.setattr("useorlose.import_storage.atomic_write_json", fail_on_last_write)
         with pytest.raises(KeyboardInterrupt if interruption else ValueError):
             publish_import(base, plan)
     if interruption:

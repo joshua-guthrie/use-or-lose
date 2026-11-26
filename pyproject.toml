@@ -1,6 +1,6 @@
 [project]
-name = "fedleave"
-version = "1.0.0"
+name = "use-or-lose"
+version = "1.1.0"
 description = "Federal leave and time tracker"
 authors = [
   {name = "Joshua Guthrie"}
@@ -40,20 +40,20 @@ build = [
   "pyinstaller>=6,<7",
 ]
 dev = [
-  "fedleave[gui,test,build]",
+  "use-or-lose[gui,test,build]",
   "mypy>=1.15,<2",
   "ruff>=0.12,<1",
 ]
 
 [project.urls]
-Homepage = "https://www.westmouthbay.com/fedleave-application/"
-Documentation = "https://www.westmouthbay.com/fedleave-application/"
-Support = "https://www.westmouthbay.com/fedleave-application/"
+Homepage = "https://www.westmouthbay.com/UseOrLose-application/"
+Documentation = "https://www.westmouthbay.com/UseOrLose-application/"
+Support = "https://www.westmouthbay.com/UseOrLose-application/"
 Repository = "https://github.com/joshua-guthrie/use-or-lose"
 
 [project.scripts]
-fedleave = "fedleave.__main__:main"
-fedleave-mcp = "fedleave.mcp.__main__:main"
+use-or-lose = "useorlose.__main__:main"
+use-or-lose-mcp = "useorlose.mcp.__main__:main"
 AnnualLeaveChartForTheYear = "annual_leave_chart.__main__:main"
 SickLeaveChartForTheYear = "sick_leave_chart.__main__:main"
 CreditHoursChartForTheYear = "credit_hours_chart.__main__:main"
@@ -67,9 +67,9 @@ CompTimeYearlyComparison = "yearly_leave_comparison_chart.comp:main"
 TravelCompYearlyComparison = "yearly_leave_comparison_chart.travel_comp:main"
 TimeOffAwardYearlyComparison = "yearly_leave_comparison_chart.time_off_award:main"
 OvertimeYearlyComparison = "yearly_leave_comparison_chart.overtime:main"
-fedleaveMonthReportGraphic = "fedleave_month_report_graphic.__main__:main"
-UseOrLoseCalendar = "fedleave_gui.__main__:main"
-UseOrLoseAnalytics = "fedleave_analytics.app:main"
+UseOrLoseMonthReportGraphic = "useorlose_month_report_graphic.__main__:main"
+UseOrLoseCalendar = "useorlose_gui.__main__:main"
+UseOrLoseAnalytics = "useorlose_analytics.app:main"
 
 [build-system]
 requires = ["setuptools>=84.1.0", "wheel>=0.46.2"]
@@ -79,11 +79,11 @@ build-backend = "setuptools.build_meta"
 package-dir = {"" = "src"}
 
 [tool.setuptools.package-data]
-fedleave_analytics = ["help.html"]
+useorlose_analytics = ["help.html"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["fedleave*", "annual_leave_chart*", "sick_leave_chart*", "credit_hours_chart*", "comp_time_chart*", "travel_comp_chart*", "time_off_award_chart*", "yearly_leave_comparison_chart*", "fedleave_month_report_graphic*", "fedleave_gui*", "fedleave_analytics*"]
+include = ["useorlose*", "annual_leave_chart*", "sick_leave_chart*", "credit_hours_chart*", "comp_time_chart*", "travel_comp_chart*", "time_off_award_chart*", "yearly_leave_comparison_chart*", "useorlose_month_report_graphic*", "useorlose_gui*", "useorlose_analytics*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -100,9 +100,9 @@ select = ["E4", "E7", "E9", "F", "I"]
 [tool.mypy]
 python_version = "3.11"
 files = [
-  "src/fedleave/payperiods.py",
-  "src/fedleave/project_info.py",
-  "src/fedleave/transaction_effects.py",
-  "src/fedleave/read_api.py",
+  "src/useorlose/payperiods.py",
+  "src/useorlose/project_info.py",
+  "src/useorlose/transaction_effects.py",
+  "src/useorlose/read_api.py",
 ]
 strict = true

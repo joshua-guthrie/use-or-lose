@@ -4,14 +4,14 @@ from __future__ import annotations
 
 import pytest
 
-from fedleave.ledger import (
+from useorlose.ledger import (
     TRANSACTION_DIRECTIONS,
     Transaction,
     calculate_balances,
     calculate_daily_activity,
     calculate_pay_period_activity,
 )
-from fedleave.transaction_effects import (
+from useorlose.transaction_effects import (
     DECREASE_DIRECTIONS,
     INCREASE_DIRECTIONS,
     signed_balance_effect,

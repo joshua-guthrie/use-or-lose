@@ -10,15 +10,15 @@ import pytest
 from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import QDialog, QMessageBox
 
-from fedleave_gui.main_window import MainWindow, PreferencesDialog
-from fedleave_gui.settings import load_settings
+from useorlose_gui.main_window import MainWindow, PreferencesDialog
+from useorlose_gui.settings import load_settings
 
 
 @pytest.fixture
 def update_window(qtbot, monkeypatch, tmp_path):
     settings_file = tmp_path / "settings.json"
-    monkeypatch.setattr("fedleave_gui.settings.settings_path", lambda: settings_file)
-    monkeypatch.setattr("fedleave_gui.main_window.settings_path", lambda: settings_file)
+    monkeypatch.setattr("useorlose_gui.settings.settings_path", lambda: settings_file)
+    monkeypatch.setattr("useorlose_gui.main_window.settings_path", lambda: settings_file)
     monkeypatch.setattr(MainWindow, "refresh", lambda self: None)
     calls = []
 
@@ -26,7 +26,7 @@ def update_window(qtbot, monkeypatch, tmp_path):
         calls.append(True)
         return {"status": "ok", "update_available": False}
 
-    monkeypatch.setattr("fedleave_gui.backend.FedleaveBackend.check_for_updates", check_for_updates)
+    monkeypatch.setattr("useorlose_gui.backend.UseOrLoseBackend.check_for_updates", check_for_updates)
     window = MainWindow()
     qtbot.addWidget(window)
     return window, settings_file, calls

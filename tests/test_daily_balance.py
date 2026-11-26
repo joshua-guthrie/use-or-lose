@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from fedleave.ledger import calculate_balances, calculate_daily_activity
+from useorlose.ledger import calculate_balances, calculate_daily_activity
 
 
 def test_calculate_balances_as_of_date(tmp_path: Path):

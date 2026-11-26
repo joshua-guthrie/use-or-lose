@@ -6,10 +6,10 @@ from pathlib import Path
 
 import pytest
 
-from fedleave.commands.data import import_wms_http
-from fedleave.config import init_config
-from fedleave.storage import write_json
-from fedleave.wms_import import WmsImportError, parse_wms_http_leave_report
+from useorlose.commands.data import import_wms_http
+from useorlose.config import init_config
+from useorlose.storage import write_json
+from useorlose.wms_import import WmsImportError, parse_wms_http_leave_report
 
 
 def _row(cells: list[str]) -> str:

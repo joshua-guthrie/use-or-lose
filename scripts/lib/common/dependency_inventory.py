@@ -18,7 +18,7 @@ from packaging.version import Version
 
 def resolved_packages(*, runtime_only: bool = False) -> dict[str, str]:
     if runtime_only:
-        pending = [("fedleave", ""), ("fedleave", "gui")]
+        pending = [("use-or-lose", ""), ("use-or-lose", "gui")]
         visited: set[tuple[str, str]] = set()
         selected = {}
         while pending:
@@ -61,7 +61,7 @@ def main() -> None:
         encoding="utf-8",
     )
     args.requirements.write_text(
-        "".join(f"{name}=={version}\n" for name, version in packages.items() if name != "fedleave"), encoding="utf-8"
+        "".join(f"{name}=={version}\n" for name, version in packages.items() if name != "use-or-lose"), encoding="utf-8"
     )
 
 

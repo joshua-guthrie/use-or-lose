@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Use or Lose Calendar Help</title></head>
+<body>
+<h1>Use or Lose Calendar Help</h1>
+<p>Use or Lose Calendar is a graphical month view for the use-or-lose command-line backend.</p>
+<p><strong>Official project website:</strong>
+  <a href="https://www.westmouthbay.com/UseOrLose-application/">https://www.westmouthbay.com/UseOrLose-application/</a>
+</p>
+<h2>Creating a New Leave Year</h2>
+<p>Start New Leave Year offers <strong>Manual Starting Balances</strong> with
+<strong>No Previous Leave Year</strong>, or <strong>Carry Over From Previous Leave Year</strong>.
+Manual mode retains the starting-balance inputs. Before creating, the GUI warns
+that previous-year balances, earned dates, lot history and expiration information
+will not be imported, even if no older files exist. Cancel creates nothing.
+Ordinary manual CLI init has no corresponding generic warning.</p>
+<p>Carryover disables manual amounts. Select a valid adjacent predecessor returned
+by the selected CLI, then request a preview. Review opening hours, cap reductions,
+original lots, dates, deadlines and material warnings before confirming. A changed
+selection invalidates the preview. Source/policy changes reject stale apply;
+preview again. Both modes refuse an existing destination. All canonical reads
+and writes use the configured CLI and data directory; the GUI never writes a ledger.</p>
+<p>OPM 2026 ends January 9, 2027; 2027 starts January 10. Actual 26/27-period schedules
+are validated. Expiration dates are inclusive last eligible usage dates, with use
+disallowed the following day. A manual expiring opening has unknown provenance;
+no fictitious earning date or renewed entitlement is created.</p>
+<p>Changed source years produce STALE_CARRYOVER with recomputed read-only balances.
+Use <strong>Tools &gt; Reconcile Carryover</strong> to preview and explicitly apply the full chain, or use <code>fedleave carryover-reconcile --year YEAR --preview --json</code>, review
+all affected years, then explicitly apply. Genuine destination activity is preserved.
+Interrupted reconciliation requires <code>--recover</code>. Manual years remain independent.</p>
+<h2>Paid Parental Leave (PPL) and FMLA</h2>
+<p>In the day editor add <strong>Paid Parental Leave (PPL)</strong> and choose
+<strong>Earn</strong>. New Earn entries suggest an editable 480-hour standard
+full-time example; existing values are retained. The earned date is treated as
+the start of the 12-month use window. Enter the actual qualifying date. There
+is no separate event field. PPL cannot be paid out or extended.</p>
+<p>PPL <strong>Use</strong> automatically consumes FMLA exactly once. Manual
+<strong>Family and Medical Leave Act (FMLA)</strong> offers Use only and means
+additional non-PPL FMLA usage. It adds no physical absence. Same-day combinations
+require clarification; never mirror PPL hours as manual FMLA.</p>
+<p>The balance status and expiration dialog show source IDs, last eligible and
+first ineligible dates, scheduled/protected use and potential or expired loss.
+FMLA is a negative within-period usage tracker, not paid leave or a spendable
+bank. Its period begins with first actual use, independently of PPL's earned
+date or the federal leave year. Future or unresolved use is provisional.</p>
+<p>Capacity is N/A until relevant history is reviewed and
+<code>rules.fmla.history_complete_from</code> is supplied in config.json.
+Missing historical tours are explicitly unverified. The limit is twelve
+administrative workweeks; the configured schedule or agency-confirmed
+<code>rules.fmla.weekly_hours</code> determines its hour equivalent. Existing
+linked successor years reflect source corrections immediately. Manual years
+remain independent. These results do not determine agency eligibility or approval.</p>
+<p>Policy guidance:
+<a href="https://www.opm.gov/policy-data-oversight/pay-leave/leave-administration/fact-sheets/paid-parental-leave/">OPM PPL</a> and
+<a href="https://www.opm.gov/policy-data-oversight/pay-leave/leave-administration/fact-sheets/family-and-medical-leave/">OPM FMLA</a>.</p>
+<h2>Calendar Layout</h2>
+<p>The main window shows month navigation, a calendar grid, pay periods touching the displayed month, and balances as of today. Each pay period has its own Type, Earned, Used, and Balance table.</p>
+<h2>Day Cells</h2>
+<p>Each day cell shows the day number, nonzero leave entries, holidays, pay days, and pay-period endings. Zero values are intentionally not shown.</p>
+<h2>Leave Abbreviations</h2>
+<table border="1" cellspacing="0" cellpadding="4">
+<thead><tr><th>Abbreviation</th><th>Leave Type</th></tr></thead>
+<tbody>
+<tr><td>PPL</td><td>Paid Parental Leave (PPL)</td></tr>
+<tr><td>FMLA</td><td>Family and Medical Leave Act (FMLA)</td></tr>
+<tr><td>A</td><td>Annual Leave</td></tr>
+<tr><td>S</td><td>Sick Leave</td></tr>
+<tr><td>OT</td><td>Overtime</td></tr>
+<tr><td>Comp</td><td>Comp Time</td></tr>
+<tr><td>Cr</td><td>Credit Hours</td></tr>
+<tr><td>TC</td><td>Travel Comp</td></tr>
+<tr><td>Admin</td><td>Admin Leave</td></tr>
+<tr><td>LWOP</td><td>LWOP</td></tr>
+<tr><td>Mil</td><td>Military Leave</td></tr>
+<tr><td>Court</td><td>Court Leave</td></tr>
+<tr><td>RC</td><td>Religious Comp</td></tr>
+<tr><td>TOA</td><td>Time-Off Award</td></tr>
+<tr><td>Exc</td><td>Excused Leave</td></tr>
+<tr><td>H</td><td>Holiday</td></tr>
+<tr><td>Flex</td><td>Flex</td></tr>
+<tr><td>Other</td><td>Other</td></tr>
+<tr><td>RA</td><td>Restored Annual</td></tr>
+</tbody>
+</table>
+<h2>Day Editing</h2>
+<p>Click a day to edit supplied leave categories authoritatively. Select Use or Earn for each leave type and enter positive hours; newly added leave types default to Use. Saving calls the use-or-lose backend and reloads the month from backend JSON.</p>
+<h2>Leave Charts</h2>
+<p>The View menu includes a Leave Charts submenu for annual leave, sick leave, credit hours, comp time, travel comp, and time-off award charts. Each chart opens in its own window and offers Save PNG, Save PDF, and Print actions.</p>
+<p>Analysis &gt; Analytics opens the read-only Use or Lose Analytics companion using the same backend, resolved data directory, displayed leave year, font size, and report folder as the calendar. Its Summary, Seasonality, Calendar Heatmap, Overtime, Comp, and Credit, and Cumulative Usage pages report hours and include qualifying future scheduled entries. The What-if Planner opens in its own window from the Analysis &gt; Planning menu.</p>
+<h2>What-if Planner</h2>
+<p>Choose <strong>Analysis &gt; Planning &gt; What-if Planner...</strong>. Set a cutoff, horizon inside the selected initialized leave year, scenario name, category, and optional reserve. The cutoff defaults to today within that year's bounds; the horizon defaults to the actual leave-year end. Reserves are per category, in hours. Equality is allowed; a breach means a daily closing balance below the reserve.</p>
+<p><strong>File &gt; Help...</strong> (F1) in the planning window opens detailed offline instructions for the active tool, including examples and action differences. Hover over buttons for short explanations. <strong>Add tentative use</strong> adds extra use alongside existing bookings. Click a draft Date cell (or press Space/Enter) to open a calendar bounded after cutoff through horizon; Cancel preserves the original text. F2 also permits ISO date entry. Date selection does not guarantee working capacity.</p>
+<p><strong>Scenario rows</strong> is the single editor. Every eligible scheduled booking appears automatically as a Scheduled row with the operation Unchanged. Set a Scheduled row to Remove to omit that original from the scenario, or Replace to substitute only its leave category through Replacement Leave Type; original date and hours stay fixed. Proposed rows created by Add tentative use offer only Add or Remove, and Remove discards the tentative addition. The baseline and ledger keep all originals, and Scheduled rows remain visible when removed or after Reset. Legacy scenarios that combine several originals in one operation are shown read-only with an explanation.</p>
+<p><strong>Undo selected changes</strong> deletes draft operations: Add disappears; Replace/Remove originals return to the scenario. <strong>Reset all changes</strong> clears operations while retaining name, dates and reserves. Neither action changes the ledger or cancels real leave.</p>
+<p>The baseline and scenario chart share one result with the <strong>Summary</strong> and <strong>Daily closing balances</strong> tabs. Summary lists each leave type's balance on the horizon date, starting balance, minimum balance, and the latest date that minimum occurs; excused, holiday, LWOP and never-positive leave types are omitted. The chart footer shows the selected category's scenario ending balance. A positive final balance does not hide an earlier negative balance or reserve breach. Carryover, pre-cap annual balance, and prospective forfeiture appear only at the actual leave-year end. Hours are not pooled across categories. Purpose-restricted categories stay labeled; projected balances do not grant eligibility.</p>
+<p>Working-hour capacity comes from configured workdays, start/end/lunch, cached observed holidays, and existing absences across categories. Capacity conflicts are separate from balance shortfalls. Requested dates and hours are retained, not rescheduled. Missing schedule/holiday context, original lot provenance, and unsupported policies produce warnings and N/A metrics. Irregular rosters and historical knowledge are not reconstructed. Recorded Through Cutoff includes effective past planned/requested rows without asserting attendance; a historical cutoff uses current records, not what was known at that earlier time.</p>
+<p>Export scenario JSON saves a versioned definition with assumptions, source identity, and reference fingerprints. Import requires Replace or Merge and checks a fresh read-only snapshot; invalid or stale operations do not partially change the active scenario. Unrelated source edits do not invalidate unchanged references. Refresh rechecks source data; review and explicitly resolve stale references or remove their scenario rows. CSV includes filters, cutoff/horizon, units, reserves, assumptions, provenance, and warnings. Open Chart offers its exact supporting table, CSV, PNG, PDF, and Print.</p>
+<p>Scenarios are session-only, with an indicator for changes since import/export. There is <strong>no Apply to Ledger</strong>. The planner never writes, initializes, migrates, synchronizes, or backs up leave records, including on failed validation, cancellation, or close. Save exports outside the canonical datastore. Calculations run in workers and stale results are discarded.</p>
+<h2>Cumulative Usage</h2>
+<p>Open <strong>Analysis &gt; Analytics... &gt; Cumulative Usage</strong> to see the running total of effective used hours for the selected leave types across the whole leave year. Choose one category or an explicit sum; annual is the default, and sick and purpose-restricted leave are included only when selected. The chart uses all effective used statuses, so denied/cancelled/void rows are excluded and earned hours, openings, corrections, expirations and forfeitures are not usage. Future dated entries are included; planned or requested dates do not confirm leave was taken. There is no cutoff, alignment, reference-year comparison or coverage confirmation. CSV and chart PNG/PDF/Print reuse the exact curve and preserve original transaction IDs. File &gt; Help/F1 in Analytics provides full definitions and examples. No leave records are modified.</p>
+<h2>Preferences</h2>
+<p>Preferences can set a backend executable, optional data directory, first day of week, display toggles, font size, print orientation, and PDF export folder.</p>
+<p>Under <strong>File &gt; Preferences &gt; Software updates</strong>, clear <strong>Check for updates automatically</strong> and choose <strong>Save</strong> to disable startup and periodic software update checks. This option is enabled by default and saved in your per-user GUI settings, separately from leave records. It takes effect immediately and persists across restarts. <strong>Help &gt; Check for Updates...</strong> remains available for a manual check. Re-enable the option to restore the normal schedule of at most one check per day.</p>
+<h2>Printing and PDF Export</h2>
+<p>Print preview, printer output, and PDF export use the same landscape month-report graphic layout as fedleaveMonthReportGraphic. Reports do not show zero values.</p>
+<h2>Troubleshooting</h2>
+<p>If the backend cannot be found, open Preferences and set the fedleave executable path. In a packaged install, the GUI expects the companion executables and shared runtime to remain together. The GUI does not fabricate data after backend failures. For current installation and support information, visit the official project website above.</p>
+</body>
+</html>

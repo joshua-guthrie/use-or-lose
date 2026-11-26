@@ -6,18 +6,18 @@ from datetime import date
 import pytest
 from typer.testing import CliRunner
 
-from fedleave.cli import app
-from fedleave.cross_year import resolve_snapshot
-from fedleave.ledger import calculate_balances
-from fedleave.parental import anniversary, fmla_report, parental_report
 from leave_year_support import store as create_store
 from leave_year_support import tree, tx
+from useorlose.cli import app
+from useorlose.cross_year import resolve_snapshot
+from useorlose.ledger import calculate_balances
+from useorlose.parental import anniversary, fmla_report, parental_report
 
 
 def store(base, **kwargs):
     result = create_store(base, **kwargs)
     # Real initialized stores already have the permanent writer-lock inode.
-    (base / ".fedleave.lock").touch()
+    (base / ".useorlose.lock").touch()
     return result
 
 
@@ -341,7 +341,7 @@ def test_parental_hours_follow_positive_finite_configured_increments(tmp_path, h
 
 
 def test_parental_reconciliation_recovers_interrupted_chain_and_is_idempotent(tmp_path, monkeypatch):
-    import fedleave.cross_year as service
+    import useorlose.cross_year as service
 
     store(tmp_path)
     grant = cli(tmp_path, "add", "--year", "2026", "--date", "2026-09-01", "--category", "ppl", "--earned", "480")

@@ -21,7 +21,7 @@ def test_privileged_bootstrap_removes_ordinary_user_write_access():
     assert uid != 0
     for command in ("setpriv", "sudo", "setfacl", "getfacl"):
         assert shutil.which(command), command
-    with tempfile.TemporaryDirectory(prefix="fedleave-security-test-", dir="/var/lib") as directory:
+    with tempfile.TemporaryDirectory(prefix="useorlose-security-test-", dir="/var/lib") as directory:
         root = Path(directory)
         root.chmod(0o755)
         package = _load_packaging_module()
@@ -61,7 +61,7 @@ def test_privileged_bootstrap_removes_ordinary_user_write_access():
                     "--clear-groups",
                     "test",
                     "-w",
-                    str(release / "fedleave"),
+                    str(release / "use-or-lose"),
                 ]
             )
             assert probe.returncode != 0

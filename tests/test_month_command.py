@@ -1,8 +1,8 @@
 import json
 from pathlib import Path
 
-from fedleave.cli import add, month
-from fedleave.config import init_config
+from useorlose.cli import add, month
+from useorlose.config import init_config
 
 
 def _init_data_dir(data_dir: Path) -> None:

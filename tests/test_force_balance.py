@@ -3,9 +3,9 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from fedleave.commands.forced_balance import force_balance
-from fedleave.config import init_config
-from fedleave.ledger import calculate_balances
+from useorlose.commands.forced_balance import force_balance
+from useorlose.config import init_config
+from useorlose.ledger import calculate_balances
 
 
 def _init(data_dir: Path) -> None:

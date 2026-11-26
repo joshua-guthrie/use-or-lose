@@ -1,10 +1,10 @@
 import json
 from pathlib import Path
 
-from fedleave.cli import list_transactions
-from fedleave.config import init_config
-from fedleave.ledger import add_transaction_to_leave_year, create_transaction
-from fedleave.storage import write_json
+from useorlose.cli import list_transactions
+from useorlose.config import init_config
+from useorlose.ledger import add_transaction_to_leave_year, create_transaction
+from useorlose.storage import write_json
 
 
 def _data_dir_with_transaction(tmp_path: Path) -> tuple[Path, str]:

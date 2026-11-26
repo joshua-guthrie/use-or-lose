@@ -5,11 +5,11 @@ from datetime import date
 
 from typer.testing import CliRunner
 
-from fedleave.cli import app
-from fedleave.config import Config
-from fedleave.expirations import synchronize_expirations
-from fedleave.ledger import calculate_balances
-from fedleave.payperiods import generate_pay_periods
+from useorlose.cli import app
+from useorlose.config import Config
+from useorlose.expirations import synchronize_expirations
+from useorlose.ledger import calculate_balances
+from useorlose.payperiods import generate_pay_periods
 
 
 def source_store(tmp_path):

@@ -7,7 +7,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from fedleave.cli import validate
+from useorlose.cli import validate
 
 
 def test_validate_applies_fixes(tmp_path: Path):

@@ -1,8 +1,8 @@
 import json
 from pathlib import Path
 
-from fedleave.cli import add
-from fedleave.config import init_config
+from useorlose.cli import add
+from useorlose.config import init_config
 
 
 def test_authoritative_add_removes_matching_transaction(tmp_path: Path):

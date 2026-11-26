@@ -11,10 +11,10 @@ import pytest
 import typer
 from typer.main import get_command
 
-from fedleave.cli import app
-from fedleave.mcp.catalog import CatalogError, discover, inventory
-from fedleave.mcp.execution import Executor
-from fedleave.mcp.policy import Policy
+from useorlose.cli import app
+from useorlose.mcp.catalog import CatalogError, discover, inventory
+from useorlose.mcp.execution import Executor
+from useorlose.mcp.policy import Policy
 
 GOLDEN_NAMES = """carryover_reconcile snapshot accrual_change activity add balance check_for_updates compare_leave_balances correct
 expiration_extend expirations export_data force_balance help holidays import_data import_wms_http init list
@@ -36,7 +36,7 @@ def test_complete_registry_and_parameter_parity():
 
     walk(root, (), [])
     catalog = discover()
-    assert set(catalog) == {f"fedleave_{name}" for name in GOLDEN_NAMES}
+    assert set(catalog) == {f"use_or_lose_{name}" for name in GOLDEN_NAMES}
     leaves = {c.path: c for c in catalog.values() if not c.special}
     assert leaves.keys() == actual.keys()
     for path, params in actual.items():
@@ -60,7 +60,7 @@ def test_complete_registry_and_parameter_parity():
 
 def test_all_set_day_fields_and_legacy_aliases():
     catalog = discover()
-    props = catalog["fedleave_set_day"].schema["properties"]
+    props = catalog["use_or_lose_set_day"].schema["properties"]
     for name in [
         "annual",
         "sick",
@@ -85,7 +85,7 @@ def test_all_set_day_fields_and_legacy_aliases():
         assert name in props
         assert f"{name}_comment" in props
     assert "acknowledge_fmla_overlap" in props
-    command = catalog["fedleave_add"]
+    command = catalog["use_or_lose_add"]
     arguments = {
         "date": "2026-07-01",
         "category": "annual",
@@ -111,7 +111,7 @@ def test_new_typer_commands_and_parameters_appear_without_tool_definitions():
         pass
 
     catalog = discover(get_command(sample))
-    tool = catalog["fedleave_new_group_added"]
+    tool = catalog["use_or_lose_new_group_added"]
     assert tool.schema["properties"]["year"]["type"] == "integer"
     assert tool.schema["properties"]["names"]["type"] == "array"
     assert tool.argv({"year": 2026, "names": ["--literal", "a b"]}) == [
@@ -145,7 +145,7 @@ def test_click_groups_tuples_repeated_flags_ranges_defaults_and_positional_value
     def leaf(**kwargs):
         observed.append(kwargs)
 
-    tool = discover(group)["fedleave_leaf"]
+    tool = discover(group)["use_or_lose_leaf"]
     arguments = {
         "tenant": "--not-an-option",
         "items": ["--hello", "world"],
@@ -195,7 +195,7 @@ def test_invokable_groups_collision_safe_names_and_unsupported_types():
         pass
 
     catalog = discover(root)
-    assert "fedleave_root" in catalog
+    assert "use_or_lose_root" in catalog
     assert len(catalog) == 3
     assert sorted(catalog) == sorted(discover(root))
     assert len({c.name for c in catalog.values()}) == 3
@@ -210,7 +210,7 @@ def test_invokable_groups_collision_safe_names_and_unsupported_types():
 
 
 def test_eager_help_and_version_do_not_require_leaf_values():
-    tool = discover()["fedleave_add"]
+    tool = discover()["use_or_lose_add"]
     assert tool.argv({"version": True}) == ["--version", "add"]
     assert tool.argv({"add__help": True}) == ["add", "--help"]
 
@@ -226,7 +226,7 @@ def test_unclassified_typer_command_executes_only_with_full_access(tmp_path, mon
         typer.echo(json.dumps({"value": value, "enabled": enabled}))
 
     catalog = discover(get_command(sample))
-    tool = catalog["fedleave_future"]
+    tool = catalog["use_or_lose_future"]
     invocations = []
 
     async def registered_cli(executable, argv, env, timeout, max_output):
@@ -234,7 +234,7 @@ def test_unclassified_typer_command_executes_only_with_full_access(tmp_path, mon
         result = CliRunner().invoke(sample, argv)
         return {"ok": result.exit_code == 0, "exit_code": result.exit_code, "stdout": result.stdout, "stderr": ""}
 
-    monkeypatch.setattr("fedleave.mcp.execution.run_cli", registered_cli)
+    monkeypatch.setattr("useorlose.mcp.execution.run_cli", registered_cli)
     arguments = {"value": "--literal ; $(ignored)", "enabled": False}
     executor = Executor(catalog, Policy())
     result = asyncio.run(executor.call(tool.name, arguments))

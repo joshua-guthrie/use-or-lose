@@ -6,11 +6,11 @@ from copy import deepcopy
 import pytest
 from typer.testing import CliRunner
 
-from fedleave.cli import app
-from fedleave.cross_year import manual_ledger, resolve_snapshot
-from fedleave.expirations import expiration_report
-from fedleave.ledger import calculate_balances
 from leave_year_support import store, tree
+from useorlose.cli import app
+from useorlose.cross_year import manual_ledger, resolve_snapshot
+from useorlose.expirations import expiration_report
+from useorlose.ledger import calculate_balances
 
 CATEGORIES = ["annual", "sick", "comp", "credit", "travel_comp", "time_off_award", "religious_comp", "restored_annual"]
 
@@ -100,7 +100,7 @@ def test_MAN_018_existing_destination_unchanged(tmp_path):
 def test_MAN_022_explicit_store_wins(tmp_path, monkeypatch):
     older = tmp_path / "default"
     store(older, balances={"annual": 999})
-    monkeypatch.setenv("FEDLEAVE_MCP_DATA_DIR", str(older))
+    monkeypatch.setenv("USE_OR_LOSE_MCP_DATA_DIR", str(older))
     before = tree(older)
     selected = tmp_path / "selected"
     result = CliRunner().invoke(

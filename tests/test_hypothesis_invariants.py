@@ -5,9 +5,9 @@ from datetime import date, timedelta
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
-from fedleave.cli_helpers import normalize_iso_date
-from fedleave.ledger import generate_transaction_id
-from fedleave.payperiods import generate_pay_periods
+from useorlose.cli_helpers import normalize_iso_date
+from useorlose.ledger import generate_transaction_id
+from useorlose.payperiods import generate_pay_periods
 
 
 @given(st.dates(min_value=date(2020, 1, 1), max_value=date(2030, 12, 31)))

@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from fedleave.cli import holidays
+from useorlose.cli import holidays
 
 
 def test_import_ics_creates_cache(tmp_path: Path):

@@ -5,9 +5,9 @@ from datetime import date
 import pytest
 from typer.testing import CliRunner
 
-from fedleave.cli import app
-from fedleave.ledger import calculate_balances
 from leave_year_support import store, tx
+from useorlose.cli import app
+from useorlose.ledger import calculate_balances
 
 
 def test_ppl_earned_and_used_are_supported(tmp_path):
@@ -85,8 +85,8 @@ def cli(base, *args, success=True):
 def test_cross_year_grant_entered_after_successor_creation_is_readonly(tmp_path):
     import json
 
-    from fedleave.cross_year import resolve_snapshot
     from leave_year_support import tree
+    from useorlose.cross_year import resolve_snapshot
 
     store(tmp_path)
     cli(tmp_path, "init", "--from-year", "2026", "--year", "2027")
@@ -110,7 +110,7 @@ def test_cross_year_grant_entered_after_successor_creation_is_readonly(tmp_path)
 def test_prior_fmla_usage_keeps_its_first_use_anchor_across_years(tmp_path):
     import json
 
-    from fedleave.cross_year import resolve_snapshot
+    from useorlose.cross_year import resolve_snapshot
 
     store(
         tmp_path,
@@ -172,7 +172,7 @@ def test_duplicate_same_day_event_and_extensions_are_rejected(tmp_path):
 
 
 def test_fmla_limit_and_alternate_tour_are_weeks_based(tmp_path):
-    from fedleave.parental import fmla_report
+    from useorlose.parental import fmla_report
 
     ledger = {"transactions": [tx("use", "2026-06-01", "fmla", "used", 600, scheduled_weekly_hours=50)]}
     schedule = {
@@ -186,7 +186,7 @@ def test_fmla_limit_and_alternate_tour_are_weeks_based(tmp_path):
 
 
 def test_analytics_counts_parental_absence_once_and_fmla_zero():
-    from fedleave_analytics.analytics import analyze_leave_year
+    from useorlose_analytics.analytics import analyze_leave_year
 
     ledger = {
         "leave_year": 2026,
@@ -209,8 +209,8 @@ def test_analytics_counts_parental_absence_once_and_fmla_zero():
 
 
 def test_exhausted_overlapping_window_remains_a_cross_year_constraint(tmp_path):
-    from fedleave.cross_year import apply_creation, creation_plan, resolve_snapshot
-    from fedleave.parental import parental_report
+    from useorlose.cross_year import apply_creation, creation_plan, resolve_snapshot
+    from useorlose.parental import parental_report
 
     store(
         tmp_path,
@@ -291,7 +291,7 @@ def test_export_import_and_cross_year_read_surfaces_preserve_provenance(tmp_path
 
 
 def test_manual_boundary_does_not_import_unrelated_ppl(tmp_path):
-    from fedleave.cross_year import resolve_snapshot
+    from useorlose.cross_year import resolve_snapshot
 
     store(tmp_path, transactions=[tx("grant", "2026-10-01", "ppl", "earned", 480)])
     cli(tmp_path, "init", "--year", "2027", "--leave-year-start", "2027-01-10")
@@ -300,7 +300,7 @@ def test_manual_boundary_does_not_import_unrelated_ppl(tmp_path):
 
 
 def test_four_ten_hour_days_still_provide_480_fmla_hours():
-    from fedleave.parental import weekly_hours
+    from useorlose.parental import weekly_hours
 
     assert (
         weekly_hours(
@@ -318,7 +318,7 @@ def test_four_ten_hour_days_still_provide_480_fmla_hours():
 
 @pytest.mark.parametrize("status,void", [("denied", False), ("cancelled", False), ("reconciled", True)])
 def test_inactive_usage_does_not_start_a_period(status, void):
-    from fedleave.parental import fmla_report
+    from useorlose.parental import fmla_report
 
     ledger = {
         "transactions": [

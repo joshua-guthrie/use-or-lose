@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Annual Leave Chart for the Year - Generates PNG leave balance charts using fedleave data."""
+"""Annual Leave Chart for the Year - Generates PNG leave balance charts using useorlose data."""
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ from typing import Any
 
 from PIL import Image, ImageDraw, ImageFont
 
-from fedleave.chart_style import (
+from useorlose.chart_style import (
     BACKGROUND,
     BASE_ASPECT_RATIO,
     BASE_WIDTH,
@@ -32,9 +32,9 @@ from fedleave.chart_style import (
     TEXT,
     draw_historical_and_future_line,
 )
-from fedleave.executable_search import is_executable, iter_executable_candidates
-from fedleave.exporting import export_file
-from fedleave.project_info import HELP_EPILOG
+from useorlose.executable_search import is_executable, iter_executable_candidates
+from useorlose.exporting import export_file
+from useorlose.project_info import HELP_EPILOG
 
 # Chart rendering constants (base dimensions)
 Y_MIN = Decimal("0")
@@ -66,33 +66,33 @@ class ChartDimensions:
         self.scale = scale
 
 
-def find_fedleave_app() -> Path:
+def find_useorlose_app() -> Path:
     """
-    Find the fedleave application in the same directory as the chart executable or in PATH.
+    Find the use-or-lose application in the same directory as the chart executable or in PATH.
 
     Returns:
-        Path to fedleave executable
+        Path to use-or-lose executable
 
     Raises:
-        SystemExit: If fedleave cannot be found with helpful error message
+        SystemExit: If use-or-lose cannot be found with helpful error message
     """
     searched: list[Path] = []
-    for candidate in iter_executable_candidates("fedleave"):
+    for candidate in iter_executable_candidates("use-or-lose"):
         searched.append(candidate)
         if is_executable(candidate):
             return candidate
 
-    fedleave_in_path = shutil.which("fedleave")
-    if fedleave_in_path:
-        return Path(fedleave_in_path)
+    useorlose_in_path = shutil.which("useorlose")
+    if useorlose_in_path:
+        return Path(useorlose_in_path)
 
     details = "\n".join(f"  - {candidate}" for candidate in searched)
     raise SystemExit(
         f"""
         
-Error: fedleave application not found.
+Error: useorlose application not found.
 
-The AnnualLeaveChartForTheYear application requires fedleave to be installed.
+The AnnualLeaveChartForTheYear application requires useorlose to be installed.
 
 Install the current Use or Lose suite and keep its companion applications together.
 
@@ -100,57 +100,57 @@ Searched:
 {details}
 
 If you downloaded both applications together, the backend should be inside the
-fedleave bundle directory next to this application.
+useorlose bundle directory next to this application.
         
 """
     )
 
 
-def run_fedleave(args: list[str]) -> Any:
+def run_useorlose(args: list[str]) -> Any:
     """
-    Run fedleave command and return parsed JSON output.
+    Run useorlose command and return parsed JSON output.
 
     Args:
-        args: Command line arguments to pass to fedleave
+        args: Command line arguments to pass to useorlose
 
     Returns:
-        Parsed JSON output from fedleave --json
+        Parsed JSON output from useorlose --json
 
     Raises:
-        SystemExit: If fedleave command fails
+        SystemExit: If useorlose command fails
     """
-    fedleave = find_fedleave_app()
+    useorlose = find_useorlose_app()
     result = subprocess.run(
-        [str(fedleave), *args],
+        [str(useorlose), *args],
         text=True,
         capture_output=True,
         check=False,
     )
     if result.returncode != 0:
         detail = "\n".join(part for part in [result.stdout, result.stderr] if part).strip()
-        raise SystemExit(f"fedleave command failed with exit code {result.returncode}:\n{detail}")
+        raise SystemExit(f"useorlose command failed with exit code {result.returncode}:\n{detail}")
     try:
         return json.loads(result.stdout)
     except json.JSONDecodeError as e:
-        raise SystemExit(f"Failed to parse fedleave output as JSON: {e}\nOutput: {result.stdout}")
+        raise SystemExit(f"Failed to parse useorlose output as JSON: {e}\nOutput: {result.stdout}")
 
 
 def get_default_data_dir() -> Path:
-    """Return the same platform-specific default data directory used by fedleave."""
+    """Return the same platform-specific default data directory used by useorlose."""
     if sys.platform.startswith("win"):
         local_appdata = os.getenv("LOCALAPPDATA")
         if local_appdata:
-            return Path(local_appdata) / "fedleave"
-        return Path.home() / "AppData" / "Local" / "fedleave"
+            return Path(local_appdata) / "useorlose"
+        return Path.home() / "AppData" / "Local" / "useorlose"
 
     xdg_data_home = os.getenv("XDG_DATA_HOME")
     if xdg_data_home:
-        return Path(xdg_data_home) / "fedleave"
+        return Path(xdg_data_home) / "useorlose"
 
     home = os.getenv("HOME")
     if home:
-        return Path(home) / ".local" / "share" / "fedleave"
-    return Path.home() / ".local" / "share" / "fedleave"
+        return Path(home) / ".local" / "share" / "useorlose"
+    return Path.home() / ".local" / "share" / "useorlose"
 
 
 def infer_leave_year(data_dir: Path) -> int:
@@ -159,7 +159,7 @@ def infer_leave_year(data_dir: Path) -> int:
     year_files = sorted(leave_year_dir.glob("*.json"))
     if not year_files:
         raise SystemExit(
-            f"No leave-year files found in {leave_year_dir}. Run `fedleave init` first or specify --data-dir PATH."
+            f"No leave-year files found in {leave_year_dir}. Run `useorlose init` first or specify --data-dir PATH."
         )
 
     today = date.today()
@@ -184,16 +184,16 @@ def infer_leave_year(data_dir: Path) -> int:
         return max(valid_years)
 
     raise SystemExit(
-        f"No readable leave-year files found in {leave_year_dir}. Run `fedleave init` first or specify --data-dir PATH."
+        f"No readable leave-year files found in {leave_year_dir}. Run `useorlose init` first or specify --data-dir PATH."
     )
 
 
 def get_leave_year_data(year: int, data_dir: Path | None = None) -> dict[str, Any]:
     """Obtain the canonical read-only linked snapshot from the selected CLI."""
     data_dir = data_dir or get_default_data_dir()
-    payload = run_fedleave(["snapshot", "--year", str(year), "--json", "--data-dir", str(data_dir)])
+    payload = run_useorlose(["snapshot", "--year", str(year), "--json", "--data-dir", str(data_dir)])
     if not isinstance(payload, dict) or "leave_year_start" not in payload:
-        raise SystemExit("fedleave returned an invalid accounting snapshot")
+        raise SystemExit("useorlose returned an invalid accounting snapshot")
     return payload
 
 
@@ -210,7 +210,7 @@ def format_hours(value: Decimal) -> str:
 
 
 def pay_period_end_date(period_data: Any) -> date:
-    """Return a pay period's end date from supported fedleave schemas."""
+    """Return a pay period's end date from supported useorlose schemas."""
     if isinstance(period_data, dict):
         end_value = period_data.get("end_date") or period_data.get("end")
         if not end_value:
@@ -243,7 +243,7 @@ def load_font(size: int, bold: bool = False, scale: float = 1.0) -> ImageFont.Fr
 
 def annual_balance_points(year: int, data_dir: Path | None = None):
     """Use the shared accounting snapshot for each pay-period endpoint."""
-    from fedleave.charting import snapshot_balance_points
+    from useorlose.charting import snapshot_balance_points
 
     snapshot = get_leave_year_data(year, data_dir)
     points = snapshot_balance_points(snapshot, "annual")
@@ -365,7 +365,7 @@ def render(
 def main() -> None:
     """Main entry point."""
     parser = argparse.ArgumentParser(
-        description="Create annual leave balance chart PNG using fedleave data.",
+        description="Create annual leave balance chart PNG using useorlose data.",
         epilog=HELP_EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
@@ -377,7 +377,7 @@ def main() -> None:
         default=BASE_WIDTH,
         help=f"Image width in pixels (default: {BASE_WIDTH}). Height is scaled maintaining aspect ratio.",
     )
-    parser.add_argument("--data-dir", help="fedleave data directory (default: ~/.local/share/fedleave)")
+    parser.add_argument("--data-dir", help="useorlose data directory (default: ~/.local/share/useorlose)")
     args = parser.parse_args()
 
     # Validate output file is PNG
@@ -405,7 +405,7 @@ def main() -> None:
             {
                 "ok": True,
                 "agent": "Annual Leave Chart for the Year",
-                "source_of_truth": "fedleave",
+                "source_of_truth": "useorlose",
                 "product": "annual-leave-chart-png",
                 "year": args.year,
                 "leave_year_start": snapshot.get("leave_year_start"),

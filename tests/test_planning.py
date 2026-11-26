@@ -6,10 +6,10 @@ from datetime import date
 
 import pytest
 
-from fedleave.config import Config
-from fedleave.cross_year import seed_accruals
-from fedleave.ledger import calculate_balances
-from fedleave.planning import (
+from useorlose.config import Config
+from useorlose.cross_year import seed_accruals
+from useorlose.ledger import calculate_balances
+from useorlose.planning import (
     PlanningValidationError,
     make_operation,
     new_scenario,

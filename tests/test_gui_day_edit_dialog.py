@@ -5,7 +5,7 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication
 
-from fedleave_gui.main_window import DayEditDialog, MainWindow, SaveDayPreviewDialog
+from useorlose_gui.main_window import DayEditDialog, MainWindow, SaveDayPreviewDialog
 
 
 def _application() -> QApplication:
@@ -142,8 +142,8 @@ def test_edit_day_requires_preview_confirmation(monkeypatch):
         def exec(self):
             return 0
 
-    monkeypatch.setattr("fedleave_gui.main_window.DayEditDialog", FakeEditDialog)
-    monkeypatch.setattr("fedleave_gui.main_window.SaveDayPreviewDialog", FakePreviewDialog)
+    monkeypatch.setattr("useorlose_gui.main_window.DayEditDialog", FakeEditDialog)
+    monkeypatch.setattr("useorlose_gui.main_window.SaveDayPreviewDialog", FakePreviewDialog)
 
     window.edit_day({"date": "2026-07-08", "entries": [{"category": "annual", "direction": "used", "hours": 2.0}]})
 
@@ -153,7 +153,7 @@ def test_edit_day_requires_preview_confirmation(monkeypatch):
         def exec(self):
             return 1
 
-    monkeypatch.setattr("fedleave_gui.main_window.SaveDayPreviewDialog", AcceptedPreviewDialog)
+    monkeypatch.setattr("useorlose_gui.main_window.SaveDayPreviewDialog", AcceptedPreviewDialog)
 
     window.edit_day({"date": "2026-07-08", "entries": [{"category": "annual", "direction": "used", "hours": 2.0}]})
 

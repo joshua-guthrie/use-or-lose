@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from fedleave.read_api import (
+from useorlose.read_api import (
     ReadApiError,
     dated_balance,
     day_activity,

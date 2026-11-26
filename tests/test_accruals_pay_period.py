@@ -1,10 +1,10 @@
 import json
 from pathlib import Path
 
-from fedleave.cli import accrual_change, balance, pay_period_summary, pay_periods_summary, use_or_lose
-from fedleave.config import init_config
-from fedleave.ledger import calculate_balances, calculate_pay_period_activity, ensure_automatic_accruals
-from fedleave.storage import write_json
+from useorlose.cli import accrual_change, balance, pay_period_summary, pay_periods_summary, use_or_lose
+from useorlose.config import init_config
+from useorlose.ledger import calculate_balances, calculate_pay_period_activity, ensure_automatic_accruals
+from useorlose.storage import write_json
 
 
 def _init_data_dir(data_dir: Path) -> dict:

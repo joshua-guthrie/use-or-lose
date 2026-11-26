@@ -9,10 +9,10 @@ from datetime import date
 import pytest
 from typer.testing import CliRunner
 
-from fedleave.cli import app
-from fedleave.cross_year import apply_creation, creation_plan, resolve_snapshot
-from fedleave.ledger import calculate_balances, calculate_daily_activity
 from leave_year_support import save, store, tree, tx
+from useorlose.cli import app
+from useorlose.cross_year import apply_creation, creation_plan, resolve_snapshot
+from useorlose.ledger import calculate_balances, calculate_daily_activity
 
 
 def call(base, *arguments, ok=True):
@@ -126,7 +126,7 @@ def test_CLI_017_INT_007_expiration_report_uses_original_identity(tmp_path):
     call(tmp_path, "init", "--from-year", "2026", "--year", "2027")
     # Report takes an injectable as-of date through the domain; CLI default is
     # today, so source history is independently checked without changing clocks.
-    from fedleave.expirations import expiration_report
+    from useorlose.expirations import expiration_report
 
     snapshot = resolve_snapshot(tmp_path, 2027)
     report = expiration_report(snapshot, snapshot.config, as_of=date(2027, 6, 1))
@@ -169,7 +169,7 @@ def test_INT_014_legacy_forward_link_keeps_historical_lot(tmp_path):
             )
         ],
     )
-    from fedleave.expirations import expiration_report
+    from useorlose.expirations import expiration_report
 
     report = expiration_report(source, config, as_of=date(2026, 8, 1))
     assert report["lots"][0]["remaining_hours"] == 8
@@ -185,7 +185,7 @@ def test_hash_seed_determinism(tmp_path, seed):
         [
             sys.executable,
             "-m",
-            "fedleave",
+            "useorlose",
             "rollover",
             "--from-year",
             "2026",
@@ -208,7 +208,7 @@ def test_hash_seed_determinism(tmp_path, seed):
 def test_INT_006_009_019_warning_expiry_chart_month_and_balance_agree(tmp_path):
     from decimal import Decimal
 
-    from fedleave.charting import snapshot_balance_points
+    from useorlose.charting import snapshot_balance_points
 
     store(tmp_path, transactions=[tx("origin", "2026-06-01", "comp", "earned", 8, expiration_date="2027-02-01")])
     call(tmp_path, "init", "--from-year", "2026", "--year", "2027")

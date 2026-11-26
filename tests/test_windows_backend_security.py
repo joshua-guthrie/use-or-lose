@@ -6,11 +6,11 @@ from pathlib import Path
 
 import pytest
 
-from fedleave.executable_search import is_executable, validate_backend
-from fedleave_analytics.app import load_analytics_data
-from fedleave_analytics.snapshots import ReadOnlySnapshotSource
-from fedleave_gui.backend import BackendOptions, FedleaveBackend
-from fedleave_month_report_graphic.report import run_fedleave
+from useorlose.executable_search import is_executable, validate_backend
+from useorlose_analytics.app import load_analytics_data
+from useorlose_analytics.snapshots import ReadOnlySnapshotSource
+from useorlose_gui.backend import BackendOptions, UseOrLoseBackend
+from useorlose_month_report_graphic.report import run_useorlose
 
 
 @pytest.mark.parametrize("suffix", [".bat", ".cmd", ".BAT", ".CmD"])
@@ -27,38 +27,38 @@ def test_windows_batch_backend_rejected_before_process_creation(tmp_path, monkey
     monkeypatch.setattr(subprocess, "run", forbidden)
     with pytest.raises((RuntimeError, ValueError, OSError)):
         if caller == "calendar":
-            FedleaveBackend(BackendOptions(fedleave_path=str(backend))).run_text(["--version"])
+            UseOrLoseBackend(BackendOptions(useorlose_path=str(backend))).run_text(["--version"])
         elif caller == "snapshot":
             ReadOnlySnapshotSource(backend, None)._run(["types"])
         elif caller == "analytics":
             load_analytics_data(backend, None, 2026)
         else:
-            run_fedleave(backend, ["types"])
+            run_useorlose(backend, ["types"])
 
 
 def test_windows_discovery_does_not_accept_batch_fallback(tmp_path, monkeypatch):
-    import fedleave_gui.backend as backend_module
+    import useorlose_gui.backend as backend_module
 
-    backend = tmp_path / "fedleave.cmd"
+    backend = tmp_path / "useorlose.cmd"
     backend.write_text("@echo off\n")
     monkeypatch.setattr(sys, "platform", "win32")
     monkeypatch.setattr(backend_module, "iter_executable_candidates", lambda name: iter(()))
     monkeypatch.setattr(backend_module.shutil, "which", lambda name: str(backend))
     with pytest.raises(RuntimeError):
-        backend_module.find_fedleave()
+        backend_module.find_useorlose()
     assert not is_executable(backend)
 
 
 @pytest.mark.parametrize("suffix", [".exe", ".EXE"])
 def test_windows_native_backend_validation_preserves_explicit_and_bare_paths(tmp_path, monkeypatch, suffix):
-    import fedleave.executable_search as search
+    import useorlose.executable_search as search
 
     executable = tmp_path / ("native backend" + suffix)
     executable.write_bytes(b"native test fixture; validation only")
     monkeypatch.setattr(sys, "platform", "win32")
-    monkeypatch.setattr(search.shutil, "which", lambda name: str(executable) if name == "fedleave.exe" else None)
+    monkeypatch.setattr(search.shutil, "which", lambda name: str(executable) if name == "use-or-lose.exe" else None)
     assert validate_backend(executable) == executable
-    assert validate_backend("fedleave") == executable
+    assert validate_backend("use-or-lose") == executable
     assert is_executable(executable)
 
 
@@ -78,7 +78,7 @@ def test_windows_validation_checks_the_resolved_executable_suffix(tmp_path, monk
 
 @pytest.mark.skipif(os.name != "nt", reason="Native Windows exe/argument integration runs in Windows CI")
 def test_native_windows_cli_keeps_hostile_comments_literal(tmp_path, monkeypatch):
-    executable = Path(sysconfig.get_path("scripts")) / "fedleave.exe"
+    executable = Path(sysconfig.get_path("scripts")) / "useorlose.exe"
     assert executable.is_file()
     data = tmp_path / "store"
     subprocess.run(
@@ -87,7 +87,7 @@ def test_native_windows_cli_keeps_hostile_comments_literal(tmp_path, monkeypatch
         capture_output=True,
     )
     monkeypatch.chdir(tmp_path)
-    backend = FedleaveBackend(BackendOptions(fedleave_path=str(executable), data_dir=str(data)))
+    backend = UseOrLoseBackend(BackendOptions(useorlose_path=str(executable), data_dir=str(data)))
     comment = 'quote " & echo SENTINEL > SHOULD_NOT_EXIST & | %VALUE% !VALUE! ^ Unicode café'
     backend.force_balance(date="2026-07-01", category="annual", hours=10, comment=comment)
     backend.set_day("2026-07-02", {"sick": -2}, comments={"sick": comment})

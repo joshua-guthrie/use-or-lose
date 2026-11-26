@@ -25,7 +25,7 @@ def application_directory(command: str, args: list[str]) -> Path:
 
 
 async def smoke(command: str, args: list[str], expected_names=None, *, restricted=False):
-    with tempfile.TemporaryDirectory(prefix="fedleave-mcp-smoke-") as folder:
+    with tempfile.TemporaryDirectory(prefix="useorlose-mcp-smoke-") as folder:
         root = Path(folder)
         policy = root / "policy.json"
         if restricted:
@@ -46,10 +46,10 @@ async def smoke(command: str, args: list[str], expected_names=None, *, restricte
             assert len(names) == len(listed.tools)
             if expected_names is not None:
                 assert names == set(expected_names), (names, expected_names)
-            assert "fedleave_starting_balance_set" in names
+            assert "use_or_lose_starting_balance_set" in names
             assert (
                 "restored_annual_comment"
-                in next(t for t in listed.tools if t.name == "fedleave_set_day").input_schema["properties"]
+                in next(t for t in listed.tools if t.name == "use_or_lose_set_day").input_schema["properties"]
             )
 
             async def call(name, arguments):
@@ -59,19 +59,20 @@ async def smoke(command: str, args: list[str], expected_names=None, *, restricte
                 assert payload["ok"] and payload["exit_code"] == 0, payload
                 return payload
 
-            await call("fedleave_init", {"year": 2026, "leave_year_start": "2026-01-11"})
-            balance = await call("fedleave_balance", {"year": 2026, "as_of": "2026-07-01"})
+            await call("use_or_lose_init", {"year": 2026, "leave_year_start": "2026-01-11"})
+            balance = await call("use_or_lose_balance", {"year": 2026, "as_of": "2026-07-01"})
             assert balance["format"] == "json" and "balances" in balance["data"]
             literal_comment = 'literal " & echo SENTINEL > SHOULD_NOT_EXIST & | %VALUE% !VALUE! ^ Unicode café'
             added = await call(
-                "fedleave_add", {"date": "2026-07-01", "category": "annual", "used": 2, "description": literal_comment}
+                "use_or_lose_add",
+                {"date": "2026-07-01", "category": "annual", "used": 2, "description": literal_comment},
             )
             transaction_id = added["data"]["transaction_id"]
-            literal_round_trip = await call("fedleave_list", {"year": 2026})
+            literal_round_trip = await call("use_or_lose_list", {"year": 2026})
             assert any(row.get("description") == literal_comment for row in literal_round_trip["data"]["transactions"])
             assert not (root / "SHOULD_NOT_EXIST").exists()
             await call(
-                "fedleave_reconcile",
+                "use_or_lose_reconcile",
                 {
                     "date": "2026-07-01",
                     "category": "annual",
@@ -80,19 +81,21 @@ async def smoke(command: str, args: list[str], expected_names=None, *, restricte
                     "reason": "smoke reconcile",
                 },
             )
-            await call("fedleave_correct", {"id": transaction_id, "hours": 1, "reason": "smoke correction"})
+            await call("use_or_lose_correct", {"id": transaction_id, "hours": 1, "reason": "smoke correction"})
             await call(
-                "fedleave_starting_balance_set", {"year": 2026, "category": "annual", "hours": 100, "reason": "opening"}
+                "use_or_lose_starting_balance_set",
+                {"year": 2026, "category": "annual", "hours": 100, "reason": "opening"},
             )
             await call(
-                "fedleave_set_day", {"date": "2026-07-02", "authoritative": True, "sick": -2, "sick_comment": "smoke"}
+                "use_or_lose_set_day",
+                {"date": "2026-07-02", "authoritative": True, "sick": -2, "sick_comment": "smoke"},
             )
             # Exercise parental rules in the installed/frozen sibling CLI on
             # both platforms, rather than only checking package file presence.
-            await call("fedleave_add", {"date": "2026-09-01", "category": "ppl", "earned": 480})
-            used = await call("fedleave_add", {"date": "2026-10-01", "category": "ppl", "used": 8})
-            await call("fedleave_add", {"date": "2026-10-02", "category": "fmla", "used": 4})
-            parental = (await call("fedleave_balance", {"year": 2026, "as_of": "2026-10-02"}))["data"]
+            await call("use_or_lose_add", {"date": "2026-09-01", "category": "ppl", "earned": 480})
+            used = await call("use_or_lose_add", {"date": "2026-10-01", "category": "ppl", "used": 8})
+            await call("use_or_lose_add", {"date": "2026-10-02", "category": "fmla", "used": 4})
+            parental = (await call("use_or_lose_balance", {"year": 2026, "as_of": "2026-10-02"}))["data"]
             assert parental["balances"]["ppl"] == 472 and parental["balances"]["fmla"] == -12
             assert parental["parental"]["fmla"]["ppl_derived_hours"] == 8
             assert parental["parental"]["fmla"]["remaining_hours"] is None  # History not confirmed.
@@ -100,21 +103,23 @@ async def smoke(command: str, args: list[str], expected_names=None, *, restricte
                 row["transaction_id"] == used["data"]["transaction_id"] and row["derived"]
                 for row in parental["parental"]["fmla"]["contributions"]
             )
-            invalid = await client.call_tool("fedleave_add", {"date": "2026-10-02", "category": "fmla", "earned": 480})
+            invalid = await client.call_tool(
+                "use_or_lose_add", {"date": "2026-10-02", "category": "fmla", "earned": 480}
+            )
             assert invalid.is_error
-            expiry = (await call("fedleave_expirations", {"year": 2026, "category": "ppl", "as_of": "2026-10-02"}))[
+            expiry = (await call("use_or_lose_expirations", {"year": 2026, "category": "ppl", "as_of": "2026-10-02"}))[
                 "data"
             ]
             assert expiry["lots"][0]["last_eligible_usage_date"] == "2027-08-31"
             assert expiry["lots"][0]["expiration_effective_date"] == "2027-09-01"
-            await call("fedleave_holidays", {"action": "list", "year": 2026})
+            await call("use_or_lose_holidays", {"action": "list", "year": 2026})
             # Two independent stdio server processes must coordinate through
             # their installed CLI children, including in the frozen packages.
             async with Client(params, read_timeout_seconds=60) as second:
                 results = await asyncio.gather(
                     *[
                         connection.call_tool(
-                            "fedleave_add",
+                            "use_or_lose_add",
                             {
                                 "date": "2026-07-03",
                                 "category": "annual",
@@ -126,17 +131,17 @@ async def smoke(command: str, args: list[str], expected_names=None, *, restricte
                     ]
                 )
                 assert all(not result.is_error for result in results), results
-            listed = await call("fedleave_list", {"year": 2026})
+            listed = await call("use_or_lose_list", {"year": 2026})
             descriptions = {t.get("description") for t in listed["data"]["transactions"]}
             assert {"packaged-agent-0", "packaged-agent-1"} <= descriptions
             assert not (root / "SHOULD_NOT_EXIST").exists()
             if restricted:
-                denied = await client.call_tool("fedleave_void", {"id": transaction_id})
+                denied = await client.call_tool("use_or_lose_void", {"id": transaction_id})
                 assert denied.is_error and denied.structured_content["error"] == "permission_denied"
             else:
-                await call("fedleave_void", {"id": transaction_id})
+                await call("use_or_lose_void", {"id": transaction_id})
                 await call(
-                    "fedleave_force_balance",
+                    "use_or_lose_force_balance",
                     {
                         "date": "2026-07-01",
                         "category": "annual",
@@ -145,12 +150,14 @@ async def smoke(command: str, args: list[str], expected_names=None, *, restricte
                     },
                 )
                 archive = root / "reports with spaces" / "backup.json"
-                await call("fedleave_export_data", {"output": str(archive)})
+                await call("use_or_lose_export_data", {"output": str(archive)})
                 other = root / "alternate datastore"
-                await call("fedleave_import_data", {"input": str(archive), "data_dir": str(other)})
-                await call("fedleave_import_data", {"input": str(archive), "data_dir": str(other), "overwrite": True})
+                await call("use_or_lose_import_data", {"input": str(archive), "data_dir": str(other)})
                 await call(
-                    "fedleave_rollover",
+                    "use_or_lose_import_data", {"input": str(archive), "data_dir": str(other), "overwrite": True}
+                )
+                await call(
+                    "use_or_lose_rollover",
                     {
                         "from_year": 2026,
                         "to_year": 2027,
@@ -163,7 +170,7 @@ async def smoke(command: str, args: list[str], expected_names=None, *, restricte
             # Exercise noninteractive text validation with an actual fixable
             # issue in installed/frozen children too. Windows NUL previously
             # appeared interactive, so a clean-store validation would miss it.
-            base = root / "data" if restricted else root / ("local" if os.name == "nt" else "xdg") / "fedleave"
+            base = root / "data" if restricted else root / ("local" if os.name == "nt" else "xdg") / "use-or-lose"
             # The existing packaged Analytics executable must actually render
             # Seasonality's two selectors against this exact CLI/datastore.
             suffix = ".exe" if os.name == "nt" else ""
@@ -178,7 +185,7 @@ async def smoke(command: str, args: list[str], expected_names=None, *, restricte
                     str(sibling / ("UseOrLoseAnalytics" + suffix)),
                     "--smoke-test",
                     "--backend",
-                    str(sibling / ("fedleave" + suffix)),
+                    str(sibling / ("use-or-lose" + suffix)),
                     "--data-dir",
                     str(base),
                     "--year",
@@ -200,10 +207,10 @@ async def smoke(command: str, args: list[str], expected_names=None, *, restricte
             year["transactions"][0]["date"] = f"{yyyy}-{int(mm)}-{int(dd)}"
             assert year["transactions"][0]["date"] != original_date
             year_path.write_text(json.dumps(year), encoding="utf-8")
-            validation = await client.call_tool("fedleave_validate", {"json_output": False})
+            validation = await client.call_tool("use_or_lose_validate", {"json_output": False})
             assert validation.is_error and validation.structured_content["exit_code"] == 2, validation
             assert "Apply suggested fixes" not in validation.structured_content["stdout"]
-            applied = await client.call_tool("fedleave_validate", {"json_output": False, "apply": True})
+            applied = await client.call_tool("use_or_lose_validate", {"json_output": False, "apply": True})
             assert applied.is_error and applied.structured_content["exit_code"] == 2, applied
             assert json.loads(year_path.read_text(encoding="utf-8"))["transactions"][0]["date"] == original_date
             unknown = await client.call_tool("arbitrary_shell", {"command": "echo unsafe"})

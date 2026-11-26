@@ -6,11 +6,11 @@ from datetime import date, timedelta
 import pytest
 from typer.testing import CliRunner
 
-from fedleave.cli import app
-from fedleave.cross_year import apply_creation, creation_plan, derive_carryover
-from fedleave.ledger import calculate_balances
-from fedleave.payperiods import validate_pay_periods
 from leave_year_support import store, tree, tx
+from useorlose.cli import app
+from useorlose.cross_year import apply_creation, creation_plan, derive_carryover
+from useorlose.ledger import calculate_balances
+from useorlose.payperiods import validate_pay_periods
 
 
 @pytest.mark.parametrize(

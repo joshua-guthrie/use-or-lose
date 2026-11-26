@@ -10,17 +10,17 @@ README = ROOT / "README.md"
 
 
 EXPECTED_SCREENSHOTS = {
-    "examples/fedleave-calendar-main-screen.png",
-    "examples/fedleave-calendar-edit-leave.png",
-    "examples/fedleave-calendar-preferences.png",
-    "examples/fedleave-calendar-force-balance.png",
-    "examples/fedleave-calendar-expiring-leave.png",
-    "examples/fedleave-calendar-transactions.png",
-    "examples/fedleave-analytics-main.png",
-    "examples/fedleave-analytics-seasonality.png",
-    "examples/fedleave-analytics-calendar-heatmap.png",
-    "examples/fedleave-analytics-overtime-comp-credit.png",
-    "examples/fedleave-analytics-supporting-transactions.png",
+    "examples/useorlose-calendar-main-screen.png",
+    "examples/useorlose-calendar-edit-leave.png",
+    "examples/useorlose-calendar-preferences.png",
+    "examples/useorlose-calendar-force-balance.png",
+    "examples/useorlose-calendar-expiring-leave.png",
+    "examples/useorlose-calendar-transactions.png",
+    "examples/useorlose-analytics-main.png",
+    "examples/useorlose-analytics-seasonality.png",
+    "examples/useorlose-analytics-calendar-heatmap.png",
+    "examples/useorlose-analytics-overtime-comp-credit.png",
+    "examples/useorlose-analytics-supporting-transactions.png",
     "examples/annual-leave-chart-sample.png",
     "examples/sick-leave-chart-sample.png",
     "examples/credit-hours-chart-sample.png",
@@ -55,10 +55,10 @@ def test_readme_screenshots_are_high_resolution_png_files() -> None:
             assert image.height >= 700, f"{relative_path} is only {image.height}px high"
 
 
-def test_readme_identifies_fedleave_as_main_and_analytics_as_a_companion() -> None:
+def test_readme_identifies_useorlose_as_main_and_analytics_as_a_companion() -> None:
     text = README.read_text(encoding="utf-8")
 
-    assert "The main application is `fedleave`" in text
+    assert "The main application is `use-or-lose`" in text
     companion_section = text.split("## Companion Applications", 1)[1]
     assert "### Companion Application: UseOrLoseAnalytics" in companion_section
     assert "Analysis > Analytics..." in companion_section

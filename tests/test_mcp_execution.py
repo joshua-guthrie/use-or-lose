@@ -9,9 +9,9 @@ import sys
 
 import pytest
 
-from fedleave.mcp.catalog import discover
-from fedleave.mcp.execution import Executor, run_cli
-from fedleave.mcp.policy import Policy
+from useorlose.mcp.catalog import discover
+from useorlose.mcp.execution import Executor, run_cli
+from useorlose.mcp.policy import Policy
 
 
 @pytest.fixture
@@ -20,7 +20,7 @@ def executor(tmp_path):
 
 
 def call(executor, tool, arguments=None):
-    return asyncio.run(executor.call(f"fedleave_{tool}", arguments or {}))
+    return asyncio.run(executor.call(f"use_or_lose_{tool}", arguments or {}))
 
 
 def initialize(executor):
@@ -151,7 +151,7 @@ def test_malformed_json_and_nonzero_stderr_are_not_success(executor, monkeypatch
     async def fake(*args):
         return {"ok": True, "exit_code": 0, "stdout": output, "stderr": "warning"}
 
-    monkeypatch.setattr("fedleave.mcp.execution.run_cli", fake)
+    monkeypatch.setattr("useorlose.mcp.execution.run_cli", fake)
     result = call(executor, "balance", {"year": 2026})
     assert result["error"] == "malformed_json" and result["stderr"] == "warning"
 
@@ -165,7 +165,7 @@ def test_audit_contains_outcome_not_leave_details(executor, tmp_path):
     )["ok"]
     text = audit.read_text()
     assert "sensitive appointment" not in text
-    assert json.loads(text.splitlines()[-1])["tool"] == "fedleave_add"
+    assert json.loads(text.splitlines()[-1])["tool"] == "use_or_lose_add"
     result = call(
         executor,
         "set_day",
@@ -256,14 +256,14 @@ def test_full_access_migrations_match_direct_cli_even_with_inherited_guards(full
     legacy = json.loads(year_path.read_text())
     legacy["starting_balance_history"] = [{"old": "private"}]
     year_path.write_text(json.dumps(legacy))
-    direct = tmp_path / "direct-default" / "fedleave"
+    direct = tmp_path / "direct-default" / "use-or-lose"
     shutil.copytree(base, direct)
     # Simulate inheriting a restricted launch. Full access clears these in its
     # child, preserving the actual OS-user defaults and normal maintenance.
-    monkeypatch.setenv("FEDLEAVE_MCP_READ_ONLY", "1")
-    monkeypatch.setenv("FEDLEAVE_MCP_WRITE_ROOTS", "[]")
-    monkeypatch.setenv("FEDLEAVE_MCP_PROTECTED_PATHS", json.dumps([str(year_path)]))
-    monkeypatch.setenv("FEDLEAVE_MCP_DATA_DIR", str(tmp_path / "unrelated"))
+    monkeypatch.setenv("USE_OR_LOSE_MCP_READ_ONLY", "1")
+    monkeypatch.setenv("USE_OR_LOSE_MCP_WRITE_ROOTS", "[]")
+    monkeypatch.setenv("USE_OR_LOSE_MCP_PROTECTED_PATHS", json.dumps([str(year_path)]))
+    monkeypatch.setenv("USE_OR_LOSE_MCP_DATA_DIR", str(tmp_path / "unrelated"))
     result = call(full_access, "years")
     assert result["ok"], result
     direct_env = {k: v for k, v in os.environ.items() if not k.startswith("FEDLEAVE_MCP_")}
@@ -282,7 +282,7 @@ def test_full_access_migrations_match_direct_cli_even_with_inherited_guards(full
 
 
 def full_access_executable():
-    from fedleave.mcp.execution import find_executable
+    from useorlose.mcp.execution import find_executable
 
     return find_executable()
 
@@ -313,7 +313,7 @@ def test_full_access_matches_direct_cli_transactions_json_and_exit_codes(full_ac
         direct_result = subprocess.run(
             [
                 str(full_access_executable()),
-                *full_access.catalog[f"fedleave_{tool}"].argv(
+                *full_access.catalog[f"use_or_lose_{tool}"].argv(
                     {**arguments, "json_output": True, "data_dir": str(direct)}
                 ),
             ],
@@ -352,7 +352,7 @@ def test_full_access_imports_ics_and_wms_files_without_roots(full_access, tmp_pa
 def test_full_access_network_commands_run_registered_cli_with_stubbed_services(full_access, monkeypatch):
     from typer.testing import CliRunner
 
-    from fedleave.cli import app
+    from useorlose.cli import app
 
     requested = []
 
@@ -367,8 +367,8 @@ def test_full_access_network_commands_run_registered_cli_with_stubbed_services(f
             b"DTSTAMP:20260101T000000Z\nDTSTART;VALUE=DATE:20260101\nSUMMARY:Test\nEND:VEVENT\nEND:VCALENDAR\n"
         )
 
-    monkeypatch.setattr("fedleave.commands.updates.check_for_updates", update_check)
-    monkeypatch.setattr("fedleave.holidays.download_ics", download_ics)
+    monkeypatch.setattr("useorlose.commands.updates.check_for_updates", update_check)
+    monkeypatch.setattr("useorlose.holidays.download_ics", download_ics)
 
     async def registered_cli(executable, argv, env, timeout, max_output):
         result = CliRunner().invoke(app, argv)
@@ -379,7 +379,7 @@ def test_full_access_network_commands_run_registered_cli_with_stubbed_services(f
             "stderr": result.stderr,
         }
 
-    monkeypatch.setattr("fedleave.mcp.execution.run_cli", registered_cli)
+    monkeypatch.setattr("useorlose.mcp.execution.run_cli", registered_cli)
     result = call(full_access, "check_for_updates")
     assert result["ok"] and result["data"]["status"] == "ok", result
     result = call(
@@ -415,7 +415,7 @@ def test_full_access_text_validation_reports_and_applies_without_prompting(full_
 
 
 def test_full_access_lock_contention_reports_cli_exit_75(full_access):
-    from fedleave.locking import datastore_lock
+    from useorlose.locking import datastore_lock
 
     full_access.policy = Policy(lock_timeout_seconds=0.1)
     with datastore_lock(full_access.policy.data_dir):

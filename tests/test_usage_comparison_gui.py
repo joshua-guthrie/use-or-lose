@@ -12,10 +12,10 @@ from PySide6.QtCore import QThread, QThreadPool
 from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QFileDialog, QMessageBox, QPushButton
 
-from fedleave_analytics.app import AnalyticsWindow
-from fedleave_analytics.comparison_model import cumulative_tables
-from fedleave_analytics.comparison_view import ComparisonWidget
 from leave_year_support import source, store, tree, tx
+from useorlose_analytics.app import AnalyticsWindow
+from useorlose_analytics.comparison_model import cumulative_tables
+from useorlose_analytics.comparison_view import ComparisonWidget
 
 TODAY = date(2026, 6, 30)
 
@@ -92,7 +92,7 @@ def test_controls_reuse_cached_sources_and_keep_exact_result(qtbot, comparison, 
     def forbidden(*args):
         raise AssertionError("Control edits must not reload backend snapshots")
 
-    monkeypatch.setattr("fedleave_analytics.snapshots.ReadOnlySnapshotSource._run", forbidden)
+    monkeypatch.setattr("useorlose_analytics.snapshots.ReadOnlySnapshotSource._run", forbidden)
     view.category_actions["sick"].setChecked(True)
     wait_result(qtbot, view)
     assert view.result.parameters.categories == ("annual", "sick")
@@ -116,7 +116,7 @@ def test_real_backend_legacy_readonly_store_survives_exports(qtbot, tmp_path, mo
     before, files = tree(data), list(data.rglob("*.json"))
     for path in files:
         path.chmod(0o444)
-    backend = Path(sysconfig.get_path("scripts")) / ("fedleave.exe" if os.name == "nt" else "fedleave")
+    backend = Path(sysconfig.get_path("scripts")) / ("use-or-lose.exe" if os.name == "nt" else "use-or-lose")
     view = ComparisonWidget(backend, str(data), 2026, today=TODAY)
     qtbot.addWidget(view)
     try:
@@ -151,7 +151,7 @@ def test_real_backend_legacy_readonly_store_survives_exports(qtbot, tmp_path, mo
 
 def test_missing_store_is_not_initialized(qtbot, tmp_path):
     data = tmp_path / "missing"
-    backend = Path(sysconfig.get_path("scripts")) / ("fedleave.exe" if os.name == "nt" else "fedleave")
+    backend = Path(sysconfig.get_path("scripts")) / ("use-or-lose.exe" if os.name == "nt" else "use-or-lose")
     view = ComparisonWidget(backend, str(data), 2026, today=TODAY)
     qtbot.addWidget(view)
     view.load_source()
@@ -209,9 +209,9 @@ def test_cancel_during_worker_loading_discards_late_snapshot(qtbot, monkeypatch,
         assert released.wait(10)
         return source(year)
 
-    monkeypatch.setattr("fedleave_analytics.snapshots.ReadOnlySnapshotSource.snapshot", snapshot)
+    monkeypatch.setattr("useorlose_analytics.snapshots.ReadOnlySnapshotSource.snapshot", snapshot)
     monkeypatch.setattr(
-        "fedleave_analytics.snapshots.ReadOnlySnapshotSource.inventory",
+        "useorlose_analytics.snapshots.ReadOnlySnapshotSource.inventory",
         lambda self: [{"leave_year": 2026, "valid": True}],
     )
     view = ComparisonWidget(Path("/selected/backend"), "/exact/store", 2026, today=TODAY)

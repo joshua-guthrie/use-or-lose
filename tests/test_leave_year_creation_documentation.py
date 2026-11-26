@@ -6,8 +6,8 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from fedleave.cli import app
 from leave_year_support import store
+from useorlose.cli import app
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -87,7 +87,7 @@ def test_cli_help_exposes_modes_and_review_options(command, terms):
 
 
 def test_DOC_015_GUI_help_and_architecture_agree():
-    gui = (ROOT / "help/fedleave-calendar-help.html").read_text()
+    gui = (ROOT / "help/useorlose-calendar-help.html").read_text()
     architecture = (ROOT / "docs/ARCHITECTURE.md").read_text()
     assert "Manual Starting Balances" in gui and "Carry Over From Previous Leave Year" in gui
     assert "GUI warns" in gui and "carryover-reconcile" in gui
@@ -98,10 +98,10 @@ def test_DOC_015_GUI_help_and_architecture_agree():
 def test_GUI_025_PKG_005_no_GUI_ledger_writer():
     # New-year workflow and adapter must contain only CLI calls, never raw store
     # access. Settings/report export writes elsewhere in Qt remain legitimate.
-    main = (ROOT / "src/fedleave_gui/main_window.py").read_text()
+    main = (ROOT / "src/useorlose_gui/main_window.py").read_text()
     dialog = main[main.index("class StartYearDialog") : main.index("class SelectMonthDialog")]
     create = main[main.index("    def _ensure_leave_year") : main.index("    def validate_data")]
-    backend = (ROOT / "src/fedleave_gui/backend.py").read_text()
+    backend = (ROOT / "src/useorlose_gui/backend.py").read_text()
     for source in (dialog, create, backend):
         assert "write_json" not in source and "leave_years/" not in source
         assert "write_text" not in source
@@ -113,6 +113,6 @@ def test_PKG_001_002_core_modules_are_in_discovered_packages():
     import setuptools
 
     packages = setuptools.find_packages(where=str(ROOT / "src"))
-    assert "fedleave" in packages
+    assert "useorlose" in packages
     for filename in ("categories.py", "cross_year.py"):
-        assert (ROOT / "src/fedleave" / filename).is_file()
+        assert (ROOT / "src/useorlose" / filename).is_file()

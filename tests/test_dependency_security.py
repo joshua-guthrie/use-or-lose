@@ -36,7 +36,7 @@ def test_inventory_describes_resolved_environment_without_local_metadata(tmp_pat
         assert packages[name] == version(name)
     assert ("pytest" in packages) is (not runtime_only)
     lines = requirements.read_text().splitlines()
-    assert "fedleave" in packages
-    assert not any(line.startswith("fedleave==") for line in lines)
-    assert lines == [f"{name}=={value}" for name, value in sorted(packages.items()) if name != "fedleave"]
+    assert "use-or-lose" in packages
+    assert not any(line.startswith("useorlose==") for line in lines)
+    assert lines == [f"{name}=={value}" for name, value in sorted(packages.items()) if name != "use-or-lose"]
     assert str(Path.cwd()) not in output.read_text() + requirements.read_text()

@@ -5,8 +5,8 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication, QSizePolicy
 
-from fedleave_gui.main_window import DayCell
-from fedleave_gui.settings import GuiSettings
+from useorlose_gui.main_window import DayCell
+from useorlose_gui.settings import GuiSettings
 
 
 def _application() -> QApplication:

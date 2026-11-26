@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from fedleave.holidays import generate_federal_holidays
+from useorlose.holidays import generate_federal_holidays
 
 
 def test_generate_federal_holidays(tmp_path: Path):

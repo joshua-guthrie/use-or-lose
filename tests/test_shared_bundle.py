@@ -31,7 +31,7 @@ def _engine(module, platform: str = "linux"):
 def test_linux_bundle_deduplicates_large_identical_runtime_files(tmp_path: Path) -> None:
     module = _load_engine_module()
     engine = _engine(module)
-    bundle = tmp_path / "fedleave-Ubuntu"
+    bundle = tmp_path / "useorlose-Ubuntu"
     support = bundle / "_internal"
     nested = support / "PySide6" / "Qt" / "lib"
     nested.mkdir(parents=True)
@@ -52,14 +52,14 @@ def test_linux_bundle_deduplicates_large_identical_runtime_files(tmp_path: Path)
 def test_publish_preserves_internal_deduplication_links(tmp_path: Path) -> None:
     module = _load_engine_module()
     engine = _engine(module)
-    completed = tmp_path / "completed" / "fedleave-Ubuntu"
+    completed = tmp_path / "completed" / "useorlose-Ubuntu"
     support = completed / "_internal"
     nested = support / "nested"
     nested.mkdir(parents=True)
     canonical = support / "runtime.so"
     canonical.write_bytes(b"runtime")
     (nested / "runtime.so").symlink_to("../runtime.so")
-    published = tmp_path / "published" / "fedleave-Ubuntu"
+    published = tmp_path / "published" / "useorlose-Ubuntu"
 
     engine._publish_build(completed, published)
 
@@ -71,7 +71,7 @@ def test_publish_preserves_internal_deduplication_links(tmp_path: Path) -> None:
 def test_windows_bundle_does_not_create_symlinks(tmp_path: Path) -> None:
     module = _load_engine_module()
     engine = _engine(module, platform="windows")
-    support = tmp_path / "fedleave-Windows" / "_internal"
+    support = tmp_path / "useorlose-Windows" / "_internal"
     support.mkdir(parents=True)
     first = support / "first.dll"
     second = support / "second.dll"

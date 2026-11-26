@@ -31,7 +31,7 @@ def test_manifest_lists_all_project_scripts():
     manifest = (ROOT / "scripts" / "lib" / "common" / "application_manifest.toml").read_text(encoding="utf-8")
 
     expected_apps = [
-        "fedleave",
+        "use-or-lose",
         "UseOrLoseCalendar",
         "UseOrLoseAnalytics",
         "AnnualLeaveChartForTheYear",
@@ -47,7 +47,7 @@ def test_manifest_lists_all_project_scripts():
         "TravelCompYearlyComparison",
         "TimeOffAwardYearlyComparison",
         "OvertimeYearlyComparison",
-        "fedleaveMonthReportGraphic",
+        "UseOrLoseMonthReportGraphic",
     ]
 
     for app in expected_apps:

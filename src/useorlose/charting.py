@@ -1,0 +1,687 @@
+"""Share data loading, rendering, and CLI behavior across chart companions."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import shutil
+import subprocess
+import sys
+from calendar import monthrange
+from dataclasses import dataclass
+from datetime import date
+from decimal import Decimal
+from pathlib import Path
+from typing import Any
+
+from PIL import Image, ImageDraw, ImageFont
+
+from .chart_style import (
+    BACKGROUND,
+    BASE_ASPECT_RATIO,
+    BASE_WIDTH,
+    BLUE,
+    BORDER,
+    GRID_MAJOR,
+    GRID_MINOR,
+    PLOT_BOTTOM,
+    PLOT_LEFT,
+    PLOT_RIGHT,
+    PLOT_TOP,
+    TEXT,
+    draw_historical_and_future_line,
+)
+from .cli_helpers import load_read_snapshot as load_leave_year
+from .cli_helpers import parse_iso_date
+from .config import get_default_data_dir as resolve_default_data_dir
+from .executable_search import is_executable, iter_executable_candidates, validate_backend
+from .exporting import export_file
+from .ledger import calculate_balances
+from .project_info import HELP_EPILOG
+
+Y_MIN = Decimal("0")
+
+
+@dataclass(frozen=True)
+class LeaveChartSpec:
+    """Static identity and data selection for one balance-chart executable."""
+
+    app_name: str
+    title: str
+    category: str
+    product: str
+    point_field: str = "balance_hours"
+
+
+@dataclass(frozen=True)
+class ComparisonChartSpec:
+    """Static identity and scale policy for one comparison-chart executable."""
+
+    app_name: str
+    title: str
+    category: str
+    product: str
+    value_field: str = "balance_hours"
+    y_rounding: int = 10
+
+
+COMPARISON_CATEGORY_LABELS = {
+    "annual": "Annual Leave",
+    "sick": "Sick Leave",
+    "overtime": "Overtime Worked",
+    "credit": "Credit Hours",
+    "comp": "Comp Time",
+    "travel_comp": "Travel Comp",
+    "time_off_award": "Time-Off Award",
+}
+
+
+class ChartDimensions:
+    """Scale the common chart coordinate system to an output resolution."""
+
+    def __init__(self, width_pixels: int = BASE_WIDTH, y_max: Decimal = Decimal("10")):
+        self.width = width_pixels
+        self.height = int(width_pixels * BASE_ASPECT_RATIO)
+        scale = width_pixels / BASE_WIDTH
+        self.plot_left = int(PLOT_LEFT * scale)
+        self.plot_top = int(PLOT_TOP * scale)
+        self.plot_right = int(PLOT_RIGHT * scale)
+        self.plot_bottom = int(PLOT_BOTTOM * scale)
+        self.y_min = Y_MIN
+        self.y_max = y_max
+        self.scale = scale
+
+
+def round_up_to_nearest_ten(value: Decimal) -> Decimal:
+    if value <= 0:
+        return Decimal("0")
+    return ((value + 9) // 10) * 10
+
+
+def round_up_to_nearest_fifty(value: Decimal) -> Decimal:
+    if value <= 0:
+        return Decimal("0")
+    return ((value + 49) // 50) * 50
+
+
+def y_tick_step(y_max: Decimal) -> Decimal:
+    target = max(y_max / Decimal("5"), Decimal("10"))
+    return max(Decimal("10"), round_up_to_nearest_ten(target))
+
+
+def comparison_y_tick_step(y_max: Decimal) -> Decimal:
+    target = max(y_max / Decimal("5"), Decimal("10"))
+    return max(Decimal("10"), round_up_to_nearest_ten(target))
+
+
+def comparison_date_for_year(as_of: date, year: int) -> date:
+    """Map a selected comparison date onto a specific leave year."""
+    last_day = monthrange(year, as_of.month)[1]
+    return date(year, as_of.month, min(as_of.day, last_day))
+
+
+def _executable_names(app_name: str) -> tuple[str, ...]:
+    if sys.platform.startswith("win"):
+        return (f"{app_name}.exe",)
+    return (app_name,)
+
+
+def find_companion_app(app_name: str, explicit: str | None = None) -> Path:
+    """Locate a bundled or PATH-visible companion executable."""
+    if explicit:
+        path = validate_backend(explicit)
+        if is_executable(path):
+            return path
+        raise FileNotFoundError(f"{app_name} executable was not found or is not executable: {path}")
+
+    searched: list[Path] = []
+    for candidate in iter_executable_candidates(app_name):
+        searched.append(candidate)
+        if is_executable(candidate):
+            return candidate
+
+    for executable_name in _executable_names(app_name):
+        path_hit = shutil.which(executable_name)
+        if path_hit and is_executable(Path(path_hit)):
+            return Path(path_hit)
+
+    details = "\n".join(f"  - {candidate}" for candidate in searched)
+    raise FileNotFoundError(
+        f"{app_name} executable was not found.\n\n"
+        f"Searched:\n{details}\n\n"
+        "Install the current Use or Lose suite or place the companion app next to this application."
+    )
+
+
+def get_default_data_dir() -> Path:
+    if sys.platform.startswith("win"):
+        local_appdata = os.getenv("LOCALAPPDATA")
+        if local_appdata:
+            return Path(local_appdata) / "UseOrLose"
+        xdg_data_home = os.getenv("XDG_DATA_HOME")
+        if xdg_data_home:
+            return Path(xdg_data_home) / "use-or-lose"
+        return Path.home() / "AppData" / "Local" / "UseOrLose"
+
+    xdg_data_home = os.getenv("XDG_DATA_HOME")
+    if xdg_data_home:
+        return Path(xdg_data_home) / "use-or-lose"
+
+    home = os.getenv("HOME")
+    if home:
+        return Path(home) / ".local" / "share" / "use-or-lose"
+    return Path.home() / ".local" / "share" / "use-or-lose"
+
+
+def infer_leave_year(data_dir: Path) -> int:
+    """Choose the leave year containing today, falling back to the latest."""
+    leave_year_dir = data_dir / "leave_years"
+    year_files = sorted(leave_year_dir.glob("*.json"))
+    if not year_files:
+        raise SystemExit(
+            f"No leave-year files found in {leave_year_dir}. Run `use-or-lose init` first or specify --data-dir PATH."
+        )
+
+    today = date.today()
+    valid_years: list[int] = []
+    for year_file in year_files:
+        try:
+            year = int(year_file.stem)
+            leave_year = json.loads(year_file.read_text())
+            valid_years.append(year)
+        except (OSError, ValueError, json.JSONDecodeError):
+            continue
+
+        try:
+            start = date.fromisoformat(str(leave_year["leave_year_start"]))
+            end = date.fromisoformat(str(leave_year["leave_year_end"]))
+        except (KeyError, ValueError):
+            continue
+        if start <= today <= end:
+            return year
+
+    if valid_years:
+        return max(valid_years)
+
+    raise SystemExit(
+        f"No readable leave-year files found in {leave_year_dir}. Run `use-or-lose init` first or specify --data-dir PATH."
+    )
+
+
+def get_leave_year_data(year: int, data_dir: Path | None = None) -> dict[str, Any]:
+    """Obtain the canonical read-only linked snapshot from the selected CLI."""
+    data_dir = data_dir or get_default_data_dir()
+    payload = run_useorlose(["snapshot", "--year", str(year), "--json", "--data-dir", str(data_dir)])
+    if not isinstance(payload, dict) or "leave_year_start" not in payload:
+        raise SystemExit("use-or-lose returned an invalid accounting snapshot")
+    return payload
+
+
+def decimal_hours(value: Any) -> Decimal:
+    return Decimal(str(value or "0"))
+
+
+def format_hours(value: Decimal) -> str:
+    if value == value.to_integral():
+        return str(value.quantize(Decimal("1")))
+    return format(value.normalize(), "f")
+
+
+def pay_period_end_date(period_data: Any) -> date:
+    if isinstance(period_data, dict):
+        end_value = period_data.get("end_date") or period_data.get("end")
+        if not end_value:
+            raise SystemExit(f"Pay period is missing end_date: {period_data}")
+        return date.fromisoformat(str(end_value))
+    return period_data
+
+
+def load_font(size: int, bold: bool = False, scale: float = 1.0) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
+    scaled_size = int(size * scale)
+    windows_fonts = Path(os.environ.get("WINDIR", "C:/Windows")) / "Fonts"
+    candidates = [
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+        if bold
+        else "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "/usr/share/fonts/truetype/liberation2/LiberationSans-Bold.ttf"
+        if bold
+        else "/usr/share/fonts/truetype/liberation2/LiberationSans-Regular.ttf",
+        windows_fonts / ("arialbd.ttf" if bold else "arial.ttf"),
+        windows_fonts / ("segoeuib.ttf" if bold else "segoeui.ttf"),
+        windows_fonts / ("calibrib.ttf" if bold else "calibri.ttf"),
+    ]
+    for candidate in candidates:
+        path = Path(candidate)
+        if path.exists():
+            return ImageFont.truetype(str(path), scaled_size)
+    return ImageFont.load_default()
+
+
+def snapshot_balance_points(snapshot: dict[str, Any], category: str) -> list[tuple[date, Decimal]]:
+    """Use canonical accounting for each point on one pre-resolved snapshot."""
+    periods = list(snapshot.get("pay_periods", []))
+    if not periods:
+        from .payperiods import generate_pay_periods
+
+        periods = generate_pay_periods(
+            date.fromisoformat(snapshot["leave_year_start"]), int(snapshot.get("pay_period_count", 26))
+        )
+    points = []
+    for period in periods:
+        end = pay_period_end_date(period)
+        value = calculate_balances(snapshot, until_date=end.isoformat()).get(category, 0.0)
+        points.append((end, decimal_hours(value)))
+    return points
+
+
+def category_balance_points(
+    category: str,
+    year: int,
+    data_dir: Path | None = None,
+) -> tuple[list[tuple[date, Decimal]], dict[str, Any], Decimal]:
+    """Calculate points from the CLI snapshot without a parallel balance formula."""
+    snapshot = get_leave_year_data(year, data_dir)
+    points = snapshot_balance_points(snapshot, category)
+    opening = decimal_hours(snapshot.get("starting_balances", {}).get(category, 0))
+    maximum = max([opening, *(value for _, value in points)])
+    return points, snapshot, maximum
+
+
+def y_to_px(value: Decimal, dims: ChartDimensions) -> float:
+    clamped = max(dims.y_min, min(dims.y_max, value))
+    return float(
+        dims.plot_bottom - ((clamped - dims.y_min) / (dims.y_max - dims.y_min)) * (dims.plot_bottom - dims.plot_top)
+    )
+
+
+def x_positions(count: int, dims: ChartDimensions) -> list[float]:
+    if count <= 1:
+        return [(dims.plot_left + dims.plot_right) / 2]
+    return [dims.plot_left + (dims.plot_right - dims.plot_left) * index / (count - 1) for index in range(count)]
+
+
+def catmull_rom(points: list[tuple[float, float]], samples_per_segment: int = 18) -> list[tuple[float, float]]:
+    """Interpolate a smooth curve through comparison-chart points."""
+    if len(points) < 3:
+        return points
+    smooth: list[tuple[float, float]] = []
+    extended = [points[0], *points, points[-1]]
+    for index in range(1, len(extended) - 2):
+        p0 = extended[index - 1]
+        p1 = extended[index]
+        p2 = extended[index + 1]
+        p3 = extended[index + 2]
+        for step in range(samples_per_segment):
+            t = step / samples_per_segment
+            t2 = t * t
+            t3 = t2 * t
+            coordinates = []
+            for axis in (0, 1):
+                value = 0.5 * (
+                    (2 * p1[axis])
+                    + (-p0[axis] + p2[axis]) * t
+                    + (2 * p0[axis] - 5 * p1[axis] + 4 * p2[axis] - p3[axis]) * t2
+                    + (-p0[axis] + 3 * p1[axis] - 3 * p2[axis] + p3[axis]) * t3
+                )
+                coordinates.append(float(value))
+            smooth.append((coordinates[0], coordinates[1]))
+    smooth.append(points[-1])
+    return smooth
+
+
+def rotated_label(text: str, font: ImageFont.ImageFont) -> Image.Image:
+    bbox = font.getbbox(text)
+    width = bbox[2] - bbox[0] + 8
+    height = bbox[3] - bbox[1] + 8
+    label = Image.new("RGBA", (width, height), (255, 255, 255, 0))
+    draw = ImageDraw.Draw(label)
+    draw.text((4 - bbox[0], 4 - bbox[1]), text, font=font, fill=TEXT)
+    return label.rotate(90, expand=True)
+
+
+def draw_diamond(draw: ImageDraw.ImageDraw, x: float, y: float, radius: int = 9) -> None:
+    pts = [(x, y - radius), (x + radius, y), (x, y + radius), (x - radius, y)]
+    draw.polygon(pts, fill=BLUE, outline=BLUE)
+
+
+def render_balance_chart(
+    title: str,
+    points: list[tuple[date, Decimal]],
+    output: Path,
+    dims: ChartDimensions,
+    y_step: Decimal,
+    *,
+    data_dir: Path | None = None,
+) -> None:
+    """Render a pay-period balance line to a PNG file."""
+    image = Image.new("RGB", (dims.width, dims.height), BACKGROUND)
+    draw = ImageDraw.Draw(image)
+
+    title_font = load_font(50, scale=dims.scale)
+    tick_font = load_font(22, scale=dims.scale)
+    x_font = load_font(21, scale=dims.scale)
+
+    draw.rectangle((4, 6, dims.width - 5, dims.height - 10), outline=BORDER, width=2)
+
+    title_box = draw.textbbox((0, 0), title, font=title_font)
+    draw.text(
+        ((dims.width - (title_box[2] - title_box[0])) / 2, 39),
+        title,
+        font=title_font,
+        fill=TEXT,
+    )
+
+    draw.rectangle((dims.plot_left, dims.plot_top, dims.plot_right, dims.plot_bottom), outline=BORDER, width=2)
+
+    y_labels = list(range(int(dims.y_min), int(dims.y_max) + 1, int(y_step)))
+    if not y_labels:
+        y_labels = [0]
+    if y_labels[-1] != int(dims.y_max):
+        y_labels.append(int(dims.y_max))
+    for y_value in y_labels:
+        y = round(y_to_px(Decimal(y_value), dims))
+        draw.line((dims.plot_left, y, dims.plot_right, y), fill=GRID_MAJOR, width=2)
+        label = str(y_value)
+        box = draw.textbbox((0, 0), label, font=tick_font)
+        draw.text(
+            (dims.plot_left - 22 - (box[2] - box[0]), y - (box[3] - box[1]) / 2 - 2),
+            label,
+            font=tick_font,
+            fill=TEXT,
+        )
+
+    xs = x_positions(len(points), dims)
+    for x in xs:
+        draw.line((round(x), dims.plot_top, round(x), dims.plot_bottom), fill=GRID_MINOR, width=2)
+
+    raw_line = [(xs[index], y_to_px(value, dims)) for index, (_, value) in enumerate(points)]
+    dated_line = [
+        (period_end, raw_line[index][0], raw_line[index][1]) for index, (period_end, _value) in enumerate(points)
+    ]
+    draw_historical_and_future_line(draw, dated_line, as_of=date.today(), fill=BLUE, width=5)
+
+    for x, y in raw_line:
+        draw_diamond(draw, x, y, 9)
+
+    for index, (period_end, _) in enumerate(points):
+        rendered = rotated_label(period_end.isoformat(), x_font)
+        x = round(xs[index] - rendered.width / 2)
+        y = dims.plot_bottom + 16
+        image.paste(rendered, (x, y), rendered)
+
+    with export_file(output, data_dir or get_default_data_dir()) as destination:
+        image.save(destination, format="PNG")
+
+
+def comparison_chart_points(
+    category: str,
+    as_of: str,
+    data_dir: Path | None = None,
+) -> tuple[list[dict[str, Any]], Decimal, str]:
+    """Calculate the same calendar-date balance across available leave years."""
+    base_dir = resolve_default_data_dir(data_dir)
+    year_dir = base_dir / "leave_years"
+    if not year_dir.exists():
+        raise FileNotFoundError(f"Leave year directory not found: {year_dir}")
+
+    selected_date = parse_iso_date(as_of)
+    target_date = selected_date.isoformat()
+    points: list[dict[str, Any]] = []
+    max_value = Decimal("0")
+
+    for path in sorted(year_dir.glob("*.json")):
+        if not path.stem.isdigit():
+            continue
+        year = int(path.stem)
+        try:
+            leave_year = load_leave_year(year, data_dir)
+        except FileNotFoundError:
+            continue
+        comparison_date = comparison_date_for_year(selected_date, year).isoformat()
+        balances = calculate_balances(leave_year, until_date=comparison_date)
+        value = Decimal(str(balances.get(category, 0.0)))
+        max_value = max(max_value, value)
+        points.append(
+            {
+                "year": year,
+                "value": float(value),
+                "leave_year_start": leave_year.get("leave_year_start"),
+                "leave_year_end": leave_year.get("leave_year_end"),
+            }
+        )
+
+    if not points:
+        raise FileNotFoundError(f"No readable leave-year files found in {year_dir}")
+
+    points.sort(key=lambda entry: int(entry["year"]))
+    return points, max_value, target_date
+
+
+def render_comparison_chart(
+    title: str,
+    points: list[dict[str, Any]],
+    output: Path,
+    dims: ChartDimensions,
+    y_step: Decimal,
+    x_label: str,
+    *,
+    data_dir: Path | None = None,
+) -> None:
+    """Render year-over-year values to a smoothed PNG line chart."""
+    image = Image.new("RGB", (dims.width, dims.height), BACKGROUND)
+    draw = ImageDraw.Draw(image)
+
+    title_font = load_font(50, scale=dims.scale)
+    tick_font = load_font(22, scale=dims.scale)
+    x_font = load_font(21, scale=dims.scale)
+
+    draw.rectangle((4, 6, dims.width - 5, dims.height - 10), outline=BORDER, width=2)
+
+    title_box = draw.textbbox((0, 0), title, font=title_font)
+    draw.text(
+        ((dims.width - (title_box[2] - title_box[0])) / 2, 39),
+        title,
+        font=title_font,
+        fill=TEXT,
+    )
+
+    draw.rectangle((dims.plot_left, dims.plot_top, dims.plot_right, dims.plot_bottom), outline=BORDER, width=2)
+
+    y_labels = list(range(int(dims.y_min), int(dims.y_max) + 1, int(y_step)))
+    if not y_labels:
+        y_labels = [0]
+    if y_labels[-1] != int(dims.y_max):
+        y_labels.append(int(dims.y_max))
+    for y_value in y_labels:
+        y = round(y_to_px(Decimal(y_value), dims))
+        draw.line((dims.plot_left, y, dims.plot_right, y), fill=GRID_MAJOR, width=2)
+        label = str(y_value)
+        box = draw.textbbox((0, 0), label, font=tick_font)
+        draw.text(
+            (dims.plot_left - 22 - (box[2] - box[0]), y - (box[3] - box[1]) / 2 - 2),
+            label,
+            font=tick_font,
+            fill=TEXT,
+        )
+
+    xs = x_positions(len(points), dims)
+    for x in xs:
+        draw.line((round(x), dims.plot_top, round(x), dims.plot_bottom), fill=GRID_MINOR, width=2)
+
+    raw_line = [(xs[index], y_to_px(Decimal(str(point["value"])), dims)) for index, point in enumerate(points)]
+    smooth = catmull_rom(raw_line)
+    draw.line([(round(x), round(y)) for x, y in smooth], fill=BLUE, width=5, joint="curve")
+
+    for x, y in raw_line:
+        draw_diamond(draw, x, y, 9)
+
+    for index, point in enumerate(points):
+        rendered = rotated_label(str(point["year"]), x_font)
+        x = round(xs[index] - rendered.width / 2)
+        y = dims.plot_bottom + 16
+        image.paste(rendered, (x, y), rendered)
+
+    x_label_box = draw.textbbox((0, 0), x_label, font=tick_font)
+    draw.text(
+        (dims.plot_right - (x_label_box[2] - x_label_box[0]) - 10, dims.plot_bottom + 86),
+        x_label,
+        font=tick_font,
+        fill=TEXT,
+    )
+
+    with export_file(output, data_dir or get_default_data_dir()) as destination:
+        image.save(destination, format="PNG")
+
+
+def run_useorlose(args: list[str]) -> Any:
+    """Run the sibling CLI and return its decoded JSON result."""
+    try:
+        useorlose = find_companion_app("use-or-lose")
+    except FileNotFoundError as exc:
+        raise SystemExit(str(exc)) from exc
+    result = subprocess.run([str(useorlose), *args], text=True, capture_output=True, check=False)
+    if result.returncode != 0:
+        detail = "\n".join(part for part in [result.stdout, result.stderr] if part).strip()
+        raise SystemExit(f"use-or-lose command failed with exit code {result.returncode}:\n{detail}")
+    try:
+        return json.loads(result.stdout)
+    except json.JSONDecodeError as exc:
+        raise SystemExit(f"Failed to parse use-or-lose output as JSON: {exc}\nOutput: {result.stdout}") from exc
+
+
+def run_chart_app(spec: LeaveChartSpec) -> None:
+    """Parse common balance-chart options and render one configured category."""
+    parser = argparse.ArgumentParser(
+        description=f"Create {spec.title.lower()} balance chart PNG using use-or-lose data.",
+        epilog=HELP_EPILOG,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument("--year", type=int, help="Leave year. Defaults to current leave year.")
+    parser.add_argument("--outputFile", required=True, help="Output PNG file path")
+    parser.add_argument(
+        "--resolution",
+        type=int,
+        default=BASE_WIDTH,
+        help=f"Image width in pixels (default: {BASE_WIDTH}). Height is scaled maintaining aspect ratio.",
+    )
+    parser.add_argument("--data-dir", help="use-or-lose data directory (default: ~/.local/share/use-or-lose)")
+    args = parser.parse_args()
+
+    output_path = Path(args.outputFile).expanduser()
+    if output_path.suffix.lower() != ".png":
+        raise SystemExit(f"Error: Output file must have .png extension. Got: {output_path}")
+    if args.resolution <= 0:
+        raise SystemExit(f"Error: Resolution must be a positive number of pixels. Got: {args.resolution}")
+
+    data_dir = Path(args.data_dir).expanduser() if args.data_dir else get_default_data_dir()
+    if args.year is None:
+        args.year = infer_leave_year(data_dir)
+
+    try:
+        points, snapshot, max_balance = category_balance_points(spec.category, args.year, data_dir)
+    except FileNotFoundError as exc:
+        raise SystemExit(str(exc)) from exc
+    y_max = max(Decimal("10"), round_up_to_nearest_ten(max_balance))
+    y_step = y_tick_step(y_max)
+    output = output_path.absolute()
+    dims = ChartDimensions(width_pixels=args.resolution, y_max=y_max)
+    render_balance_chart(spec.title, points, output, dims, y_step, data_dir=data_dir)
+
+    print(
+        json.dumps(
+            {
+                "ok": True,
+                "agent": f"{spec.title} Chart for the Year",
+                "source_of_truth": "use-or-lose",
+                "product": spec.product,
+                "year": args.year,
+                "leave_year_start": snapshot.get("leave_year_start"),
+                "leave_year_end": snapshot.get("leave_year_end"),
+                "point_count": len(points),
+                "warnings": snapshot.get("accounting_warnings", []),
+                "resolution_pixels": args.resolution,
+                "image_dimensions": {"width": dims.width, "height": dims.height},
+                "y_axis": {"min": int(dims.y_min), "max": int(dims.y_max)},
+                "max_balance_hours": format_hours(max_balance),
+                "output_png": str(output),
+                "points": [
+                    {"pay_period_end": day.isoformat(), spec.point_field: format_hours(value)} for day, value in points
+                ],
+            },
+            indent=2,
+        )
+    )
+
+
+def run_comparison_chart_app(spec: ComparisonChartSpec) -> None:
+    """Parse common comparison options and render one configured category."""
+    parser = argparse.ArgumentParser(
+        description=f"Create {spec.title.lower()} PNG using useorlose data.",
+        epilog=HELP_EPILOG,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument("--as-of", default="today", help="Comparison date YYYY-MM-DD or today.")
+    parser.add_argument("--outputFile", required=True, help="Output PNG file path")
+    parser.add_argument(
+        "--resolution",
+        type=int,
+        default=BASE_WIDTH,
+        help=f"Image width in pixels (default: {BASE_WIDTH}). Height is scaled maintaining aspect ratio.",
+    )
+    parser.add_argument("--data-dir", help="use-or-lose data directory (default: ~/.local/share/use-or-lose)")
+    args = parser.parse_args()
+
+    output_path = Path(args.outputFile).expanduser()
+    if output_path.suffix.lower() != ".png":
+        raise SystemExit(f"Error: Output file must have .png extension. Got: {output_path}")
+    if args.resolution <= 0:
+        raise SystemExit(f"Error: Resolution must be a positive number of pixels. Got: {args.resolution}")
+
+    data_dir = Path(args.data_dir).expanduser() if args.data_dir else get_default_data_dir()
+
+    try:
+        payload = run_useorlose(
+            [
+                "compare-leave-balances",
+                "--category",
+                spec.category,
+                "--as-of",
+                args.as_of,
+                "--json",
+                "--data-dir",
+                str(data_dir),
+            ]
+        )
+    except FileNotFoundError as exc:
+        raise SystemExit(str(exc)) from exc
+
+    points = list(payload.get("points", []))
+    as_of = str(payload.get("as_of", args.as_of))
+    y_axis = payload.get("y_axis", {}) if isinstance(payload.get("y_axis"), dict) else {}
+    y_max = Decimal(str(y_axis.get("max", 10)))
+    y_step = comparison_y_tick_step(y_max)
+    output = output_path.absolute()
+    dims = ChartDimensions(width_pixels=args.resolution, y_max=y_max)
+    render_comparison_chart(spec.title, points, output, dims, y_step, as_of, data_dir=data_dir)
+
+    print(
+        json.dumps(
+            {
+                "ok": True,
+                "agent": f"{spec.title} Yearly Comparison",
+                "source_of_truth": "use-or-lose",
+                "product": spec.product,
+                "category": spec.category,
+                "as_of": as_of,
+                "point_count": len(points),
+                "resolution_pixels": args.resolution,
+                "image_dimensions": {"width": dims.width, "height": dims.height},
+                "y_axis": {"min": int(dims.y_min), "max": int(dims.y_max)},
+                "max_value_hours": payload.get("max_value_hours"),
+                "output_png": str(output),
+                "points": points,
+            },
+            indent=2,
+        )
+    )

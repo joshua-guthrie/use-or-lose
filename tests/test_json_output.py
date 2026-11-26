@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from fedleave.cli import (
+from useorlose.cli import (
     add,
     balance,
     correct,
@@ -18,9 +18,9 @@ from fedleave.cli import (
     void,
     years,
 )
-from fedleave.config import init_config
-from fedleave.ledger import add_transaction_to_leave_year, create_transaction
-from fedleave.storage import write_json
+from useorlose.config import init_config
+from useorlose.ledger import add_transaction_to_leave_year, create_transaction
+from useorlose.storage import write_json
 
 
 def _init_data_dir(data_dir: Path) -> Path:

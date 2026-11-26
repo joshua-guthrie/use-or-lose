@@ -5,7 +5,7 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from PySide6.QtWidgets import QApplication, QDialog
 
-from fedleave_gui.main_window import MainWindow
+from useorlose_gui.main_window import MainWindow
 
 
 def _application() -> QApplication:
@@ -56,7 +56,7 @@ class _FakeBackend:
 def test_transactions_in_range_filters_dates_and_zero_rows(monkeypatch):
     _application()
     monkeypatch.setattr(MainWindow, "refresh", lambda self: None)
-    monkeypatch.setattr("fedleave_gui.main_window._available_leave_years", lambda _data_dir: [2026, 2027])
+    monkeypatch.setattr("useorlose_gui.main_window._available_leave_years", lambda _data_dir: [2026, 2027])
     window = MainWindow()
     window.backend = _FakeBackend()
 
@@ -71,7 +71,7 @@ def test_transactions_in_range_filters_dates_and_zero_rows(monkeypatch):
 def test_transactions_in_range_sorts_by_date_and_id(monkeypatch):
     _application()
     monkeypatch.setattr(MainWindow, "refresh", lambda self: None)
-    monkeypatch.setattr("fedleave_gui.main_window._available_leave_years", lambda _data_dir: [2026])
+    monkeypatch.setattr("useorlose_gui.main_window._available_leave_years", lambda _data_dir: [2026])
     window = MainWindow()
 
     class _OrderingBackend:
@@ -92,7 +92,7 @@ def test_transactions_in_range_sorts_by_date_and_id(monkeypatch):
 def test_view_leave_transactions_uses_backend_and_filters_zero_rows(monkeypatch):
     _application()
     monkeypatch.setattr(MainWindow, "refresh", lambda self: None)
-    monkeypatch.setattr("fedleave_gui.main_window._available_leave_years", lambda _data_dir: [2026])
+    monkeypatch.setattr("useorlose_gui.main_window._available_leave_years", lambda _data_dir: [2026])
 
     class _Backend:
         def __init__(self):
@@ -149,8 +149,8 @@ def test_view_leave_transactions_uses_backend_and_filters_zero_rows(monkeypatch)
             captured["shown"] = True
             return QDialog.Accepted
 
-    monkeypatch.setattr("fedleave_gui.main_window.TransactionDateRangeDialog", _DateRangeDialog)
-    monkeypatch.setattr("fedleave_gui.main_window.LeaveTransactionsDialog", _TransactionsDialog)
+    monkeypatch.setattr("useorlose_gui.main_window.TransactionDateRangeDialog", _DateRangeDialog)
+    monkeypatch.setattr("useorlose_gui.main_window.LeaveTransactionsDialog", _TransactionsDialog)
 
     window.view_leave_transactions()
 

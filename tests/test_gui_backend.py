@@ -7,9 +7,9 @@ from pathlib import Path
 
 import pytest
 
-import fedleave.executable_search as executable_search
-import fedleave_gui.backend as backend_module
-from fedleave_gui.backend import BackendOptions, FedleaveBackend
+import useorlose.executable_search as executable_search
+import useorlose_gui.backend as backend_module
+from useorlose_gui.backend import BackendOptions, UseOrLoseBackend
 
 _NATIVE_FAKE_DIR = None
 
@@ -21,7 +21,7 @@ def native_fake_backend_directory(tmp_path_factory):
         _NATIVE_FAKE_DIR = tmp_path_factory.mktemp("native fake backend")
 
 
-def _fake_fedleave(path: Path) -> Path:
+def _fake_useorlose(path: Path) -> Path:
     script = path.with_suffix(".py") if sys.platform.startswith("win") else path
     script.write_text(
         """#!/usr/bin/env python3
@@ -104,7 +104,7 @@ elif args[:1] == ["years"]:
         )
     )
 elif args[:1] == ["--version"]:
-    print("fedleave 0.2.0")
+    print("use-or-lose 0.2.0")
 else:
     print("ok")
 """,
@@ -113,7 +113,7 @@ else:
     if sys.platform.startswith("win"):
         # Keep a real child-process contract without reintroducing cmd.exe.
         assert _NATIVE_FAKE_DIR is not None
-        executable = _NATIVE_FAKE_DIR / "fake-fedleave.exe"
+        executable = _NATIVE_FAKE_DIR / "fake-useorlose.exe"
         if not executable.exists():
             subprocess.run(
                 [
@@ -123,7 +123,7 @@ else:
                     "--noconfirm",
                     "--onefile",
                     "--name",
-                    "fake-fedleave",
+                    "fake-useorlose",
                     "--distpath",
                     str(_NATIVE_FAKE_DIR),
                     "--workpath",
@@ -150,9 +150,9 @@ def _bundle_executable(bundle_root: Path, app_name: str) -> Path:
     return executable
 
 
-def test_gui_backend_uses_fedleave_binary_for_month_and_set_day(tmp_path: Path):
-    fake = _fake_fedleave(tmp_path / "fedleave")
-    backend = FedleaveBackend(BackendOptions(fedleave_path=str(fake), data_dir=str(tmp_path / "data")))
+def test_gui_backend_uses_useorlose_binary_for_month_and_set_day(tmp_path: Path):
+    fake = _fake_useorlose(tmp_path / "use-or-lose")
+    backend = UseOrLoseBackend(BackendOptions(useorlose_path=str(fake), data_dir=str(tmp_path / "data")))
 
     month = backend.load_month(2026, 7)
     assert month["year"] == 2026
@@ -196,9 +196,9 @@ def test_gui_backend_uses_fedleave_binary_for_month_and_set_day(tmp_path: Path):
     assert args[-2:] == ["--data-dir", str(tmp_path / "data")]
 
 
-def test_gui_backend_uses_fedleave_binary_for_accrual_change(tmp_path: Path):
-    fake = _fake_fedleave(tmp_path / "fedleave")
-    backend = FedleaveBackend(BackendOptions(fedleave_path=str(fake), data_dir=str(tmp_path / "data")))
+def test_gui_backend_uses_useorlose_binary_for_accrual_change(tmp_path: Path):
+    fake = _fake_useorlose(tmp_path / "use-or-lose")
+    backend = UseOrLoseBackend(BackendOptions(useorlose_path=str(fake), data_dir=str(tmp_path / "data")))
 
     result = backend.accrual_change(as_of="2026-07-12", hours=8.0)
 
@@ -217,8 +217,8 @@ def test_gui_backend_uses_fedleave_binary_for_accrual_change(tmp_path: Path):
 
 
 def test_update_check_does_not_pass_data_directory_to_network_only_command(tmp_path: Path):
-    fake = _fake_fedleave(tmp_path / "fedleave")
-    backend = FedleaveBackend(BackendOptions(fedleave_path=str(fake), data_dir=str(tmp_path / "data")))
+    fake = _fake_useorlose(tmp_path / "use-or-lose")
+    backend = UseOrLoseBackend(BackendOptions(useorlose_path=str(fake), data_dir=str(tmp_path / "data")))
 
     result = backend.check_for_updates()
 
@@ -226,37 +226,37 @@ def test_update_check_does_not_pass_data_directory_to_network_only_command(tmp_p
 
 
 def test_gui_backend_reports_version_and_executable_path(tmp_path: Path):
-    fake = _fake_fedleave(tmp_path / "fedleave")
-    backend = FedleaveBackend(BackendOptions(fedleave_path=str(fake), data_dir=str(tmp_path / "data")))
+    fake = _fake_useorlose(tmp_path / "use-or-lose")
+    backend = UseOrLoseBackend(BackendOptions(useorlose_path=str(fake), data_dir=str(tmp_path / "data")))
 
-    assert backend.version() == "fedleave 0.2.0"
+    assert backend.version() == "use-or-lose 0.2.0"
     assert backend.executable_path() == fake
 
 
-def test_find_fedleave_uses_bundled_backend_directory(tmp_path: Path, monkeypatch):
+def test_find_useorlose_uses_bundled_backend_directory(tmp_path: Path, monkeypatch):
     app_executable = _bundle_executable(tmp_path / "UseOrLoseCalendar", "UseOrLoseCalendar")
-    backend_executable = _bundle_executable(tmp_path / "fedleave", "fedleave")
+    backend_executable = _bundle_executable(tmp_path / "use-or-lose", "use-or-lose")
 
     monkeypatch.setattr(sys, "argv", [str(app_executable)])
     monkeypatch.setattr(
         executable_search,
         "__file__",
-        str(tmp_path / "fedleave" / "executable_search.py"),
+        str(tmp_path / "use-or-lose" / "executable_search.py"),
     )
     monkeypatch.setattr(backend_module.shutil, "which", lambda name: None)
 
-    assert backend_module.find_fedleave() == backend_executable
+    assert backend_module.find_useorlose() == backend_executable
 
 
 def test_find_month_report_graphic_uses_bundled_backend_directory(tmp_path: Path, monkeypatch):
     app_executable = _bundle_executable(tmp_path / "UseOrLoseCalendar", "UseOrLoseCalendar")
-    report_executable = _bundle_executable(tmp_path / "fedleaveMonthReportGraphic", "fedleaveMonthReportGraphic")
+    report_executable = _bundle_executable(tmp_path / "UseOrLoseMonthReportGraphic", "UseOrLoseMonthReportGraphic")
 
     monkeypatch.setattr(sys, "argv", [str(app_executable)])
     monkeypatch.setattr(
         executable_search,
         "__file__",
-        str(tmp_path / "fedleave" / "executable_search.py"),
+        str(tmp_path / "use-or-lose" / "executable_search.py"),
     )
     monkeypatch.setattr(backend_module.shutil, "which", lambda name: None)
 
@@ -275,7 +275,7 @@ def test_run_chart_app_uses_bundled_companion_executable(tmp_path: Path, monkeyp
     monkeypatch.setattr(backend_module, "find_companion_app", lambda name, explicit=None: chart_executable)
     monkeypatch.setattr(backend_module.subprocess, "run", fake_run)
 
-    backend = FedleaveBackend(BackendOptions(data_dir=str(tmp_path / "data")))
+    backend = UseOrLoseBackend(BackendOptions(data_dir=str(tmp_path / "data")))
     backend.run_chart_app(
         "CreditHoursChartForTheYear",
         output_file=tmp_path / "chart.png",
@@ -300,31 +300,31 @@ def test_run_chart_app_uses_bundled_companion_executable(tmp_path: Path, monkeyp
     assert captured["kwargs"]["timeout"] == backend_module.GRAPHIC_COMMAND_TIMEOUT_SECONDS
 
 
-def test_find_fedleave_reports_search_paths_when_missing(tmp_path: Path, monkeypatch):
+def test_find_useorlose_reports_search_paths_when_missing(tmp_path: Path, monkeypatch):
     app_executable = _bundle_executable(tmp_path / "UseOrLoseCalendar", "UseOrLoseCalendar")
 
     monkeypatch.setattr(sys, "argv", [str(app_executable)])
     monkeypatch.setattr(
         executable_search,
         "__file__",
-        str(tmp_path / "fedleave" / "executable_search.py"),
+        str(tmp_path / "use-or-lose" / "executable_search.py"),
     )
     monkeypatch.setattr(
         executable_search,
         "_candidate_roots",
-        lambda: iter([tmp_path / "fedleave" / "bin", tmp_path / "fedleave" / "dist"]),
+        lambda: iter([tmp_path / "use-or-lose" / "bin", tmp_path / "use-or-lose" / "dist"]),
     )
     monkeypatch.setattr(backend_module.shutil, "which", lambda name: None)
 
     with pytest.raises(backend_module.BackendMissingError, match="Searched:"):
-        backend_module.find_fedleave()
+        backend_module.find_useorlose()
 
 
 def test_gui_backend_hides_windows_console_when_launching_backend(monkeypatch, tmp_path: Path):
-    fake = _fake_fedleave(tmp_path / "fedleave")
-    backend_module = __import__("fedleave_gui.backend", fromlist=["FedleaveBackend"])
-    backend = backend_module.FedleaveBackend(
-        backend_module.BackendOptions(fedleave_path=str(fake), data_dir=str(tmp_path / "data"))
+    fake = _fake_useorlose(tmp_path / "use-or-lose")
+    backend_module = __import__("useorlose_gui.backend", fromlist=["UseOrLoseBackend"])
+    backend = backend_module.UseOrLoseBackend(
+        backend_module.BackendOptions(useorlose_path=str(fake), data_dir=str(tmp_path / "data"))
     )
 
     captured: dict[str, object] = {}
@@ -332,14 +332,14 @@ def test_gui_backend_hides_windows_console_when_launching_backend(monkeypatch, t
     def fake_run(command, **kwargs):
         captured["command"] = command
         captured["kwargs"] = kwargs
-        return types.SimpleNamespace(returncode=0, stdout="fedleave 0.2.0", stderr="")
+        return types.SimpleNamespace(returncode=0, stdout="use-or-lose 0.2.0", stderr="")
 
     monkeypatch.setattr(backend_module.sys, "platform", "win32")
     monkeypatch.setattr(backend_module.subprocess, "CREATE_NO_WINDOW", 0x08000000, raising=False)
     monkeypatch.setattr(backend_module.subprocess, "run", fake_run)
-    monkeypatch.setattr(backend_module, "find_fedleave", lambda explicit=None: fake)
+    monkeypatch.setattr(backend_module, "find_useorlose", lambda explicit=None: fake)
 
-    assert backend.version() == "fedleave 0.2.0"
+    assert backend.version() == "use-or-lose 0.2.0"
     assert captured["command"] == [str(fake), "--version"]
     assert captured["kwargs"]["creationflags"] == 0x08000000
     assert captured["kwargs"]["text"] is True
@@ -349,8 +349,8 @@ def test_gui_backend_hides_windows_console_when_launching_backend(monkeypatch, t
 
 
 def test_gui_backend_reports_command_timeout(monkeypatch, tmp_path: Path):
-    fake = _fake_fedleave(tmp_path / "fedleave")
-    backend = FedleaveBackend(BackendOptions(fedleave_path=str(fake)))
+    fake = _fake_useorlose(tmp_path / "use-or-lose")
+    backend = UseOrLoseBackend(BackendOptions(useorlose_path=str(fake)))
 
     def time_out(command, **kwargs):
         raise backend_module.subprocess.TimeoutExpired(command, kwargs["timeout"])

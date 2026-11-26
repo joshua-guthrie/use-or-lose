@@ -8,10 +8,10 @@ import pytest
 from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import QFileDialog, QMessageBox
 
-from fedleave_gui.backend import BackendOptions, FedleaveBackend
-from fedleave_gui.main_window import MainWindow
-from fedleave_gui.settings import GuiSettings
 from leave_year_support import store, tree
+from useorlose_gui.backend import BackendOptions, UseOrLoseBackend
+from useorlose_gui.main_window import MainWindow
+from useorlose_gui.settings import GuiSettings
 
 
 @pytest.mark.parametrize("decision", ["keep", "cancel replace", "apply replace"])
@@ -19,15 +19,15 @@ def test_conflicting_gui_merge_requires_a_separate_replace_confirmation(qtbot, m
     current = tmp_path / "current"
     incoming = tmp_path / "incoming"
     archive = tmp_path / "backup.json"
-    executable = Path(sysconfig.get_path("scripts")) / ("fedleave.exe" if os.name == "nt" else "fedleave")
+    executable = Path(sysconfig.get_path("scripts")) / ("use-or-lose.exe" if os.name == "nt" else "use-or-lose")
     for base, target in ((current, 5), (incoming, 8)):
         store(base, balances={"annual": 20})
-        backend = FedleaveBackend(BackendOptions(str(executable), str(base)))
+        backend = UseOrLoseBackend(BackendOptions(str(executable), str(base)))
         backend.force_balance(date="2026-02-01", category="annual", hours=target, comment="Synthetic target")
     backend.run_text(["export-data", "--output", str(archive)])
     before, source_bytes = tree(current), archive.read_bytes()
 
-    window = MainWindow(GuiSettings(data_dir=str(current), fedleave_path=str(executable)))
+    window = MainWindow(GuiSettings(data_dir=str(current), useorlose_path=str(executable)))
     qtbot.addWidget(window)
     destinations = []
     refreshed = []

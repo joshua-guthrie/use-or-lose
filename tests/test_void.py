@@ -1,9 +1,9 @@
 from pathlib import Path
 
-from fedleave.cli import void
-from fedleave.config import init_config
-from fedleave.ledger import add_transaction_to_leave_year, create_transaction
-from fedleave.storage import write_json
+from useorlose.cli import void
+from useorlose.config import init_config
+from useorlose.ledger import add_transaction_to_leave_year, create_transaction
+from useorlose.storage import write_json
 
 
 def test_void_deletes_transaction(tmp_path: Path):

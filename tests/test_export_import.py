@@ -5,10 +5,10 @@ import pytest
 import typer
 from typer.testing import CliRunner
 
-from fedleave.cli import export_data, import_data
-from fedleave.cli_app import app
-from fedleave.config import init_config
-from fedleave.cross_year import manual_ledger
+from useorlose.cli import export_data, import_data
+from useorlose.cli_app import app
+from useorlose.config import init_config
+from useorlose.cross_year import manual_ledger
 
 
 def _init_data_dir(data_dir: Path) -> None:

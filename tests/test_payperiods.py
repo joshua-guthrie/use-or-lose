@@ -1,6 +1,6 @@
 from datetime import date
 
-from fedleave.payperiods import generate_pay_periods, normalize_pay_period, pay_period_pay_date
+from useorlose.payperiods import generate_pay_periods, normalize_pay_period, pay_period_pay_date
 
 
 def test_generate_26_pay_periods():

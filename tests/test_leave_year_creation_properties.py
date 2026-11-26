@@ -8,10 +8,10 @@ import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 
-from fedleave.config import Config
-from fedleave.cross_year import derive_carryover, fingerprint, manual_ledger
-from fedleave.ledger import calculate_balances
 from leave_year_support import tx
+from useorlose.config import Config
+from useorlose.cross_year import derive_carryover, fingerprint, manual_ledger
+from useorlose.ledger import calculate_balances
 
 
 def source_for(year=2026, annual=0, transactions=None):

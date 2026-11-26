@@ -1,6 +1,6 @@
 import pytest
 
-from fedleave.validation import sanitize_text, sanitize_url
+from useorlose.validation import sanitize_text, sanitize_url
 
 
 def test_sanitize_text_strips_and_limits():

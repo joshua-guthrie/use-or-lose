@@ -6,15 +6,15 @@ from pathlib import Path
 
 import pytest
 
-from fedleave_analytics.analytics import analyze_leave_year
-from fedleave_analytics.seasonality import SeasonalitySelection, seasonality_options, seasonality_series
+from useorlose_analytics.analytics import analyze_leave_year
+from useorlose_analytics.seasonality import SeasonalitySelection, seasonality_options, seasonality_series
 
 
 def seasonal_payload(rows=(), *, start="2026-01-11", count=26):
     from datetime import timedelta
 
-    from fedleave.categories import CATEGORY_POLICIES
-    from fedleave.payperiods import generate_pay_periods
+    from useorlose.categories import CATEGORY_POLICIES
+    from useorlose.payperiods import generate_pay_periods
 
     return {
         "year": 2026,
@@ -569,7 +569,7 @@ def test_credit_hours_are_analyzed_and_heatmaps_only_include_nonzero_series():
 
 
 def test_analytics_package_entrypoint_supports_direct_execution():
-    entrypoint = Path(__file__).parents[1] / "src" / "fedleave_analytics" / "__main__.py"
+    entrypoint = Path(__file__).parents[1] / "src" / "useorlose_analytics" / "__main__.py"
     result = subprocess.run(
         [sys.executable, str(entrypoint), "--help"],
         capture_output=True,

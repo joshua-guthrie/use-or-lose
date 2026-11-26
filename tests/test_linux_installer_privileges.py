@@ -50,7 +50,7 @@ def test_linux_install_prompts_for_sudo_instead_of_failing(tmp_path, monkeypatch
     monkeypatch.setattr(module.os, "geteuid", lambda: 1000, raising=False)
     monkeypatch.setattr(module.InstallerEngine, "_project_version", lambda self: "9.9.9")
 
-    dist_dir = tmp_path / "dist" / "fedleave-Ubuntu"
+    dist_dir = tmp_path / "dist" / "useorlose-Ubuntu"
     dist_dir.mkdir(parents=True)
 
     captured: dict[str, object] = {}
@@ -84,7 +84,7 @@ def test_linux_install_requires_privilege_in_unattended_mode(tmp_path, monkeypat
     engine = module.InstallerEngine(ROOT, options)
     monkeypatch.setattr(module.os, "geteuid", lambda: 1000, raising=False)
 
-    dist_dir = tmp_path / "dist" / "fedleave-Ubuntu"
+    dist_dir = tmp_path / "dist" / "useorlose-Ubuntu"
     dist_dir.mkdir(parents=True)
 
     with pytest.raises(module.InstallerError, match="unattended mode") as exc_info:
@@ -105,7 +105,7 @@ def test_linux_install_repairs_existing_build_workspace_ownership(tmp_path, monk
     engine.log = lambda message: None
 
     engine.build_root.mkdir(parents=True)
-    stale_entry = engine.build_root / "entries" / "fedleave.py"
+    stale_entry = engine.build_root / "entries" / "useorlose.py"
     stale_entry.parent.mkdir(parents=True)
     stale_entry.write_text("print('stale')\n")
 

@@ -36,7 +36,7 @@ def _install_chart_import_stubs(monkeypatch) -> None:
 
 def _compare_leave_balances(monkeypatch):
     _install_chart_import_stubs(monkeypatch)
-    from fedleave.cli import compare_leave_balances
+    from useorlose.cli import compare_leave_balances
 
     return compare_leave_balances
 
@@ -109,7 +109,7 @@ def test_compare_leave_balances_outputs_json_for_multiple_years(tmp_path: Path, 
 
 def test_comparison_date_for_year_clamps_february_29_on_non_leap_year(monkeypatch):
     _install_chart_import_stubs(monkeypatch)
-    charting = importlib.import_module("fedleave.charting")
+    charting = importlib.import_module("useorlose.charting")
 
     assert charting.comparison_date_for_year(date(2024, 2, 29), 2025).isoformat() == "2025-02-28"
 

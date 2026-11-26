@@ -1,12 +1,12 @@
 import json
 from pathlib import Path
 
-from fedleave.config import init_config
-from fedleave.storage import write_json
+from useorlose.config import init_config
+from useorlose.storage import write_json
 
 
 def test_init_creates_config_and_leave_year(tmp_path: Path):
-    data_dir = tmp_path / "fedleave_data"
+    data_dir = tmp_path / "use_or_lose_data"
     init_config(
         year=2026,
         leave_year_start="2026-01-11",
@@ -30,7 +30,7 @@ def test_init_creates_config_and_leave_year(tmp_path: Path):
 
 
 def test_init_repairs_missing_files_without_overwriting_existing_config(tmp_path: Path):
-    data_dir = tmp_path / "fedleave_data"
+    data_dir = tmp_path / "use_or_lose_data"
     (data_dir / "leave_years").mkdir(parents=True)
     (data_dir / "holiday_cache").mkdir(parents=True)
     existing_config = {"schema_version": 1, "user": {"display_name": "Existing User", "timezone": "UTC"}}

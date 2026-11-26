@@ -77,12 +77,12 @@ jobs:
         run: scripts\WindowsInstall.bat --unattended --build-only --verbose
 
       - name: Verify complete Windows bundle
-        run: python installer/package.py validate-bundle --platform windows --bundle-dir dist/fedleave-Windows
+        run: python installer/package.py validate-bundle --platform windows --bundle-dir dist/use-or-lose-Windows
 
       - name: Check resolved Windows build and runtime advisories
         run: |
           python -m pip install "pip-audit>=2.10,<3"
-          python -m pip_audit --strict --disable-pip --no-deps --vulnerability-service osv -r dist/fedleave-Windows/DEPENDENCIES.txt
+          python -m pip_audit --strict --disable-pip --no-deps --vulnerability-service osv -r dist/use-or-lose-Windows/DEPENDENCIES.txt
 
       - name: Remove duplicate build workspace
         shell: pwsh
@@ -97,7 +97,7 @@ jobs:
         run: |
           $ErrorActionPreference = "Stop"
           $artifactDir = Join-Path $PWD "artifacts"
-          $sourceDir = Join-Path $PWD "dist\fedleave-Windows"
+          $sourceDir = Join-Path $PWD "dist\use-or-lose-Windows"
           New-Item -ItemType Directory -Force -Path $artifactDir | Out-Null
           # Chocolatey updates the machine PATH after this job has already
           # started, so use its deterministic install path in the next step.
@@ -122,7 +122,7 @@ jobs:
           $ErrorActionPreference = "Stop"
           $installer = Join-Path $PWD "artifacts\UseOrLose-Setup-$env:PACKAGE_VERSION-Windows-x64.exe"
           $installDir = Join-Path $env:ProgramFiles "UseOrLose"
-          $userDataDir = Join-Path $env:LOCALAPPDATA "fedleave"
+          $userDataDir = Join-Path $env:LOCALAPPDATA "UseOrLose"
           $sentinel = Join-Path $userDataDir "ci-user-data-preserved.txt"
           New-Item -ItemType Directory -Force -Path $userDataDir | Out-Null
           Set-Content -Path $sentinel -Value "must survive install and uninstall"
@@ -130,10 +130,10 @@ jobs:
           $install = Start-Process -FilePath $installer -ArgumentList "/S" -Wait -PassThru
           if ($install.ExitCode -ne 0) { throw "Silent installation failed: $($install.ExitCode)" }
           python installer/package.py validate-bundle --platform windows --bundle-dir $installDir
-          & "$installDir\fedleave.exe" --version
+          & "$installDir\use-or-lose.exe" --version
           if ($LASTEXITCODE -ne 0) { throw "Installed CLI smoke test failed" }
           python -m pip install "mcp==2.3.0"
-          python scripts/lib/common/mcp_smoke.py --server "$installDir\fedleave-mcp.exe"
+          python scripts/lib/common/mcp_smoke.py --server "$installDir\use-or-lose-mcp.exe"
           if ($LASTEXITCODE -ne 0) { throw "Installed MCP stdio read/write smoke test failed" }
 
           $uninstall = Start-Process -FilePath "$installDir\Uninstall.exe" -ArgumentList "/S" -Wait -PassThru
@@ -146,7 +146,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: fedleave-windows-${{ needs.metadata.outputs.package-version }}
+          name: use-or-lose-windows-${{ needs.metadata.outputs.package-version }}
           path: |
             artifacts/UseOrLose-Setup-*-Windows-x64.exe
             artifacts/UseOrLose-Setup-*-Windows-x64.exe.sha256
@@ -186,15 +186,15 @@ jobs:
         run: ./scripts/LinuxInstall.sh --unattended --build-only --verbose
 
       - name: Verify complete Linux bundle
-        run: python installer/package.py validate-bundle --platform linux --bundle-dir dist/fedleave-Ubuntu
+        run: python installer/package.py validate-bundle --platform linux --bundle-dir dist/use-or-lose-Ubuntu
 
       - name: Enforce Linux GLIBC compatibility baseline
-        run: python installer/package.py audit-linux-abi --bundle-dir dist/fedleave-Ubuntu --max-glibc 2.35
+        run: python installer/package.py audit-linux-abi --bundle-dir dist/use-or-lose-Ubuntu --max-glibc 2.35
 
       - name: Check resolved Linux build and runtime advisories
         run: |
           python -m pip install "pip-audit>=2.10,<3"
-          python -m pip_audit --strict --disable-pip --no-deps --vulnerability-service osv -r dist/fedleave-Ubuntu/DEPENDENCIES.txt
+          python -m pip_audit --strict --disable-pip --no-deps --vulnerability-service osv -r dist/use-or-lose-Ubuntu/DEPENDENCIES.txt
 
       - name: Remove duplicate build workspace
         run: rm -rf .build
@@ -202,7 +202,7 @@ jobs:
       - name: Create archive and checksum
         run: |
           python installer/package.py linux-archive \
-            --bundle-dir dist/fedleave-Ubuntu \
+            --bundle-dir dist/use-or-lose-Ubuntu \
             --output-dir artifacts \
             --version "$PACKAGE_VERSION"
           archive="artifacts/UseOrLose-${PACKAGE_VERSION}-Linux-x86_64.tar.gz"
@@ -217,15 +217,15 @@ jobs:
           extract_dir="$(mktemp -d)"
           tar -xzf "artifacts/UseOrLose-${PACKAGE_VERSION}-Linux-x86_64.tar.gz" -C "$extract_dir"
           python installer/package.py validate-bundle --platform linux --bundle-dir "$extract_dir/UseOrLose"
-          "$extract_dir/UseOrLose/fedleave" --version
+          "$extract_dir/UseOrLose/use-or-lose" --version
 
       - name: Validate and exercise bootstrap installer
         run: |
           set -Eeuo pipefail
           shellcheck installer/linux/install.sh
-          install_root="$RUNNER_TEMP/fedleave-bootstrap"
-          bin_dir="$RUNNER_TEMP/fedleave-bin"
-          rolling_dir="$RUNNER_TEMP/fedleave-rolling-assets"
+          install_root="$RUNNER_TEMP/use-or-lose-bootstrap"
+          bin_dir="$RUNNER_TEMP/use-or-lose-bin"
+          rolling_dir="$RUNNER_TEMP/use-or-lose-stable-assets"
           mkdir "$rolling_dir"
           cp "artifacts/UseOrLose-${PACKAGE_VERSION}-Linux-x86_64.tar.gz" \
             "$rolling_dir/UseOrLose-Latest-Linux-x86_64.tar.gz"
@@ -239,14 +239,14 @@ jobs:
             --asset-base-url "file://$rolling_dir" \
             --install-root "$install_root" \
             --bin-dir "$bin_dir"
-          "$bin_dir/fedleave" --version
+          "$bin_dir/use-or-lose" --version
           python -m pip install "mcp==2.3.0"
-          python scripts/lib/common/mcp_smoke.py --server "$bin_dir/fedleave-mcp"
+          python scripts/lib/common/mcp_smoke.py --server "$bin_dir/use-or-lose-mcp"
           test -L "$install_root/current"
 
       - uses: actions/upload-artifact@v4
         with:
-          name: fedleave-linux-${{ needs.metadata.outputs.package-version }}
+          name: use-or-lose-linux-${{ needs.metadata.outputs.package-version }}
           path: |
             artifacts/UseOrLose-*-Linux-x86_64.tar.gz
             artifacts/UseOrLose-*-Linux-x86_64.tar.gz.sha256
@@ -265,7 +265,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
-          name: fedleave-linux-${{ needs.metadata.outputs.package-version }}
+          name: use-or-lose-linux-${{ needs.metadata.outputs.package-version }}
           path: artifacts
       - name: Launch released applications on independent older userspace
         run: |
@@ -292,7 +292,7 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          pattern: fedleave-*
+          pattern: use-or-lose-*
           path: release-assets
           merge-multiple: true
 

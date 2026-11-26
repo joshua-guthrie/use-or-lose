@@ -5,10 +5,10 @@ from datetime import date
 
 import pytest
 
-from fedleave.cross_year import apply_creation, creation_plan, derive_carryover, resolve_snapshot
-from fedleave.expirations import expiration_report, synchronize_expirations
-from fedleave.ledger import calculate_balances
 from leave_year_support import save, store, tree, tx
+from useorlose.cross_year import apply_creation, creation_plan, derive_carryover, resolve_snapshot
+from useorlose.expirations import expiration_report, synchronize_expirations
+from useorlose.ledger import calculate_balances
 
 
 @pytest.mark.parametrize(

@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import io
 
-from fedleave.project_info import OFFICIAL_PROJECT_URL
-from fedleave.update_check import check_for_updates
+from useorlose.project_info import OFFICIAL_PROJECT_URL
+from useorlose.update_check import check_for_updates
 
 CURRENT_BUILD = "a" * 40
 LATEST_BUILD = "b" * 40

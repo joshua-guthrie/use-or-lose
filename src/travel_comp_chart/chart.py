@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from fedleave.charting import LeaveChartSpec, run_chart_app
+from useorlose.charting import LeaveChartSpec, run_chart_app
 
 SPEC = LeaveChartSpec(
     app_name="TravelCompChartForTheYear",

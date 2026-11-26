@@ -7,16 +7,16 @@ from datetime import date, datetime
 import pytest
 from PIL import ImageDraw
 
-from fedleave.executable_search import is_executable
-from fedleave.ledger import TRANSACTION_CATEGORIES
-from fedleave_month_report_graphic.report import (
+from useorlose.executable_search import is_executable
+from useorlose.ledger import TRANSACTION_CATEGORIES
+from useorlose_month_report_graphic.report import (
     CATEGORY_LABELS,
     PAYDAY_STROKE,
     ArgumentError,
     Options,
     OutputError,
     ReportData,
-    find_fedleave,
+    find_useorlose,
     load_report_data,
     parse_args,
     parse_month,
@@ -117,7 +117,7 @@ def test_parse_args_supports_version_without_output_file(capsys):
         parse_args(["--version"])
 
     assert exc.value.code == 0
-    assert "fedleaveMonthReportGraphic" in capsys.readouterr().out
+    assert "useorloseMonthReportGraphic" in capsys.readouterr().out
 
 
 def test_parse_args_rejects_existing_output_without_overwrite(tmp_path):
@@ -128,18 +128,18 @@ def test_parse_args_rejects_existing_output_without_overwrite(tmp_path):
         parse_args(["--outputFile", str(output)])
 
 
-def test_find_fedleave_accepts_explicit_path(tmp_path):
-    fedleave = tmp_path / ("fedleave.exe" if sys.platform.startswith("win") else "fedleave")
-    fedleave.write_text("#!/bin/sh\n", encoding="utf-8")
-    fedleave.chmod(0o755)
+def test_find_useorlose_accepts_explicit_path(tmp_path):
+    useorlose = tmp_path / ("use-or-lose.exe" if sys.platform.startswith("win") else "use-or-lose")
+    useorlose.write_text("#!/bin/sh\n", encoding="utf-8")
+    useorlose.chmod(0o755)
 
-    assert find_fedleave(fedleave) == fedleave
+    assert find_useorlose(useorlose) == useorlose
 
 
 def test_windows_executable_detection_rejects_extensionless_binary(monkeypatch, tmp_path):
-    monkeypatch.setattr("fedleave_month_report_graphic.report.sys.platform", "win32")
-    linux_binary_name = tmp_path / "fedleave"
-    windows_binary_name = tmp_path / "fedleave.exe"
+    monkeypatch.setattr("useorlose_month_report_graphic.report.sys.platform", "win32")
+    linux_binary_name = tmp_path / "use-or-lose"
+    windows_binary_name = tmp_path / "useorlose.exe"
     linux_binary_name.write_bytes(b"not a windows executable")
     windows_binary_name.write_bytes(b"fake exe")
 
@@ -293,20 +293,20 @@ def test_load_report_data_prefers_enriched_month_payload(monkeypatch, tmp_path):
     }
 
     monkeypatch.setattr(
-        "fedleave_month_report_graphic.report.find_fedleave", lambda explicit=None: tmp_path / "fedleave"
+        "useorlose_month_report_graphic.report.find_useorlose", lambda explicit=None: tmp_path / "use-or-lose"
     )
 
-    def fake_run_fedleave(_fedleave, args):
+    def fake_run_useorlose(_useorlose, args):
         calls.append(args)
         if args[0] == "month":
             return month_payload
         if args[0] == "use-or-lose":
             return projected_payload
-        raise AssertionError(f"Unexpected extra fedleave call: {args}")
+        raise AssertionError(f"Unexpected extra useorlose call: {args}")
 
-    monkeypatch.setattr("fedleave_month_report_graphic.report.run_fedleave", fake_run_fedleave)
+    monkeypatch.setattr("useorlose_month_report_graphic.report.run_useorlose", fake_run_useorlose)
 
-    _fedleave, data = load_report_data(Options(tmp_path / "month.png", 2026, 7, 1920, None, None, False, False, False))
+    _useorlose, data = load_report_data(Options(tmp_path / "month.png", 2026, 7, 1920, None, None, False, False, False))
 
     assert [call[0] for call in calls] == ["month", "use-or-lose"]
     assert data.balance_json["balances"]["annual"] == 124.0

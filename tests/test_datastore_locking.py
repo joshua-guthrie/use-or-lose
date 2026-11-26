@@ -12,9 +12,9 @@ from pathlib import Path
 import pytest
 from typer.main import get_command
 
-from fedleave.cli import app
-from fedleave.config import init_config
-from fedleave.locking import LockedCommand, datastore_lock
+from useorlose.cli import app
+from useorlose.config import init_config
+from useorlose.locking import LockedCommand, datastore_lock
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -34,7 +34,7 @@ def environment(base):
     return {
         **os.environ,
         "PYTHONPATH": str(ROOT / "src"),
-        "FEDLEAVE_MCP_DATA_DIR": str(base),
+        "USE_OR_LOSE_MCP_DATA_DIR": str(base),
         "FEDLEAVE_LOCK_TIMEOUT": "5",
     }
 
@@ -57,7 +57,7 @@ def test_contending_cli_writers_retain_both_updates(tmp_path):
         with datastore_lock(base):
             for i in range(2):
                 ready = tmp_path / f"ready-{i}"
-                code = f"from pathlib import Path; from fedleave.cli import app; Path({str(ready)!r}).touch(); app()"
+                code = f"from pathlib import Path; from useorlose.cli import app; Path({str(ready)!r}).touch(); app()"
                 argv = [
                     sys.executable,
                     "-c",
@@ -100,7 +100,7 @@ def test_cli_lock_timeout_is_retriable_and_stores_are_independent(tmp_path):
     with datastore_lock(base):
         env = {**environment(base), "FEDLEAVE_LOCK_TIMEOUT": ".1"}
         result = subprocess.run(
-            [sys.executable, "-m", "fedleave", "types"], env=env, capture_output=True, text=True, timeout=15
+            [sys.executable, "-m", "useorlose", "types"], env=env, capture_output=True, text=True, timeout=15
         )
         assert result.returncode == 75
         assert "Datastore busy" in result.stderr
@@ -112,7 +112,7 @@ def test_process_crash_releases_os_lock_without_removing_lock_file(tmp_path):
     base = tmp_path / "data"
     ready = tmp_path / "ready"
     code = (
-        "import time; from pathlib import Path; from fedleave.locking import datastore_lock; "
+        "import time; from pathlib import Path; from useorlose.locking import datastore_lock; "
         f"lock = datastore_lock(Path({str(base)!r})); lock.__enter__(); "
         f"Path({str(ready)!r}).touch(); time.sleep(60)"
     )
@@ -123,7 +123,7 @@ def test_process_crash_releases_os_lock_without_removing_lock_file(tmp_path):
         wait_for(ready, worker)
         worker.kill()
         worker.communicate(timeout=10)
-        assert (base / ".fedleave.lock").exists()
+        assert (base / ".useorlose.lock").exists()
         with datastore_lock(base, timeout=0.2):
             pass
     finally:

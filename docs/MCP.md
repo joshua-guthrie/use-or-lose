@@ -44,7 +44,7 @@ allow it to run from any working directory.
 These minimal configurations work with clients that accept `mcpServers`,
 including the Inspector example below. Other clients may use a different
 surrounding format; the command and empty argument list stay the same.
-Do not set `FEDLEAVE_MCP_CONFIG` for a policy-free launch.
+Do not set `USE_OR_LOSE_MCP_CONFIG` for a policy-free launch.
 
 Linux:
 
@@ -79,7 +79,7 @@ Startup performs no datastore migration. Each command uses its selected store ex
 
 For an optional policy, add `"args": ["--config", "/absolute/path/policy.json"]`
 (escape Windows backslashes in JSON), or configure the trusted launch environment
-variable `FEDLEAVE_MCP_CONFIG`. `--config` takes precedence. Explicitly supplied
+variable `USE_OR_LOSE_MCP_CONFIG`. `--config` takes precedence. Explicitly supplied
 missing/invalid files, invalid field types, and unknown configuration keys fail
 startup on stderr; they never fall back to full access.
 `fedleave-mcp --version` prints the build version and exits;

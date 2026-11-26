@@ -10,11 +10,11 @@ from PySide6.QtGui import QColor, QPainter, QPixmap
 from PySide6.QtPrintSupport import QPrinter
 from PySide6.QtWidgets import QApplication, QDialog, QFileDialog, QMessageBox
 
-from fedleave_analytics.charts import AnalyticsChartWindow
-from fedleave_gui.chart_windows import LeaveChartDialog
-from fedleave_gui.main_window import MainWindow
-from fedleave_month_report_graphic import report
 from test_month_report_graphic import _report_data
+from useorlose_analytics.charts import AnalyticsChartWindow
+from useorlose_gui.chart_windows import LeaveChartDialog
+from useorlose_gui.main_window import MainWindow
+from useorlose_month_report_graphic import report
 
 
 @pytest.fixture(scope="module")
@@ -90,7 +90,7 @@ def test_report_png_predictable_temp_follows_planted_symlink(tmp_path):
         month=7,
         resolution=400,
         data_dir=None,
-        fedleave=None,
+        useorlose=None,
         overwrite=False,
         quiet=True,
         verbose=False,
@@ -101,7 +101,7 @@ def test_report_png_predictable_temp_follows_planted_symlink(tmp_path):
 
 
 def test_export_guard_rejects_datastore_destinations_and_preserves_previous_report(tmp_path):
-    from fedleave.exporting import export_file
+    from useorlose.exporting import export_file
 
     store = tmp_path / "store"
     store.mkdir()
@@ -118,11 +118,11 @@ def test_export_guard_rejects_datastore_destinations_and_preserves_previous_repo
             raise RuntimeError("renderer failed")
     assert ledger.read_text() == "canonical"
     assert report.read_text() == "previous"
-    assert not list(tmp_path.glob(".fedleave-export-*"))
+    assert not list(tmp_path.glob(".useorlose-export-*"))
 
 
 def test_create_only_export_does_not_replace_a_concurrent_creator(tmp_path):
-    from fedleave.exporting import export_file
+    from useorlose.exporting import export_file
 
     report = tmp_path / "report.csv"
     with pytest.raises(FileExistsError):
@@ -157,14 +157,14 @@ def test_pdf_renderer_failure_preserves_report_and_releases_staging(application,
     try:
         MainWindow.save_pdf(window) if window_type == "month" else window.save_pdf()
         assert destination.read_text() == "previous report"
-        assert not list(tmp_path.glob(".fedleave-export-*"))
+        assert not list(tmp_path.glob(".useorlose-export-*"))
     finally:
         if window_type != "month":
             window.close()
 
 
 def test_export_workspace_is_private_on_the_running_platform(tmp_path):
-    from fedleave.exporting import export_file
+    from useorlose.exporting import export_file
 
     with export_file(tmp_path / "report.csv") as temporary:
         if os.name == "nt":
@@ -195,7 +195,7 @@ def test_export_workspace_is_private_on_the_running_platform(tmp_path):
 
 @pytest.mark.parametrize("version", [(3, 11, 9), (3, 12, 3)])
 def test_windows_python_without_private_mkdir_fails_before_staging(tmp_path, monkeypatch, version):
-    from fedleave import exporting
+    from useorlose import exporting
 
     with monkeypatch.context() as platform:
         platform.setattr(exporting.os, "name", "nt")
@@ -209,9 +209,9 @@ def test_windows_python_without_private_mkdir_fails_before_staging(tmp_path, mon
 @pytest.mark.parametrize("window_type", ["calendar", "analytics", "month"])
 @pytest.mark.parametrize("link", ["symlink", "hardlink"])
 def test_print_to_file_preserves_linked_ledger(application, tmp_path, monkeypatch, window_type, link):
-    import fedleave_analytics.charts as analytics_charts
-    import fedleave_gui.chart_windows as calendar_charts
-    import fedleave_gui.main_window as calendar_main
+    import useorlose_analytics.charts as analytics_charts
+    import useorlose_gui.chart_windows as calendar_charts
+    import useorlose_gui.main_window as calendar_main
 
     ledger = tmp_path / "2026.json"
     ledger.write_text("canonical")

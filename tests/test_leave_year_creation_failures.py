@@ -7,11 +7,11 @@ import sys
 import pytest
 from typer.testing import CliRunner
 
-import fedleave.cross_year as service
-import fedleave.storage as storage
-from fedleave.cli import app
-from fedleave.cross_year import apply_creation, apply_reconciliation, creation_plan, reconciliation_plan
+import useorlose.cross_year as service
+import useorlose.storage as storage
 from leave_year_support import save, store, tree, tx
+from useorlose.cli import app
+from useorlose.cross_year import apply_creation, apply_reconciliation, creation_plan, reconciliation_plan
 
 
 @pytest.mark.parametrize(
@@ -198,7 +198,7 @@ def test_FS_017_two_concurrent_cli_creators_one_destination(tmp_path):
     command = [
         sys.executable,
         "-m",
-        "fedleave",
+        "useorlose",
         "init",
         "--from-year",
         "2026",
@@ -298,7 +298,7 @@ def test_FS_018_concurrent_manual_creators_different_destinations(tmp_path):
         [
             sys.executable,
             "-m",
-            "fedleave",
+            "useorlose",
             "init",
             "--year",
             str(year),

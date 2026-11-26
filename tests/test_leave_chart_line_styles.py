@@ -1,6 +1,6 @@
 from datetime import date
 
-from fedleave.chart_style import BLUE, draw_historical_and_future_line
+from useorlose.chart_style import BLUE, draw_historical_and_future_line
 
 
 class RecordingDraw:

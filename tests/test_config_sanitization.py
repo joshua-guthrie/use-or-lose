@@ -1,11 +1,11 @@
 import json
 from pathlib import Path
 
-from fedleave.config import init_config
+from useorlose.config import init_config
 
 
 def test_init_config_sanitizes_url(tmp_path: Path):
-    data_dir = tmp_path / "fedleave_data"
+    data_dir = tmp_path / "use_or_lose_data"
     test_url = "https://example.com/holidays.ics"
     init_config(
         year=2026,

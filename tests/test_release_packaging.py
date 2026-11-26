@@ -21,7 +21,7 @@ BOOTSTRAP = ROOT / "installer" / "linux" / "install.sh"
 
 
 def _load_packaging_module():
-    spec = importlib.util.spec_from_file_location("fedleave_release_packaging", PACKAGE_PATH)
+    spec = importlib.util.spec_from_file_location("use_or_lose_release_packaging", PACKAGE_PATH)
     assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
     sys.modules[spec.name] = module
@@ -30,14 +30,14 @@ def _load_packaging_module():
 
 
 def _fake_bundle(module, root: Path, platform: str = "linux") -> Path:
-    bundle = root / ("fedleave-Ubuntu" if platform == "linux" else "fedleave-Windows")
+    bundle = root / ("useorlose-Ubuntu" if platform == "linux" else "useorlose-Windows")
     suffix = ".exe" if platform == "windows" else ""
     bundle.mkdir(parents=True)
     for command in module.project_scripts():
         executable = bundle / f"{command}{suffix}"
         if platform == "linux":
             executable.write_text(
-                "#!/usr/bin/env bash\nif [[ ${1:-} == --version ]]; then echo 'fedleave 0.2.0'; else echo help; fi\n",
+                "#!/usr/bin/env bash\nif [[ ${1:-} == --version ]]; then echo 'useorlose 0.2.0'; else echo help; fi\n",
                 encoding="utf-8",
             )
             executable.chmod(0o755)
@@ -177,7 +177,7 @@ def test_linux_archive_has_stable_root_and_matching_checksum(tmp_path: Path) -> 
         version_file = handle.extractfile("UseOrLose/VERSION")
         version = version_file.read() if version_file is not None else None
     assert names[0] == "UseOrLose"
-    assert "UseOrLose/fedleave" in names
+    assert "UseOrLose/use-or-lose" in names
     assert version == b"0.2.0\n"
     digest = hashlib.sha256(archive.read_bytes()).hexdigest()
     assert checksum.read_text(encoding="utf-8") == f"{digest}  {archive.name}\n"
@@ -234,11 +234,11 @@ def test_runtime_dependencies_and_bundle_manifest_remain_lean() -> None:
     runtime_requirements = "\n".join(project["dependencies"]).lower()
     development_requirements = "\n".join(project["optional-dependencies"]["dev"]).lower()
     manifest = (ROOT / "scripts" / "lib" / "common" / "application_manifest.toml").read_text(encoding="utf-8")
-    charting = (ROOT / "src" / "fedleave" / "charting.py").read_text(encoding="utf-8")
+    charting = (ROOT / "src" / "useorlose" / "charting.py").read_text(encoding="utf-8")
 
     for dependency in ("numpy", "pytest", "hypothesis", "pyinstaller"):
         assert dependency not in runtime_requirements
-    assert "fedleave[gui,test,build]" in development_requirements
+    assert "use-or-lose[gui,test,build]" in development_requirements
     assert "ruff" in development_requirements
     assert "mypy" in development_requirements
     assert 'collect_all = ["shiboken6"]' not in manifest
@@ -318,13 +318,13 @@ def test_bootstrap_installs_local_verified_release_without_python(tmp_path: Path
 
     assert result.returncode == 0, result.stderr or result.stdout
     assert (install_root / "current").is_symlink()
-    assert (bin_dir / "fedleave").is_symlink()
+    assert (bin_dir / "use-or-lose").is_symlink()
     assert (bin_dir / "UseOrLoseCalendar").is_symlink()
-    assert (install_root / "releases" / "1.0.0" / "fedleave").is_file()
+    assert (install_root / "releases" / "1.0.0" / "use-or-lose").is_file()
 
 
 @pytest.mark.skipif(os.name == "nt", reason="Linux bootstrap is exercised on POSIX hosts")
-def test_bootstrap_migrates_legacy_fedleave_command_wrappers(tmp_path: Path) -> None:
+def test_bootstrap_migrates_legacy_useorlose_command_wrappers(tmp_path: Path) -> None:
     module = _load_packaging_module()
     bundle = _fake_bundle(module, tmp_path / "bundle")
     artifacts = tmp_path / "assets"
@@ -332,9 +332,9 @@ def test_bootstrap_migrates_legacy_fedleave_command_wrappers(tmp_path: Path) -> 
     install_root = tmp_path / "install root"
     bin_dir = tmp_path / "command links"
     bin_dir.mkdir()
-    legacy_wrapper = bin_dir / "fedleave"
+    legacy_wrapper = bin_dir / "use-or-lose"
     legacy_wrapper.write_text(
-        f'#!/usr/bin/env bash\nexec {install_root}/current/fedleave/fedleave "$@"\n',
+        f'#!/usr/bin/env bash\nexec {install_root}/current/useorlose/use-or-lose "$@"\n',
         encoding="utf-8",
     )
     legacy_wrapper.chmod(0o755)
@@ -358,7 +358,7 @@ def test_bootstrap_migrates_legacy_fedleave_command_wrappers(tmp_path: Path) -> 
     assert result.returncode == 0, result.stderr or result.stdout
     assert "Migrating legacy Use or Lose command wrapper" in result.stdout
     assert legacy_wrapper.is_symlink()
-    assert legacy_wrapper.readlink() == install_root / "current" / "fedleave"
+    assert legacy_wrapper.readlink() == install_root / "current" / "use-or-lose"
 
 
 @pytest.mark.skipif(os.name == "nt", reason="Linux bootstrap is exercised on POSIX hosts")
@@ -370,7 +370,7 @@ def test_bootstrap_preserves_unrelated_regular_commands(tmp_path: Path) -> None:
     install_root = tmp_path / "install root"
     bin_dir = tmp_path / "command links"
     bin_dir.mkdir()
-    unrelated = bin_dir / "fedleave"
+    unrelated = bin_dir / "use-or-lose"
     original = "#!/usr/bin/env bash\necho unrelated\n"
     unrelated.write_text(original, encoding="utf-8")
     unrelated.chmod(0o755)

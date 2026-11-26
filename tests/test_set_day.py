@@ -1,9 +1,9 @@
 import json
 from pathlib import Path
 
-from fedleave.cli import set_day
-from fedleave.config import init_config
-from fedleave.storage import load_json
+from useorlose.cli import set_day
+from useorlose.config import init_config
+from useorlose.storage import load_json
 
 
 def _init_data_dir(data_dir: Path) -> Path:

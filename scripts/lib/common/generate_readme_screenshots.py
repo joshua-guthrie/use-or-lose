@@ -12,7 +12,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[3]
 EXAMPLES = ROOT / "examples"
-BACKEND = ROOT / "bin" / "fedleave"
+BACKEND = ROOT / "bin" / "useorlose"
 
 
 def _run(command: list[str]) -> None:
@@ -27,9 +27,9 @@ def _run(command: list[str]) -> None:
 
 def _sample_data(data_dir: Path) -> None:
     sys.path.insert(0, str(ROOT / "src"))
-    from fedleave.config import init_config
-    from fedleave.ledger import add_transaction_to_leave_year, create_transaction
-    from fedleave.storage import load_json, write_json
+    from useorlose.config import init_config
+    from useorlose.ledger import add_transaction_to_leave_year, create_transaction
+    from useorlose.storage import load_json, write_json
 
     years = [(2024, "2024-01-14"), (2025, "2025-01-12"), (2026, "2026-01-11")]
     for index, (year, start) in enumerate(years):
@@ -162,7 +162,7 @@ def _chart_screenshots(data_dir: Path) -> None:
         [
             sys.executable,
             "-m",
-            "fedleave_month_report_graphic",
+            "useorlose_month_report_graphic",
             "--year",
             "2026",
             "--month",
@@ -200,15 +200,15 @@ def _gui_screenshots(data_dir: Path) -> None:
     from PySide6.QtCore import QDate
     from PySide6.QtWidgets import QAbstractItemView, QApplication, QSplitter
 
-    import fedleave_gui.main_window as calendar_ui
-    from fedleave.storage import load_json
-    from fedleave_analytics.analytics import analyze_leave_year
-    from fedleave_analytics.app import AnalyticsWindow, TransactionDialog
-    from fedleave_gui.settings import GuiSettings
+    import useorlose_gui.main_window as calendar_ui
+    from useorlose.storage import load_json
+    from useorlose_analytics.analytics import analyze_leave_year
+    from useorlose_analytics.app import AnalyticsWindow, TransactionDialog
+    from useorlose_gui.settings import GuiSettings
 
     app = QApplication.instance() or QApplication([])
     settings = GuiSettings(
-        fedleave_path=str(BACKEND),
+        useorlose_path=str(BACKEND),
         data_dir=str(data_dir),
         show_auto_accruals=False,
         font_size=11,
@@ -220,7 +220,7 @@ def _gui_screenshots(data_dir: Path) -> None:
     window.month = 7
     window.balance_as_of = window.today
     window.refresh()
-    _capture(window, EXAMPLES / "fedleave-calendar-main-screen.png", 2560, 1440, app)
+    _capture(window, EXAMPLES / "useorlose-calendar-main-screen.png", 2560, 1440, app)
 
     day = {
         "date": "2026-07-17",
@@ -229,14 +229,14 @@ def _gui_screenshots(data_dir: Path) -> None:
             {"category": "credit", "direction": "earned", "hours": 2, "description": "Late meeting"},
         ],
     }
-    _capture(calendar_ui.DayEditDialog(day), EXAMPLES / "fedleave-calendar-edit-leave.png", 1200, 820, app)
-    _capture(calendar_ui.PreferencesDialog(settings), EXAMPLES / "fedleave-calendar-preferences.png", 1200, 900, app)
+    _capture(calendar_ui.DayEditDialog(day), EXAMPLES / "useorlose-calendar-edit-leave.png", 1200, 820, app)
+    _capture(calendar_ui.PreferencesDialog(settings), EXAMPLES / "useorlose-calendar-preferences.png", 1200, 900, app)
 
     force_dialog = calendar_ui.ForceBalanceDialog()
     force_dialog.date_input.setDate(QDate(2026, 7, 22))
     force_dialog.hours_input.setValue(184.5)
     force_dialog.comment_input.setText("Match official payroll balance")
-    _capture(force_dialog, EXAMPLES / "fedleave-calendar-force-balance.png", 1200, 720, app)
+    _capture(force_dialog, EXAMPLES / "useorlose-calendar-force-balance.png", 1200, 720, app)
 
     expiration_payload = {
         "as_of": "2026-07-22",
@@ -267,7 +267,7 @@ def _gui_screenshots(data_dir: Path) -> None:
     }
     _capture(
         calendar_ui.ExpirationStatusDialog(expiration_payload, [1, 3, 6, 12]),
-        EXAMPLES / "fedleave-calendar-expiring-leave.png",
+        EXAMPLES / "useorlose-calendar-expiring-leave.png",
         1600,
         900,
         app,
@@ -297,7 +297,7 @@ def _gui_screenshots(data_dir: Path) -> None:
     ]
     _capture(
         calendar_ui.LeaveTransactionsDialog(calendar_ui.date(2026, 7, 1), calendar_ui.date(2026, 7, 31), transactions),
-        EXAMPLES / "fedleave-calendar-transactions.png",
+        EXAMPLES / "useorlose-calendar-transactions.png",
         1600,
         900,
         app,
@@ -317,12 +317,12 @@ def _gui_screenshots(data_dir: Path) -> None:
     analytics = AnalyticsWindow(BACKEND, str(data_dir), 2026, font_size=11, auto_load=False)
     analytics.set_data(analytics_data)
     analytics.pages.setCurrentIndex(0)
-    _capture(analytics, EXAMPLES / "fedleave-analytics-main.png", 1920, 1080, app)
+    _capture(analytics, EXAMPLES / "useorlose-analytics-main.png", 1920, 1080, app)
 
     analytics.pages.setCurrentIndex(1)
     analytics.seasonality_selector.setCurrentText("Leave Used by Month")
     analytics.leave_type_selector.setCurrentIndex(analytics.leave_type_selector.findData("comp:earned"))
-    _capture(analytics, EXAMPLES / "fedleave-analytics-seasonality.png", 1920, 1080, app)
+    _capture(analytics, EXAMPLES / "useorlose-analytics-seasonality.png", 1920, 1080, app)
 
     analytics.pages.setCurrentIndex(2)
     for row in range(analytics.heatmap_table.rowCount()):
@@ -330,14 +330,14 @@ def _gui_screenshots(data_dir: Path) -> None:
         if item is not None and item.text() == "2026-07-02":
             analytics.heatmap_table.scrollToItem(item, QAbstractItemView.PositionAtTop)
             break
-    _capture(analytics, EXAMPLES / "fedleave-analytics-calendar-heatmap.png", 1920, 1080, app)
+    _capture(analytics, EXAMPLES / "useorlose-analytics-calendar-heatmap.png", 1920, 1080, app)
 
     analytics.pages.setCurrentIndex(3)
     analytics.lifecycle_tabs.setCurrentIndex(4)
     lifecycle_splitter = analytics.overtime_comp_page.findChild(QSplitter)
     if lifecycle_splitter is not None:
         lifecycle_splitter.setSizes([500, 300])
-    _capture(analytics, EXAMPLES / "fedleave-analytics-overtime-comp-credit.png", 1920, 1080, app)
+    _capture(analytics, EXAMPLES / "useorlose-analytics-overtime-comp-credit.png", 1920, 1080, app)
 
     detail_rows = [
         row
@@ -346,7 +346,7 @@ def _gui_screenshots(data_dir: Path) -> None:
     ][:8]
     _capture(
         TransactionDialog(detail_rows),
-        EXAMPLES / "fedleave-analytics-supporting-transactions.png",
+        EXAMPLES / "useorlose-analytics-supporting-transactions.png",
         1600,
         900,
         app,
@@ -356,7 +356,7 @@ def _gui_screenshots(data_dir: Path) -> None:
 def main() -> int:
     """Create temporary sample data and capture every documented application."""
     EXAMPLES.mkdir(parents=True, exist_ok=True)
-    with tempfile.TemporaryDirectory(prefix="fedleave-readme-") as temp_name:
+    with tempfile.TemporaryDirectory(prefix="useorlose-readme-") as temp_name:
         data_dir = Path(temp_name) / "data"
         _sample_data(data_dir)
         _chart_screenshots(data_dir)

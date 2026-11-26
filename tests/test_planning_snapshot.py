@@ -4,9 +4,9 @@ import json
 
 from typer.testing import CliRunner
 
-from fedleave.cli import app
-from fedleave.cli_helpers import read_snapshot_payload
 from leave_year_support import save, store, tree, tx
+from useorlose.cli import app
+from useorlose.cli_helpers import read_snapshot_payload
 
 
 def test_snapshot_adds_schedule_rules_and_cached_holidays_without_writing(tmp_path):
@@ -57,7 +57,7 @@ def test_missing_context_and_invalid_holiday_cache_are_explicit(tmp_path):
 
 def test_snapshot_reads_os_read_only_files_and_existing_read_lock(tmp_path):
     store(tmp_path)
-    lock = tmp_path / ".fedleave.lock"
+    lock = tmp_path / ".useorlose.lock"
     lock.write_text("")
     files = [path for path in tmp_path.rglob("*") if path.is_file()]
     before = tree(tmp_path)

@@ -1,19 +1,19 @@
 # Packaging metadata for scripts defined in pyproject.toml [project.scripts].
 # Any new script added to pyproject.toml must have a matching section here.
 
-[fedleave]
+[use-or-lose]
 mode = "console"
-hidden_imports = ["fedleave", "holidays", "icalendar"]
-collect_all = ["fedleave"]
+hidden_imports = ["useorlose", "holidays", "icalendar"]
+collect_all = ["useorlose"]
 
-[fedleave-mcp]
+[use-or-lose-mcp]
 mode = "console"
-hidden_imports = ["fedleave.cli", "mcp.server.lowlevel", "mcp.server.stdio", "portalocker"]
+hidden_imports = ["useorlose.cli", "mcp.server.lowlevel", "mcp.server.stdio", "portalocker"]
 collect_all = ["mcp", "mcp_types", "jsonschema_specifications", "portalocker"]
 
 [UseOrLoseCalendar]
 mode = "windowed"
-icon = "assets/fedleave-icon.ico"
+icon = "assets/use-or-lose-icon.ico"
 add_data = ["help:help", "assets:assets"]
 hidden_imports = [
   "PySide6.QtCore",
@@ -26,9 +26,9 @@ hidden_imports = [
 
 [UseOrLoseAnalytics]
 mode = "windowed"
-icon = "assets/fedleave-icon.ico"
+icon = "assets/use-or-lose-icon.ico"
 hidden_imports = ["PySide6.QtCore", "PySide6.QtGui", "PySide6.QtWidgets", "PySide6.QtPrintSupport", "shiboken6", "shiboken6.Shiboken"]
-collect_all = ["fedleave_analytics"]
+collect_all = ["useorlose_analytics"]
 
 [AnnualLeaveChartForTheYear]
 mode = "console"
@@ -82,6 +82,6 @@ hidden_imports = ["PIL", "PIL.Image", "PIL.ImageDraw", "PIL.ImageFont"]
 mode = "console"
 hidden_imports = ["PIL", "PIL.Image", "PIL.ImageDraw", "PIL.ImageFont"]
 
-[fedleaveMonthReportGraphic]
+[UseOrLoseMonthReportGraphic]
 mode = "console"
 hidden_imports = ["PIL", "PIL.Image", "PIL.ImageDraw", "PIL.ImageFont"]

@@ -16,7 +16,7 @@ from pathlib import Path
 
 
 def smoke(bundle: Path) -> None:
-    with tempfile.TemporaryDirectory(prefix="fedleave-runtime-") as folder:
+    with tempfile.TemporaryDirectory(prefix="useorlose-runtime-") as folder:
         root = Path(folder)
         data = root / "data"
         env = {
@@ -27,7 +27,7 @@ def smoke(bundle: Path) -> None:
         }
         env.pop("LD_LIBRARY_PATH", None)
         env.pop("PYTHONPATH", None)
-        cli = bundle / "fedleave"
+        cli = bundle / "useorlose"
 
         def run(command):
             subprocess.run(list(map(str, command)), env=env, check=True, timeout=120)
@@ -86,6 +86,6 @@ if __name__ == "__main__":
         smoke(options.bundle_dir.resolve())
     else:
         archive = release_archive(options.archive_dir.resolve())
-        with tempfile.TemporaryDirectory(prefix="fedleave-extracted-") as folder:
+        with tempfile.TemporaryDirectory(prefix="useorlose-extracted-") as folder:
             subprocess.run(["tar", "-xzf", str(archive), "-C", folder], check=True)
             smoke(Path(folder) / "UseOrLose")

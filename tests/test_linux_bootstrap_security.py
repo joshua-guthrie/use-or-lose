@@ -18,7 +18,7 @@ def test_bootstrap_reinstalls_verified_bytes_before_running_existing_release(tmp
     existing = install / "releases" / "0.2.0"
     existing.mkdir(parents=True)
     marker = tmp_path / "untrusted-cli-ran"
-    cli = existing / "fedleave"
+    cli = existing / "use-or-lose"
     cli.write_text(f"#!/bin/bash\ntouch '{marker}'\n")
     cli.chmod(0o755)
     result = subprocess.run(
@@ -37,7 +37,7 @@ def test_bootstrap_reinstalls_verified_bytes_before_running_existing_release(tmp
     )
     assert result.returncode == 0, result.stderr + result.stdout
     assert not marker.exists()
-    assert (install / "current" / "fedleave").read_bytes() == (bundle / "fedleave").read_bytes()
+    assert (install / "current" / "use-or-lose").read_bytes() == (bundle / "use-or-lose").read_bytes()
 
 
 @pytest.mark.skipif(os.name == "nt", reason="Linux bootstrap")

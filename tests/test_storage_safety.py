@@ -7,8 +7,8 @@ from pathlib import Path
 
 import pytest
 
-import fedleave.storage as storage
-from fedleave.storage import atomic_write_json, backup_file
+import useorlose.storage as storage
+from useorlose.storage import atomic_write_json, backup_file
 
 
 def test_atomic_write_json_rejects_overwrite_without_creating_temp_file(tmp_path: Path) -> None:
@@ -69,7 +69,7 @@ def test_backup_file_uses_unique_names_within_same_second(tmp_path: Path, monkey
 
 
 def test_config_backup_stays_inside_data_directory(tmp_path: Path) -> None:
-    data_dir = tmp_path / "fedleave-data"
+    data_dir = tmp_path / "useorlose-data"
     data_dir.mkdir()
     config = data_dir / "config.json"
     config.write_text('{"schema_version": 1}\n', encoding="utf-8")

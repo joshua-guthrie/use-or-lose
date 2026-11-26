@@ -1,6 +1,6 @@
 """Calendar labels, usage-only FMLA input and same-day grant/use editing."""
 
-from fedleave_gui.main_window import (
+from useorlose_gui.main_window import (
     CATEGORY_LABELS,
     DayEditDialog,
     ExpirationStatusDialog,

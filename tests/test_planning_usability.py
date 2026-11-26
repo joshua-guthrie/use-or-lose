@@ -7,12 +7,12 @@ import pytest
 from PySide6.QtCore import QDate, Qt, QTimer
 from PySide6.QtWidgets import QApplication, QDialog, QPushButton
 
-from fedleave_analytics.help_view import AnalyticsHelpDialog
-from fedleave_analytics.planning_controls import ScenarioDateDialog
-from fedleave_analytics.planning_view import PlannerWidget
-from fedleave_analytics.planning_window import PlanningWindow
 from test_planning_gui import planner as planner
 from test_planning_gui import row_with_source, wait_result
+from useorlose_analytics.help_view import AnalyticsHelpDialog
+from useorlose_analytics.planning_controls import ScenarioDateDialog
+from useorlose_analytics.planning_view import PlannerWidget
+from useorlose_analytics.planning_window import PlanningWindow
 
 
 def test_single_click_and_keyboard_open_calendar_commit_and_cancel(qtbot, planner):
@@ -61,7 +61,7 @@ def test_cancel_preserves_invalid_proposed_date_and_scheduled_rows_have_no_picke
     def forbidden(*args):
         raise AssertionError("Scheduled dates are fixed")
 
-    monkeypatch.setattr("fedleave_analytics.planning_view.ScenarioDateDialog", forbidden)
+    monkeypatch.setattr("useorlose_analytics.planning_view.ScenarioDateDialog", forbidden)
     planner.pick_date(scheduled, 1)
     assert not planner.scenario_table.item(scheduled, 1).flags() & Qt.ItemIsEditable
 

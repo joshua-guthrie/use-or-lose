@@ -2,9 +2,9 @@ import json
 from datetime import date
 from pathlib import Path
 
-from fedleave.cli import add, balance, daily_activity, pay_period_summary
-from fedleave.cli_helpers import parse_iso_date
-from fedleave.config import init_config
+from useorlose.cli import add, balance, daily_activity, pay_period_summary
+from useorlose.cli_helpers import parse_iso_date
+from useorlose.config import init_config
 
 
 def _init_today_data_dir(data_dir: Path) -> tuple[int, str]:

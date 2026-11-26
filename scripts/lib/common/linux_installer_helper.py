@@ -47,7 +47,7 @@ def write_linux_wrappers(repo_root: Path, current_link: Path) -> None:
 
     desktop_dir = Path("/usr/local/share/applications")
     desktop_dir.mkdir(parents=True, exist_ok=True)
-    desktop_file = desktop_dir / "fedleave-calendar.desktop"
+    desktop_file = desktop_dir / "useorlose-calendar.desktop"
     desktop_file.write_text(
         "\n".join(
             [
@@ -75,7 +75,7 @@ def cleanup_old_versions(versions_dir: Path, keep_count: int) -> None:
 
 def install_system(repo_root: Path, dist_dir: Path, version: str, keep_versions: int) -> None:
     """Stage a suite version, activate it, then update wrappers and retention."""
-    install_root = Path("/opt/fedleave")
+    install_root = Path("/opt/useorlose")
     versions = install_root / "versions"
     versions.mkdir(parents=True, exist_ok=True)
 

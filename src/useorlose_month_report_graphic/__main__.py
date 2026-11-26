@@ -1,0 +1,6 @@
+"""Entry point for UseOrLoseMonthReportGraphic."""
+
+from useorlose_month_report_graphic.report import main
+
+if __name__ == "__main__":
+    main()

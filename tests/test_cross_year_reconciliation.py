@@ -4,8 +4,9 @@ import json
 
 import pytest
 
-import fedleave.cross_year as service
-from fedleave.cross_year import (
+import useorlose.cross_year as service
+from leave_year_support import save, store, tree, tx
+from useorlose.cross_year import (
     apply_creation,
     apply_reconciliation,
     creation_plan,
@@ -13,8 +14,7 @@ from fedleave.cross_year import (
     recover_reconciliation,
     resolve_snapshot,
 )
-from fedleave.ledger import calculate_balances
-from leave_year_support import save, store, tree, tx
+from useorlose.ledger import calculate_balances
 
 
 def linked(base, last=2027, lot=False):
@@ -265,7 +265,7 @@ def test_BAL_019_020_explicit_legacy_opening_repair_is_idempotent(tmp_path):
 def test_approved_destination_extension_survives_source_reconciliation(tmp_path):
     from typer.testing import CliRunner
 
-    from fedleave.cli import app
+    from useorlose.cli import app
 
     source, _ = linked(tmp_path, lot=True)
     target = json.loads((tmp_path / "leave_years/2027.json").read_text())

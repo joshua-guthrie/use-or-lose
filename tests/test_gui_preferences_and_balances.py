@@ -7,8 +7,8 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 from PySide6.QtCore import QDate
 from PySide6.QtWidgets import QApplication, QDialog
 
-from fedleave_gui.main_window import MainWindow, PreferencesDialog, SelectDateDialog, _apply_payday_offset
-from fedleave_gui.settings import GuiSettings, load_settings, save_settings
+from useorlose_gui.main_window import MainWindow, PreferencesDialog, SelectDateDialog, _apply_payday_offset
+from useorlose_gui.settings import GuiSettings, load_settings, save_settings
 
 
 def _application() -> QApplication:
@@ -17,7 +17,7 @@ def _application() -> QApplication:
 
 def test_gui_settings_round_trip_preserves_payday_offset(monkeypatch, tmp_path: Path):
     settings_file = tmp_path / "settings.json"
-    monkeypatch.setattr("fedleave_gui.settings.settings_path", lambda: settings_file)
+    monkeypatch.setattr("useorlose_gui.settings.settings_path", lambda: settings_file)
 
     save_settings(GuiSettings(payday_offset_days=4))
 
@@ -28,7 +28,7 @@ def test_gui_settings_round_trip_preserves_payday_offset(monkeypatch, tmp_path: 
 
 def test_preferences_dialog_applies_payday_offset(monkeypatch, tmp_path: Path):
     _application()
-    monkeypatch.setattr("fedleave_gui.main_window.settings_path", lambda: tmp_path / "settings.json")
+    monkeypatch.setattr("useorlose_gui.main_window.settings_path", lambda: tmp_path / "settings.json")
     settings = GuiSettings(payday_offset_days=6)
 
     dialog = PreferencesDialog(settings)
@@ -42,7 +42,7 @@ def test_preferences_dialog_applies_payday_offset(monkeypatch, tmp_path: Path):
 def test_preferences_immediately_renders_changed_payday_offset(monkeypatch):
     _application()
     monkeypatch.setattr(MainWindow, "refresh", lambda self: None)
-    monkeypatch.setattr("fedleave_gui.main_window.save_settings", lambda settings: None)
+    monkeypatch.setattr("useorlose_gui.main_window.save_settings", lambda settings: None)
     window = MainWindow()
     window.month_json = {
         "days": [
@@ -71,7 +71,7 @@ def test_preferences_immediately_renders_changed_payday_offset(monkeypatch):
             self.settings.payday_offset_days = 0
             return self.settings
 
-    monkeypatch.setattr("fedleave_gui.main_window.PreferencesDialog", FakePreferencesDialog)
+    monkeypatch.setattr("useorlose_gui.main_window.PreferencesDialog", FakePreferencesDialog)
 
     window.preferences()
 
@@ -135,7 +135,7 @@ def test_balance_button_updates_to_selected_as_of_date(monkeypatch):
         def selected_date(self):
             return date(2026, 5, 8)
 
-    monkeypatch.setattr("fedleave_gui.main_window.SelectDateDialog", FakeSelectDateDialog)
+    monkeypatch.setattr("useorlose_gui.main_window.SelectDateDialog", FakeSelectDateDialog)
 
     window.select_balance_date()
 

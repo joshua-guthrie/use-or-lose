@@ -32,7 +32,7 @@ def _engine(module, *, unattended: bool = False):
 def test_windows_install_prompts_and_preserves_dist_when_declined(tmp_path, monkeypatch):
     module = _load_module("windows_prompt_engine", ENGINE_PATH)
     engine = _engine(module)
-    dist = tmp_path / "fedleave-Windows"
+    dist = tmp_path / "useorlose-Windows"
     dist.mkdir()
     called = False
 
@@ -52,7 +52,7 @@ def test_windows_install_prompts_and_preserves_dist_when_declined(tmp_path, monk
 def test_windows_install_requests_elevation_after_user_accepts(tmp_path, monkeypatch):
     module = _load_module("windows_elevation_engine", ENGINE_PATH)
     engine = _engine(module)
-    dist = tmp_path / "fedleave-Windows"
+    dist = tmp_path / "useorlose-Windows"
     dist.mkdir()
     captured: dict[str, object] = {}
 
@@ -73,7 +73,7 @@ def test_windows_install_requests_elevation_after_user_accepts(tmp_path, monkeyp
 def test_windows_unattended_install_skips_prompt_when_already_elevated(tmp_path, monkeypatch):
     module = _load_module("windows_unattended_engine", ENGINE_PATH)
     engine = _engine(module, unattended=True)
-    dist = tmp_path / "fedleave-Windows"
+    dist = tmp_path / "useorlose-Windows"
     dist.mkdir()
     captured: dict[str, object] = {}
 
@@ -96,13 +96,13 @@ def test_windows_unattended_install_skips_prompt_when_already_elevated(tmp_path,
 
 def test_windows_helper_installs_bundle_and_creates_both_shortcuts(tmp_path, monkeypatch):
     module = _load_module("windows_install_helper", HELPER_PATH)
-    source = tmp_path / "dist" / "fedleave-Windows"
+    source = tmp_path / "dist" / "useorlose-Windows"
     calendar = source / "UseOrLoseCalendar.exe"
     calendar.parent.mkdir(parents=True)
     calendar.write_bytes(b"calendar")
-    (source / "fedleave.exe").write_bytes(b"backend")
+    (source / "useorlose.exe").write_bytes(b"backend")
     (source / "_internal").mkdir()
-    target = tmp_path / "Program Files" / "fedleave"
+    target = tmp_path / "Program Files" / "use-or-lose"
     target.mkdir(parents=True)
     (target / "old.txt").write_text("old", encoding="utf-8")
     desktop = tmp_path / "Public" / "Desktop"
@@ -118,9 +118,9 @@ def test_windows_helper_installs_bundle_and_creates_both_shortcuts(tmp_path, mon
 
     installed_calendar = target / "UseOrLoseCalendar.exe"
     assert installed_calendar.read_bytes() == b"calendar"
-    assert (target / "fedleave.exe").read_bytes() == b"backend"
+    assert (target / "useorlose.exe").read_bytes() == b"backend"
     assert not (target / "old.txt").exists()
-    assert not target.with_name("fedleave.previous").exists()
+    assert not target.with_name("useorlose.previous").exists()
     assert shortcuts == [
         (desktop / "Use or Lose Calendar.lnk", installed_calendar, installed_calendar.parent),
         (start_menu / "Use or Lose Calendar.lnk", installed_calendar, installed_calendar.parent),
@@ -129,10 +129,10 @@ def test_windows_helper_installs_bundle_and_creates_both_shortcuts(tmp_path, mon
 
 def test_windows_helper_restores_previous_install_if_bundle_is_invalid(tmp_path):
     module = _load_module("windows_restore_helper", HELPER_PATH)
-    source = tmp_path / "dist" / "fedleave-Windows"
+    source = tmp_path / "dist" / "useorlose-Windows"
     source.mkdir(parents=True)
     (source / "not-calendar.txt").write_text("invalid", encoding="utf-8")
-    target = tmp_path / "Program Files" / "fedleave"
+    target = tmp_path / "Program Files" / "use-or-lose"
     target.mkdir(parents=True)
     (target / "old.txt").write_text("old", encoding="utf-8")
 
@@ -140,8 +140,8 @@ def test_windows_helper_restores_previous_install_if_bundle_is_invalid(tmp_path)
         module.install_system(source, target, tmp_path / "Desktop", tmp_path / "Start Menu")
 
     assert (target / "old.txt").read_text(encoding="utf-8") == "old"
-    assert not target.with_name("fedleave.staging").exists()
-    assert not target.with_name("fedleave.previous").exists()
+    assert not target.with_name("useorlose.staging").exists()
+    assert not target.with_name("useorlose.previous").exists()
 
 
 def test_build_publish_succeeds_when_previous_windows_files_remain_locked(tmp_path, monkeypatch):
@@ -149,10 +149,10 @@ def test_build_publish_succeeds_when_previous_windows_files_remain_locked(tmp_pa
     engine = _engine(module)
     messages: list[str] = []
     engine.log = messages.append
-    completed = tmp_path / "completed" / "fedleave-Windows"
+    completed = tmp_path / "completed" / "useorlose-Windows"
     completed.mkdir(parents=True)
     (completed / "new.txt").write_text("new build", encoding="utf-8")
-    published = tmp_path / "dist" / "fedleave-Windows"
+    published = tmp_path / "dist" / "useorlose-Windows"
     published.mkdir(parents=True)
     (published / "locked.pyd").write_text("old build", encoding="utf-8")
 
@@ -165,7 +165,7 @@ def test_build_publish_succeeds_when_previous_windows_files_remain_locked(tmp_pa
 
     assert (published / "new.txt").read_text(encoding="utf-8") == "new build"
     assert not (published / "locked.pyd").exists()
-    abandoned = list(published.parent.glob(".fedleave-Windows.previous-*"))
+    abandoned = list(published.parent.glob(".useorlose-Windows.previous-*"))
     assert len(abandoned) == 1
     assert (abandoned[0] / "locked.pyd").read_text(encoding="utf-8") == "old build"
     assert any("WARNING: Previous build remains" in message for message in messages)

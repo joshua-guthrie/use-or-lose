@@ -7,9 +7,9 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from PySide6.QtWidgets import QApplication, QFileDialog, QMessageBox
 
-from fedleave_gui.backend import BackendError
-from fedleave_gui.main_window import MainWindow, _visible_categories
-from fedleave_gui.settings import GuiSettings
+from useorlose_gui.backend import BackendError
+from useorlose_gui.main_window import MainWindow, _visible_categories
+from useorlose_gui.settings import GuiSettings
 
 
 def _application() -> QApplication:
@@ -94,17 +94,17 @@ def test_analytics_view_action_launches_companion_with_current_context(monkeypat
     _application()
     monkeypatch.setattr(MainWindow, "refresh", lambda self: None)
     monkeypatch.setattr(
-        "fedleave_gui.main_window.load_settings",
+        "useorlose_gui.main_window.load_settings",
         lambda: GuiSettings(data_dir=str(tmp_path / "data"), font_size=12, pdf_export_folder=str(tmp_path / "pdf")),
     )
     window = MainWindow()
     window.year = 2027
-    backend_path = tmp_path / "fedleave"
+    backend_path = tmp_path / "use-or-lose"
     analytics_path = tmp_path / "UseOrLoseAnalytics"
     calls = []
     monkeypatch.setattr(window.backend, "executable_path", lambda: backend_path)
-    monkeypatch.setattr("fedleave_gui.main_window.find_analytics", lambda: analytics_path)
-    monkeypatch.setattr("fedleave_gui.main_window.subprocess.Popen", lambda command: calls.append(command))
+    monkeypatch.setattr("useorlose_gui.main_window.find_analytics", lambda: analytics_path)
+    monkeypatch.setattr("useorlose_gui.main_window.subprocess.Popen", lambda command: calls.append(command))
 
     window.open_analytics()
 
@@ -128,15 +128,15 @@ def test_analytics_view_action_launches_companion_with_current_context(monkeypat
 def test_analytics_view_action_passes_resolved_default_data_directory(monkeypatch, tmp_path):
     _application()
     monkeypatch.setattr(MainWindow, "refresh", lambda self: None)
-    monkeypatch.setattr("fedleave_gui.main_window.load_settings", lambda: GuiSettings())
-    monkeypatch.setattr("fedleave_gui.main_window.get_default_data_dir", lambda _data_dir=None: tmp_path / "data")
+    monkeypatch.setattr("useorlose_gui.main_window.load_settings", lambda: GuiSettings())
+    monkeypatch.setattr("useorlose_gui.main_window.get_default_data_dir", lambda _data_dir=None: tmp_path / "data")
     window = MainWindow()
-    backend_path = tmp_path / "fedleave"
+    backend_path = tmp_path / "use-or-lose"
     analytics_path = tmp_path / "UseOrLoseAnalytics"
     calls = []
     monkeypatch.setattr(window.backend, "executable_path", lambda: backend_path)
-    monkeypatch.setattr("fedleave_gui.main_window.find_analytics", lambda: analytics_path)
-    monkeypatch.setattr("fedleave_gui.main_window.subprocess.Popen", lambda command: calls.append(command))
+    monkeypatch.setattr("useorlose_gui.main_window.find_analytics", lambda: analytics_path)
+    monkeypatch.setattr("useorlose_gui.main_window.subprocess.Popen", lambda command: calls.append(command))
 
     window.open_analytics()
 
@@ -148,7 +148,7 @@ def test_planning_menu_launches_existing_analytics_with_exact_context(monkeypatc
     _application()
     monkeypatch.setattr(MainWindow, "refresh", lambda self: None)
     monkeypatch.setattr(
-        "fedleave_gui.main_window.load_settings",
+        "useorlose_gui.main_window.load_settings",
         lambda: GuiSettings(
             data_dir=str(tmp_path / "selected data"), font_size=12, pdf_export_folder=str(tmp_path / "pdf")
         ),
@@ -158,8 +158,8 @@ def test_planning_menu_launches_existing_analytics_with_exact_context(monkeypatc
     backend, analytics = tmp_path / "selected backend", tmp_path / "UseOrLoseAnalytics"
     calls = []
     monkeypatch.setattr(window.backend, "executable_path", lambda: backend)
-    monkeypatch.setattr("fedleave_gui.main_window.find_analytics", lambda: analytics)
-    monkeypatch.setattr("fedleave_gui.main_window.subprocess.Popen", lambda command: calls.append(command))
+    monkeypatch.setattr("useorlose_gui.main_window.find_analytics", lambda: analytics)
+    monkeypatch.setattr("useorlose_gui.main_window.subprocess.Popen", lambda command: calls.append(command))
     analysis = next(action for action in window.menuBar().actions() if action.text() == "Analysis")
     planning = next(action for action in analysis.menu().actions() if action.text() == "Planning")
     planner_action = next(action for action in planning.menu().actions() if action.text() == "What-if Planner...")
@@ -224,7 +224,7 @@ def test_change_leave_year_action_updates_displayed_year(monkeypatch, tmp_path):
         def selected_year(self):
             return 2024
 
-    monkeypatch.setattr("fedleave_gui.main_window.ChangeLeaveYearDialog", FakeChangeLeaveYearDialog)
+    monkeypatch.setattr("useorlose_gui.main_window.ChangeLeaveYearDialog", FakeChangeLeaveYearDialog)
 
     window.change_leave_year()
 
@@ -236,7 +236,7 @@ def test_startup_loads_current_leave_year_when_available(monkeypatch, tmp_path):
     _application()
     monkeypatch.setattr(MainWindow, "refresh", lambda self: None)
     monkeypatch.setattr(
-        "fedleave_gui.main_window.load_settings",
+        "useorlose_gui.main_window.load_settings",
         lambda: GuiSettings(data_dir=str(tmp_path)),
     )
     window = MainWindow()
@@ -256,7 +256,7 @@ def test_startup_can_decline_current_year_and_browse_latest_available(monkeypatc
     _application()
     monkeypatch.setattr(MainWindow, "refresh", lambda self: None)
     monkeypatch.setattr(
-        "fedleave_gui.main_window.load_settings",
+        "useorlose_gui.main_window.load_settings",
         lambda: GuiSettings(data_dir=str(tmp_path)),
     )
     window = MainWindow()
@@ -280,7 +280,7 @@ def test_first_run_offers_to_open_new_leave_year_dialog(monkeypatch, tmp_path):
     _application()
     monkeypatch.setattr(MainWindow, "refresh", lambda self: None)
     monkeypatch.setattr(
-        "fedleave_gui.main_window.load_settings",
+        "useorlose_gui.main_window.load_settings",
         lambda: GuiSettings(data_dir=str(tmp_path)),
     )
     monkeypatch.setattr(
@@ -302,7 +302,7 @@ def test_first_run_can_decline_new_leave_year_without_backend_error(monkeypatch,
     refresh_calls = []
     monkeypatch.setattr(MainWindow, "refresh", lambda self: refresh_calls.append(True))
     monkeypatch.setattr(
-        "fedleave_gui.main_window.load_settings",
+        "useorlose_gui.main_window.load_settings",
         lambda: GuiSettings(data_dir=str(tmp_path)),
     )
     monkeypatch.setattr(
@@ -320,7 +320,7 @@ def test_first_run_can_decline_new_leave_year_without_backend_error(monkeypatch,
 def test_yearly_comparison_menu_refreshes_when_a_second_leave_year_is_added(monkeypatch, tmp_path):
     _application()
     monkeypatch.setattr(MainWindow, "refresh", lambda self: None)
-    monkeypatch.setattr("fedleave_gui.main_window.load_settings", lambda: GuiSettings(data_dir=str(tmp_path)))
+    monkeypatch.setattr("useorlose_gui.main_window.load_settings", lambda: GuiSettings(data_dir=str(tmp_path)))
     window = MainWindow()
 
     leave_years = tmp_path / "leave_years"
@@ -412,7 +412,7 @@ def test_change_accrual_action_updates_backend_and_refreshes(monkeypatch):
         def selected_hours(self):
             return 8.0
 
-    monkeypatch.setattr("fedleave_gui.main_window.ChangeAccrualDialog", FakeChangeAccrualDialog)
+    monkeypatch.setattr("useorlose_gui.main_window.ChangeAccrualDialog", FakeChangeAccrualDialog)
     monkeypatch.setattr(window, "_ensure_leave_year", lambda selected: 2026)
 
     window.change_accrual()
@@ -577,7 +577,7 @@ def test_wms_import_failure_uses_copyable_diagnostic_dialog(monkeypatch, tmp_pat
 
     monkeypatch.setattr(MainWindow, "refresh", lambda self: None)
     monkeypatch.setattr(MainWindow, "_backend", lambda self: FakeBackend())
-    monkeypatch.setattr("fedleave_gui.main_window.DiagnosticDialog", FakeDiagnosticDialog)
+    monkeypatch.setattr("useorlose_gui.main_window.DiagnosticDialog", FakeDiagnosticDialog)
     monkeypatch.setattr(
         QFileDialog, "getOpenFileName", lambda *args, **kwargs: (str(tmp_path / "clocking.html"), "HTML")
     )
@@ -612,7 +612,7 @@ def test_force_balance_dialog_calls_backend_and_refreshes(monkeypatch):
 
     monkeypatch.setattr(MainWindow, "refresh", lambda self: None)
     monkeypatch.setattr(MainWindow, "_backend", lambda self: FakeBackend())
-    monkeypatch.setattr("fedleave_gui.main_window.ForceBalanceDialog", FakeDialog)
+    monkeypatch.setattr("useorlose_gui.main_window.ForceBalanceDialog", FakeDialog)
     monkeypatch.setattr(QMessageBox, "information", lambda *args, **kwargs: None)
     window = MainWindow()
     window.refresh = lambda: refreshed.append(True)
@@ -643,7 +643,7 @@ def test_periodic_update_alert_is_not_repeated_for_same_build(monkeypatch):
 
     monkeypatch.setattr(MainWindow, "refresh", lambda self: None)
     monkeypatch.setattr(MainWindow, "_backend", lambda self: FakeBackend())
-    monkeypatch.setattr("fedleave_gui.main_window.save_settings", lambda settings: None)
+    monkeypatch.setattr("useorlose_gui.main_window.save_settings", lambda settings: None)
     monkeypatch.setattr(QMessageBox, "information", lambda *args, **kwargs: alerts.append(args[2]))
     window = MainWindow()
 
@@ -676,12 +676,12 @@ def test_open_project_website_uses_official_url(monkeypatch):
     _application()
     opened: list[str] = []
     monkeypatch.setattr(MainWindow, "refresh", lambda self: None)
-    monkeypatch.setattr("fedleave_gui.main_window.webbrowser.open", opened.append)
+    monkeypatch.setattr("useorlose_gui.main_window.webbrowser.open", opened.append)
     window = MainWindow()
 
     window.open_project_website()
 
-    assert opened == ["https://www.westmouthbay.com/fedleave-application/"]
+    assert opened == ["https://www.westmouthbay.com/UseOrLose-application/"]
 
 
 def test_select_month_action_updates_displayed_month(monkeypatch):
@@ -704,7 +704,7 @@ def test_select_month_action_updates_displayed_month(monkeypatch):
         def selected_year_month(self):
             return 2027, 3
 
-    monkeypatch.setattr("fedleave_gui.main_window.SelectMonthDialog", FakeSelectMonthDialog)
+    monkeypatch.setattr("useorlose_gui.main_window.SelectMonthDialog", FakeSelectMonthDialog)
 
     window.select_month()
 

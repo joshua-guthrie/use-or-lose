@@ -5,7 +5,7 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication, QHeaderView, QTableWidget
 
-from fedleave_gui.main_window import CATEGORY_LABELS, AbbreviationsDialog
+from useorlose_gui.main_window import CATEGORY_LABELS, AbbreviationsDialog
 
 
 def _application() -> QApplication:

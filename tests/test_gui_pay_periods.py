@@ -5,7 +5,7 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication, QGroupBox
 
-from fedleave_gui.main_window import MainWindow, _pay_period_rows
+from useorlose_gui.main_window import MainWindow, _pay_period_rows
 
 
 def _application() -> QApplication:

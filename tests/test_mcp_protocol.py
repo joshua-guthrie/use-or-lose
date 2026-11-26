@@ -11,9 +11,9 @@ from pathlib import Path
 import pytest
 from mcp import Client, StdioServerParameters, types
 
-from fedleave.mcp.catalog import discover
-from fedleave.mcp.policy import Policy
-from fedleave.mcp.server import create_server
+from useorlose.mcp.catalog import discover
+from useorlose.mcp.policy import Policy
+from useorlose.mcp.server import create_server
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -23,7 +23,7 @@ def test_official_sdk_subprocess_stdio_round_trip(restricted):
     spec = importlib.util.spec_from_file_location("mcp_smoke", ROOT / "scripts/lib/common/mcp_smoke.py")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    asyncio.run(module.smoke(sys.executable, ["-m", "fedleave.mcp"], discover(), restricted=restricted))
+    asyncio.run(module.smoke(sys.executable, ["-m", "useorlose.mcp"], discover(), restricted=restricted))
 
 
 def test_stdio_metadata_parser_accepts_bounded_edge_cases_without_datastore_writes(tmp_path):
@@ -34,7 +34,7 @@ def test_stdio_metadata_parser_accepts_bounded_edge_cases_without_datastore_writ
     async def run():
         params = StdioServerParameters(
             command=sys.executable,
-            args=["-m", "fedleave.mcp", "--config", str(policy)],
+            args=["-m", "useorlose.mcp", "--config", str(policy)],
             env={**os.environ, "OTEL_PROPAGATORS": "tracecontext"},
         )
         async with Client(params, read_timeout_seconds=30) as client:
@@ -45,7 +45,7 @@ def test_stdio_metadata_parser_accepts_bounded_edge_cases_without_datastore_writ
                 meta = types.RequestParamsMeta(traceparent=context) if context is not None else None
                 catalog = await client.list_tools(meta=meta, cache_mode="refresh")
                 assert {tool.name for tool in catalog.tools} == set(discover())
-            denied = await client.call_tool("fedleave_add", {"date": "2026-07-01", "category": "annual", "used": 1})
+            denied = await client.call_tool("use_or_lose_add", {"date": "2026-07-01", "category": "annual", "used": 1})
             assert denied.is_error and denied.structured_content["error"] == "permission_denied"
 
     asyncio.run(asyncio.wait_for(run(), timeout=90))
@@ -59,9 +59,9 @@ def test_analytics_smoke_resolves_source_scripts_and_installed_siblings(tmp_path
     scripts = tmp_path / "Python" / "Scripts"
     scripts.mkdir(parents=True)
     monkeypatch.setattr(module.sysconfig, "get_path", lambda name: str(scripts))
-    assert module.application_directory(str(tmp_path / "Python/python.exe"), ["-m", "fedleave.mcp"]) == scripts
+    assert module.application_directory(str(tmp_path / "Python/python.exe"), ["-m", "useorlose.mcp"]) == scripts
     installed = tmp_path / "Installed Use or Lose"
-    assert module.application_directory(str(installed / "fedleave-mcp.exe"), []) == installed
+    assert module.application_directory(str(installed / "useorlose-mcp.exe"), []) == installed
 
 
 def test_sdk_read_only_full_catalog_and_typed_errors(tmp_path):
@@ -70,11 +70,13 @@ def test_sdk_read_only_full_catalog_and_typed_errors(tmp_path):
         async with Client(server, raise_exceptions=True) as client:
             tools = await client.list_tools()
             assert {t.name for t in tools.tools} == set(discover())
-            result = await client.call_tool("fedleave_add", {"date": "2026-07-01", "category": "annual", "used": 1})
+            result = await client.call_tool("use_or_lose_add", {"date": "2026-07-01", "category": "annual", "used": 1})
             assert result.is_error and result.structured_content["error"] == "permission_denied"
-            result = await client.call_tool("fedleave_add", {"date": "2026-07-01", "category": "annual", "used": "bad"})
+            result = await client.call_tool(
+                "use_or_lose_add", {"date": "2026-07-01", "category": "annual", "used": "bad"}
+            )
             assert result.is_error and result.structured_content["error"] == "invalid_arguments"
-            version = await client.call_tool("fedleave_version", {})
+            version = await client.call_tool("use_or_lose_version", {})
             assert not version.is_error
 
     asyncio.run(run())
@@ -82,7 +84,7 @@ def test_sdk_read_only_full_catalog_and_typed_errors(tmp_path):
 
 def test_stdio_eof_exits_cleanly_and_imports_no_gui():
     result = subprocess.run(
-        [sys.executable, "-m", "fedleave.mcp"], input="", capture_output=True, text=True, timeout=20
+        [sys.executable, "-m", "useorlose.mcp"], input="", capture_output=True, text=True, timeout=20
     )
     assert result.returncode == 0, result.stderr
     assert result.stdout == ""
@@ -90,7 +92,7 @@ def test_stdio_eof_exits_cleanly_and_imports_no_gui():
         [
             sys.executable,
             "-c",
-            "from fedleave.mcp.server import create_server; from fedleave.mcp.policy import Policy; create_server(Policy()); import sys; assert not any(n.startswith('PySide6') for n in sys.modules)",
+            "from useorlose.mcp.server import create_server; from useorlose.mcp.policy import Policy; create_server(Policy()); import sys; assert not any(n.startswith('PySide6') for n in sys.modules)",
         ],
         env={**os.environ, "PYTHONPATH": str(ROOT / "src")},
         capture_output=True,
@@ -105,19 +107,21 @@ def test_two_sdk_clients_retain_concurrent_transactions(tmp_path):
         policy = Policy(mode="unattended", data_dir=tmp_path / "data")
         async with Client(create_server(policy), read_timeout_seconds=30) as first:
             async with Client(create_server(policy), read_timeout_seconds=30) as second:
-                initialized = await first.call_tool("fedleave_init", {"year": 2026, "leave_year_start": "2026-01-11"})
+                initialized = await first.call_tool(
+                    "use_or_lose_init", {"year": 2026, "leave_year_start": "2026-01-11"}
+                )
                 assert not initialized.is_error
                 results = await asyncio.gather(
                     *[
                         client.call_tool(
-                            "fedleave_add",
+                            "use_or_lose_add",
                             {"date": "2026-07-01", "category": "annual", "used": 1, "description": f"agent-{i}"},
                         )
                         for i, client in enumerate([first, second])
                     ]
                 )
                 assert all(not result.is_error for result in results), results
-                listed = await first.call_tool("fedleave_list", {"year": 2026})
+                listed = await first.call_tool("use_or_lose_list", {"year": 2026})
                 descriptions = {t.get("description") for t in listed.structured_content["data"]["transactions"]}
                 assert {"agent-0", "agent-1"} <= descriptions
 
@@ -131,11 +135,11 @@ def test_invalid_explicit_configuration_fails_startup_without_escalation(tmp_pat
     if content is not None:
         path.write_text(content)
     env = {k: v for k, v in os.environ.items() if not k.startswith("FEDLEAVE_MCP_")}
-    args = [sys.executable, "-m", "fedleave.mcp"]
+    args = [sys.executable, "-m", "useorlose.mcp"]
     if source == "argument":
         args.extend(["--config", str(path)])
     else:
-        env["FEDLEAVE_MCP_CONFIG"] = str(path)
+        env["USE_OR_LOSE_MCP_CONFIG"] = str(path)
     result = subprocess.run(args, env=env, input="", capture_output=True, text=True, timeout=20)
     assert result.returncode == 2
     assert result.stdout == "" and "startup failed" in result.stderr
@@ -146,11 +150,11 @@ def test_tool_annotations_account_for_maintenance_and_conditional_writes(tmp_pat
         for policy in [Policy(), Policy(mode="read_only", data_dir=tmp_path)]:
             async with Client(create_server(policy)) as client:
                 tools = {t.name: t for t in (await client.list_tools()).tools}
-                assert tools["fedleave_version"].annotations.read_only_hint
-                assert not tools["fedleave_add"].annotations.read_only_hint
-                assert tools["fedleave_balance"].annotations.read_only_hint
-                assert tools["fedleave_rollover"].annotations.destructive_hint
-                assert tools["fedleave_validate"].annotations.destructive_hint
-                assert tools["fedleave_check_for_updates"].annotations.open_world_hint
+                assert tools["use_or_lose_version"].annotations.read_only_hint
+                assert not tools["use_or_lose_add"].annotations.read_only_hint
+                assert tools["use_or_lose_balance"].annotations.read_only_hint
+                assert tools["use_or_lose_rollover"].annotations.destructive_hint
+                assert tools["use_or_lose_validate"].annotations.destructive_hint
+                assert tools["use_or_lose_check_for_updates"].annotations.open_world_hint
 
     asyncio.run(run())

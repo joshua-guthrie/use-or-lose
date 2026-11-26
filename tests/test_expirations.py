@@ -4,10 +4,10 @@ import json
 from datetime import date
 from pathlib import Path
 
-from fedleave.commands.expirations import expiration_extend
-from fedleave.config import Config
-from fedleave.expirations import expiration_report, synchronize_expirations
-from fedleave.storage import write_json
+from useorlose.commands.expirations import expiration_extend
+from useorlose.config import Config
+from useorlose.expirations import expiration_report, synchronize_expirations
+from useorlose.storage import write_json
 
 
 def _transaction(id: str, day: str, category: str, direction: str, hours: float) -> dict:

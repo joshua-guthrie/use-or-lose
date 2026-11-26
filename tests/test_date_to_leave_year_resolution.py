@@ -1,10 +1,10 @@
 import json
 from pathlib import Path
 
-from fedleave.cli import add, correct
-from fedleave.config import init_config
-from fedleave.ledger import add_transaction_to_leave_year, create_transaction
-from fedleave.storage import write_json
+from useorlose.cli import add, correct
+from useorlose.config import init_config
+from useorlose.ledger import add_transaction_to_leave_year, create_transaction
+from useorlose.storage import write_json
 
 
 def test_add_inferrs_leave_year_from_date(tmp_path: Path):

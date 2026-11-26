@@ -2,8 +2,8 @@ import io
 
 import pytest
 
-from fedleave import holidays, update_check
-from fedleave.config import init_config
+from useorlose import holidays, update_check
+from useorlose.config import init_config
 
 
 class BudgetResponse(io.BytesIO):

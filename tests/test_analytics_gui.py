@@ -8,16 +8,16 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QFontMetrics
 from PySide6.QtWidgets import QApplication, QPushButton
 
-from fedleave_analytics.analytics import analyze_leave_year
-from fedleave_analytics.app import AnalyticsWindow
-from fedleave_analytics.charts import (
+from test_analytics import seasonal_payload, seasonal_tx
+from useorlose_analytics.analytics import analyze_leave_year
+from useorlose_analytics.app import AnalyticsWindow
+from useorlose_analytics.charts import (
     render_bar_chart,
     render_heatmap,
     render_horizontal_bar_chart,
     render_monthly_heatmap,
     table_widget,
 )
-from test_analytics import seasonal_payload, seasonal_tx
 
 
 def _application() -> QApplication:
@@ -64,8 +64,8 @@ def _data():
 def test_main_window_has_required_pages_controls_without_backend_diagnostics():
     _application()
     window = AnalyticsWindow(
-        Path("/opt/fedleave/fedleave"),
-        "/data/fedleave",
+        Path("/opt/useorlose/useorlose"),
+        "/data/useorlose",
         2026,
         auto_load=False,
     )
@@ -91,14 +91,14 @@ def test_main_window_has_required_pages_controls_without_backend_diagnostics():
         "Close",
     ]
     assert not hasattr(window, "source_label")
-    assert "/data/fedleave" not in window.notice_label.text()
-    assert "/opt/fedleave" not in window.notice_label.text()
+    assert "/data/useorlose" not in window.notice_label.text()
+    assert "/opt/useorlose" not in window.notice_label.text()
     assert [window.year_combo.itemData(index) for index in range(window.year_combo.count())] == [2025, 2026]
 
 
 def test_seasonality_views_are_explained_and_populated():
     _application()
-    window = AnalyticsWindow(Path("fedleave"), "/data", 2026, auto_load=False)
+    window = AnalyticsWindow(Path("use-or-lose"), "/data", 2026, auto_load=False)
     window.set_data(_data())
     window.pages.setCurrentIndex(1)
 
@@ -199,7 +199,7 @@ def test_table_headers_match_data_alignment_and_have_role_based_widths():
 
 def test_dynamic_heatmaps_and_monthly_lifecycle_charts_are_populated():
     _application()
-    window = AnalyticsWindow(Path("fedleave"), "/data", 2026, auto_load=False)
+    window = AnalyticsWindow(Path("use-or-lose"), "/data", 2026, auto_load=False)
     window.set_data(_data())
 
     assert [window.heatmap_selector.itemText(index) for index in range(window.heatmap_selector.count())] == [
@@ -237,7 +237,7 @@ def test_dynamic_heatmaps_and_monthly_lifecycle_charts_are_populated():
 
 def test_open_chart_creates_popup_with_graphic_and_data_table():
     _application()
-    window = AnalyticsWindow(Path("fedleave"), "/data", 2026, auto_load=False)
+    window = AnalyticsWindow(Path("use-or-lose"), "/data", 2026, auto_load=False)
     window.set_data(_data())
     window.pages.setCurrentIndex(1)
 
@@ -252,7 +252,7 @@ def test_open_chart_creates_popup_with_graphic_and_data_table():
 
 def test_embedded_and_opened_charts_fit_their_available_space():
     app = _application()
-    window = AnalyticsWindow(Path("fedleave"), "/data", 2026, auto_load=False)
+    window = AnalyticsWindow(Path("use-or-lose"), "/data", 2026, auto_load=False)
     window.set_data(_data())
     window.pages.setCurrentIndex(1)
     window.resize(900, 700)
@@ -294,7 +294,7 @@ def _seasonality_window(qtbot):
         ),
         date(2026, 6, 1),
     )
-    window = AnalyticsWindow(Path("fedleave"), "/exact selected data", 2026, auto_load=False)
+    window = AnalyticsWindow(Path("use-or-lose"), "/exact selected data", 2026, auto_load=False)
     qtbot.addWidget(window)
     window.set_data(data)
     window.pages.setCurrentIndex(1)
@@ -304,7 +304,7 @@ def _seasonality_window(qtbot):
 def test_seasonality_exactly_two_selectors_preserve_analysis_and_option_state(qtbot, monkeypatch):
     from PySide6.QtWidgets import QComboBox
 
-    import fedleave_analytics.app as module
+    import useorlose_analytics.app as module
 
     window = _seasonality_window(qtbot)
     assert len(window.seasonality_page.findChildren(QComboBox)) == 2
@@ -383,7 +383,7 @@ def test_seasonality_zero_data_earned_view_and_other_pages_remain_unchanged(qtbo
 
 
 def test_seasonality_sorted_drilldown_uses_only_contributing_credits(qtbot, monkeypatch):
-    import fedleave_analytics.app as module
+    import useorlose_analytics.app as module
 
     window = _seasonality_window(qtbot)
     captured = []
@@ -423,12 +423,12 @@ def test_seasonality_popup_and_image_use_exact_selection(qtbot, tmp_path):
 def test_seasonality_loaded_from_readonly_exact_datastore_never_writes(qtbot, tmp_path, monkeypatch):
     import sysconfig
 
-    import fedleave_analytics.app as module
+    import useorlose_analytics.app as module
     from leave_year_support import store, tree
 
     base = tmp_path / "selected datastore with spaces"
     store(base, transactions=[seasonal_tx("new", direction="earned", hours=10), seasonal_tx("used", hours=4)])
-    backend = Path(sysconfig.get_path("scripts")) / ("fedleave.exe" if os.name == "nt" else "fedleave")
+    backend = Path(sysconfig.get_path("scripts")) / ("use-or-lose.exe" if os.name == "nt" else "use-or-lose")
     real_run = module.subprocess.run
     calls = []
 

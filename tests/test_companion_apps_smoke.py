@@ -4,7 +4,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from fedleave.config import init_config
+from useorlose.config import init_config
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -73,7 +73,7 @@ def test_companion_chart_apps_generate_pngs_from_source(tmp_path):
         [
             sys.executable,
             "-m",
-            "fedleave_month_report_graphic",
+            "useorlose_month_report_graphic",
             "--year",
             "2026",
             "--month",

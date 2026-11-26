@@ -16,9 +16,9 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 from PySide6.QtCore import QDate, QThreadPool, QTimer
 from PySide6.QtWidgets import QApplication, QLabel
 
-from fedleave_analytics.planning_view import PlannerWidget
 from leave_year_support import store, tree, tx
 from test_planning import TODAY, category, lot_source, operation, scenario, snapshot
+from useorlose_analytics.planning_view import PlannerWidget
 
 
 def test_repeated_planner_rendering_and_process_shutdown_are_clean():
@@ -34,7 +34,7 @@ def test_repeated_planner_rendering_and_process_shutdown_are_clean():
         from pathlib import Path
         from PySide6.QtCore import QCoreApplication, QDate, QEvent, QThreadPool
         from PySide6.QtWidgets import QApplication
-        from fedleave_analytics.planning_view import PlannerWidget
+        from useorlose_analytics.planning_view import PlannerWidget
 
         app = QApplication([])
         view = PlannerWidget(Path('/unused/backend'), '/unused/store', 2026, today=date(2026, 7, 1))
@@ -145,7 +145,7 @@ def test_planner_uses_starting_date_unified_rows_and_two_result_tabs(planner, mo
         "Min Balance Date",
     ]
 
-    import fedleave_analytics.planning_view as module
+    import useorlose_analytics.planning_view as module
 
     captured = {}
     original = module.render_planning_chart
@@ -164,7 +164,7 @@ def test_edit_add_reserve_invalid_row_and_no_backend_call_on_recalculation(qtbot
     def forbidden(*args):
         raise AssertionError("Scenario edits must reuse the snapshot")
 
-    monkeypatch.setattr("fedleave_analytics.planning_view.load_planning_snapshot", forbidden)
+    monkeypatch.setattr("useorlose_analytics.planning_view.load_planning_snapshot", forbidden)
     planner.add_tentative()
     row = proposed_rows(planner)[0]
     planner.scenario_table.item(row, 1).setText("2026-07-23")
@@ -286,7 +286,7 @@ def test_canceled_load_and_window_close_never_install_late_snapshot(qtbot, monke
         assert release.wait(10)
         return snapshot()
 
-    monkeypatch.setattr("fedleave_analytics.planning_view.load_planning_snapshot", slow_load)
+    monkeypatch.setattr("useorlose_analytics.planning_view.load_planning_snapshot", slow_load)
     view = PlannerWidget(Path("/backend"), "/store", 2026, today=TODAY)
     qtbot.addWidget(view)
     view.load_source()
@@ -319,7 +319,7 @@ def test_real_backend_legacy_read_only_store_survives_full_planner_lifecycle(qtb
             tx("legacy", "2026-06-02", "annual", "used", 2, void=True, history=[{"old": True}]),
         ],
     )
-    backend = Path(sysconfig.get_path("scripts")) / ("fedleave.exe" if os.name == "nt" else "fedleave")
+    backend = Path(sysconfig.get_path("scripts")) / ("use-or-lose.exe" if os.name == "nt" else "use-or-lose")
     before = tree(data)
     year_file = data / "leave_years/2026.json"
     year_file.chmod(0o444)

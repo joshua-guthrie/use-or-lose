@@ -242,7 +242,7 @@ class InstallerEngine:
                 source_commit=source_commit,
             )
         config_path = self._write_suite_config(
-            targets, entry_paths, spec_dir / "fedleave-suite.json", platform_dist.name
+            targets, entry_paths, spec_dir / "useorlose-suite.json", platform_dist.name
         )
         self.log(f"Building shared suite with {len(targets)} entry points")
         self._run(self._build_suite_command(py_exe, config_path, work_dir, platform_dist))
@@ -314,12 +314,12 @@ class InstallerEngine:
         source_commit: str,
     ) -> Path:
         entries_dir.mkdir(parents=True, exist_ok=True)
-        entry_filename = f"{target.name}.py" if target.name != "fedleave" else "fedleave_bootstrap.py"
+        entry_filename = f"{target.name}.py" if target.name != "use-or-lose" else "useorlose_bootstrap.py"
         entry_path = entries_dir / entry_filename
         entry_path.write_text(
             "import os\n\n"
-            f"os.environ['FEDLEAVE_BUILD_VERSION'] = {build_version!r}\n"
-            f"os.environ['FEDLEAVE_SOURCE_COMMIT'] = {source_commit!r}\n\n"
+            f"os.environ['USE_OR_LOSE_BUILD_VERSION'] = {build_version!r}\n"
+            f"os.environ['USE_OR_LOSE_SOURCE_COMMIT'] = {source_commit!r}\n\n"
             f"from {target.module} import {target.func}\n\n"
             "if __name__ == '__main__':\n"
             f"    raise SystemExit({target.func}())\n",
@@ -343,7 +343,7 @@ class InstallerEngine:
             str(platform_dist.parent),
             "--workpath",
             str(work_dir),
-            str(self.repo_root / "scripts" / "lib" / "common" / "fedleave_suite.spec"),
+            str(self.repo_root / "scripts" / "lib" / "common" / "useorlose_suite.spec"),
             "--",
             "--config",
             str(config_path),
@@ -387,7 +387,7 @@ class InstallerEngine:
             )
 
         config_path = self._write_suite_config(
-            targets, entry_paths, spec_dir / "fedleave-suite.json", platform_dist.name
+            targets, entry_paths, spec_dir / "useorlose-suite.json", platform_dist.name
         )
         command = self._build_suite_command(Path(sys.executable), config_path, work_dir, platform_dist)
         if "PyInstaller" not in command or str(config_path) != command[-1]:
@@ -398,7 +398,9 @@ class InstallerEngine:
             shutil.rmtree(smoke_root, ignore_errors=True)
 
     def _build_identity(self) -> tuple[str, str]:
-        source_commit = (os.environ.get("FEDLEAVE_SOURCE_COMMIT") or os.environ.get("GITHUB_SHA") or "").strip().lower()
+        source_commit = (
+            (os.environ.get("USE_OR_LOSE_SOURCE_COMMIT") or os.environ.get("GITHUB_SHA") or "").strip().lower()
+        )
         if not source_commit:
             result = subprocess.run(
                 ["git", "rev-parse", "HEAD"],
@@ -412,7 +414,7 @@ class InstallerEngine:
         if source_commit and not re.fullmatch(r"[0-9a-f]{7,64}", source_commit):
             raise InstallerError(f"Invalid build source commit: {source_commit!r}")
 
-        build_version = (os.environ.get("FEDLEAVE_BUILD_VERSION") or os.environ.get("PACKAGE_VERSION") or "").strip()
+        build_version = (os.environ.get("USE_OR_LOSE_BUILD_VERSION") or os.environ.get("PACKAGE_VERSION") or "").strip()
         if not build_version:
             build_version = self._project_version()
             if source_commit:
@@ -606,13 +608,13 @@ class InstallerEngine:
         return targets
 
     def _repo_dist_dir(self) -> Path:
-        folder = "fedleave-Windows" if self.options.platform == "windows" else "fedleave-Ubuntu"
+        folder = "use-or-lose-Windows" if self.options.platform == "windows" else "use-or-lose-Ubuntu"
         configured_dist_root = os.environ.get("FEDLEAVE_DIST_ROOT")
         dist_root = Path(configured_dist_root).resolve() if configured_dist_root else self.repo_root / "dist"
         return dist_root / folder
 
     def _build_dist_dir(self) -> Path:
-        folder = "fedleave-Windows" if self.options.platform == "windows" else "fedleave-Ubuntu"
+        folder = "use-or-lose-Windows" if self.options.platform == "windows" else "use-or-lose-Ubuntu"
         return self.build_root / "dist" / folder
 
     def _install_from_dist(self, dist_dir: Path) -> None:
@@ -674,7 +676,7 @@ class InstallerEngine:
     def _confirm_windows_install(self) -> bool:
         try:
             response = input(
-                "Build complete. Install Use or Lose in C:\\Program Files\\fedleave "
+                "Build complete. Install Use or Lose in C:\\Program Files\\UseOrLose "
                 "and create Desktop and Start Menu shortcuts? [y/N]: "
             )
         except EOFError:
@@ -755,13 +757,13 @@ class InstallerEngine:
         if os.geteuid() != 0:
             raise InstallerError("Rollback requires root privileges.", EXIT_PERMISSION)
 
-        versions = Path("/opt/fedleave/versions")
+        versions = Path("/opt/use-or-lose/versions")
         items = sorted([p for p in versions.iterdir() if p.is_dir()], key=lambda p: p.name)
         if len(items) < 2:
             raise InstallerError("No previous version is available for rollback.")
 
         target = items[-2]
-        current = Path("/opt/fedleave/current")
+        current = Path("/opt/use-or-lose/current")
         if current.exists() or current.is_symlink():
             current.unlink()
         current.symlink_to(target, target_is_directory=True)
@@ -773,10 +775,10 @@ class InstallerEngine:
         if os.geteuid() != 0:
             raise InstallerError("Activation requires root privileges.", EXIT_PERMISSION)
 
-        target = Path("/opt/fedleave/versions") / version
+        target = Path("/opt/use-or-lose/versions") / version
         if not target.exists():
             raise InstallerError(f"Version not found: {version}")
-        current = Path("/opt/fedleave/current")
+        current = Path("/opt/use-or-lose/current")
         if current.exists() or current.is_symlink():
             current.unlink()
         current.symlink_to(target, target_is_directory=True)
@@ -789,7 +791,7 @@ class InstallerEngine:
         if os.geteuid() != 0:
             raise InstallerError("Uninstall requires root privileges.", EXIT_PERMISSION)
 
-        shutil.rmtree(Path("/opt/fedleave"), ignore_errors=True)
+        shutil.rmtree(Path("/opt/use-or-lose"), ignore_errors=True)
 
         scripts = (
             tomllib.loads((self.repo_root / "pyproject.toml").read_text(encoding="utf-8"))
@@ -799,7 +801,7 @@ class InstallerEngine:
         for app_name in scripts:
             (Path("/usr/local/bin") / app_name).unlink(missing_ok=True)
 
-        (Path("/usr/local/share/applications") / "fedleave-calendar.desktop").unlink(missing_ok=True)
+        (Path("/usr/local/share/applications") / "use-or-lose-calendar.desktop").unlink(missing_ok=True)
         self.log("Uninstall complete")
 
     def _run(self, cmd: list[str]) -> None:

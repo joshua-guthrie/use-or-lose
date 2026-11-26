@@ -4,8 +4,8 @@ from pathlib import Path
 import pytest
 import typer
 
-from fedleave.cli import starting_balance_set
-from fedleave.config import init_config
+from useorlose.cli import starting_balance_set
+from useorlose.config import init_config
 
 
 def _init_data_dir(data_dir: Path) -> Path:
