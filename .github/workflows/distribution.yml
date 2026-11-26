@@ -1,7 +1,7 @@
 name: Distribution
 
 on:
-  # Builds and releases are on demand only: dispatch with a release version
+  # Builds and releases are on demand: dispatch with a release version.
   # to publish a desktop release, or run a development artifact validation.
   workflow_dispatch:
     inputs:
