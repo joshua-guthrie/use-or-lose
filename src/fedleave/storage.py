@@ -1,4 +1,4 @@
-"""Read, migrate, back up, and atomically replace FedLeave JSON data."""
+"""Read, migrate, back up, and atomically replace Use or Lose JSON data."""
 
 from __future__ import annotations
 

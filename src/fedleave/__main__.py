@@ -1,4 +1,4 @@
-"""Run the FedLeave command-line application as ``python -m fedleave``."""
+"""Run the Use or Lose command-line application as ``python -m fedleave``."""
 
 from .cli import app
 

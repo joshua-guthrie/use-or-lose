@@ -1,7 +1,7 @@
-# FedLeave MCP integration
+# Use or Lose MCP integration
 
 `fedleave-mcp` is an efficient, typed, discoverable interface to the **full
-FedLeave CLI** for authorized autonomous agents, assistants, IDEs, and automation
+Use or Lose CLI** for authorized autonomous agents, assistants, IDEs, and automation
 programs. The CLI remains authoritative for application behavior. MCP adapts
 that interface; it does not add a separate application approval authority.
 
@@ -33,7 +33,7 @@ The server is a sibling of `fedleave`:
 
 | Platform | Command | Default leave data |
 | --- | --- | --- |
-| Windows | `C:\Program Files\FedLeave\fedleave-mcp.exe` | `%LOCALAPPDATA%\fedleave` |
+| Windows | `C:\Program Files\Use or Lose\fedleave-mcp.exe` | `%LOCALAPPDATA%\fedleave` |
 | Linux | `/usr/local/bin/fedleave-mcp` | `$XDG_DATA_HOME/fedleave`, otherwise `~/.local/share/fedleave` |
 
 Linux command links point through `/opt/fedleave/current` to the active release.
@@ -65,7 +65,7 @@ Windows:
 {
   "mcpServers": {
     "fedleave": {
-      "command": "C:\\Program Files\\FedLeave\\fedleave-mcp.exe",
+      "command": "C:\\Program Files\\Use or Lose\\fedleave-mcp.exe",
       "args": []
     }
   }
@@ -155,7 +155,7 @@ correct, and import approved reports:
     "fedleave_reconcile", "fedleave_correct", "fedleave_import_wms_http"
   ],
   "allow_imports": true,
-  "file_read_roots": ["/home/alex/FedLeaveReports/incoming"],
+  "file_read_roots": ["/home/alex/Use or LoseReports/incoming"],
   "audit_log": "/home/alex/.config/fedleave/mcp-audit.jsonl"
 }
 ```
@@ -182,10 +182,10 @@ so every operation stays within the selected store.
 
 File inputs require a location under `file_read_roots`; exports require
 `file_write_roots` and `allow_file_output`. Empty root lists deny file access.
-For example, add `"file_write_roots": ["/home/alex/FedLeaveReports/exported"]`
+For example, add `"file_write_roots": ["/home/alex/Use or LoseReports/exported"]`
 and `"allow_file_output": true` to permit archive exports. Existing output
 files can be replaced: use a dedicated export directory. To permit a second
-datastore, add `"allowed_data_dirs": ["/home/alex/FedLeaveTestData"]`.
+datastore, add `"allowed_data_dirs": ["/home/alex/Use or LoseTestData"]`.
 
 In these restricted profiles, paths are expanded/resolved immediately before execution. Escaping symlinks,
 datastores containing protected policy/executable/audit files, and export paths
@@ -235,7 +235,7 @@ with optional restricted tool permissions, exact data stores, file roots, and
 separate high-impact permissions when appropriate. Tool descriptions are also
 untrusted data, and annotations are guidance rather than authorization controls.
 Authentication and authorization for any remotely reachable agent
-belong to its external bridge; FedLeave opens no remote endpoint.
+belong to its external bridge; Use or Lose opens no remote endpoint.
 
 An agent that can already execute `fedleave` directly under the same account
 can bypass MCP-only restrictions. A client without shell access may receive
@@ -313,7 +313,7 @@ Full-access examples, without any permission switches or file roots:
 ```
 
 ```json
-{"name":"fedleave_import_data","arguments":{"input":"C:\\Users\\Alex\\Backups\\leave.json","overwrite":true,"data_dir":"C:\\Users\\Alex\\FedLeaveTest"}}
+{"name":"fedleave_import_data","arguments":{"input":"C:\\Users\\Alex\\Backups\\leave.json","overwrite":true,"data_dir":"C:\\Users\\Alex\\Use or LoseTest"}}
 ```
 
 ```json
@@ -349,7 +349,7 @@ CLI warnings and meaningful return codes remain available in the envelope.
 
 Install the SDK in your **client development environment** with
 `python -m pip install "mcp==2.3.0"`. This is not needed to use an installed
-FedLeave package with an existing MCP client.
+Use or Lose package with an existing MCP client.
 
 ```python
 import asyncio
@@ -377,7 +377,7 @@ asyncio.run(main())
 On Windows, substitute the executable path using a Python raw string.
 Downstream developers use the same lifecycle and standard methods; no agent
 framework or model provider is required. Refresh `tools/list` after upgrading
-FedLeave instead of caching schemas indefinitely.
+Use or Lose instead of caching schemas indefinitely.
 
 ## MCP Inspector
 
@@ -395,7 +395,7 @@ npx -y @modelcontextprotocol/inspector@2.12.0 --cli \
 ```
 
 `client.json` is the Inspector's connection configuration. Its `args` can be
-empty for full access or point to an optional separate FedLeave policy.
+empty for full access or point to an optional separate Use or Lose policy.
 Inspector CLI mode connects over stdio and
 does not require opening its web UI. The Python SDK test client is mandatory in
 CI; Inspector is a separate interoperability check, not a server dependency.
@@ -408,7 +408,7 @@ OpenClaw adapter or prescribe unverified OpenClaw commands. If your particular
 OpenClaw version needs an external MCP bridge, configure that bridge according
 to its own versioned documentation with the executable, argument list, and
 policy shown above. The bridge owns client authentication and tool routing;
-FedLeave remains the same standard stdio server used by other clients.
+Use or Lose remains the same standard stdio server used by other clients.
 
 ## Synchronization, limits, and operations
 
@@ -422,7 +422,7 @@ The pinned `portalocker==3.2.0` dependency provides Windows and POSIX locking.
 Process exit, crash, timeout termination, or cancellation releases ownership.
 The lock file remains and must not be deleted during use. Different data
 directories have independent locks. These are advisory locks on local
-filesystems; old FedLeave binaries and third-party direct storage writers do
+filesystems; old Use or Lose binaries and third-party direct storage writers do
 not participate. Upgrade all writers and do not share a writable store with
 older uncoordinated processes. Custom Python storage users must hold
 `fedleave.locking.datastore_lock` around their entire read/modify/write operation.

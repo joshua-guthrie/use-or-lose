@@ -150,7 +150,7 @@ def find_companion_app(app_name: str, explicit: str | None = None) -> Path:
     raise FileNotFoundError(
         f"{app_name} executable was not found.\n\n"
         f"Searched:\n{details}\n\n"
-        "Install the current FedLeave suite or place the companion app next to this application."
+        "Install the current Use or Lose suite or place the companion app next to this application."
     )
 
 

@@ -1,1 +1,1 @@
-"""Client-neutral, dynamically discovered FedLeave MCP interface."""
+"""Client-neutral, dynamically discovered Use or Lose MCP interface."""

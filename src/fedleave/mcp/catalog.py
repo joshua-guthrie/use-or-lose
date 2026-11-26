@@ -305,7 +305,7 @@ def discover(root=None) -> dict[str, Command]:
                     tool_base(path or ("root",)),
                     path,
                     generated,
-                    command.help or command.short_help or "FedLeave CLI command",
+                    command.help or command.short_help or "Use or Lose CLI command",
                     schema,
                 )
             )
@@ -321,7 +321,7 @@ def discover(root=None) -> dict[str, Command]:
                     "fedleave_version",
                     (),
                     [],
-                    "Show the FedLeave CLI version.",
+                    "Show the Use or Lose CLI version.",
                     {"type": "object", "properties": {}, "additionalProperties": False},
                     "--version",
                 )

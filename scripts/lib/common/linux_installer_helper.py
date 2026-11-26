@@ -53,8 +53,8 @@ def write_linux_wrappers(repo_root: Path, current_link: Path) -> None:
             [
                 "[Desktop Entry]",
                 "Type=Application",
-                "Name=FedLeave Calendar",
-                "Exec=/usr/local/bin/FedLeaveCalendar",
+                "Name=Use or Lose Calendar",
+                "Exec=/usr/local/bin/UseOrLoseCalendar",
                 "Terminal=false",
                 "Categories=Office;Utility;",
             ]

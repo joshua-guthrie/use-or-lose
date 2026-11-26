@@ -7,7 +7,7 @@ Official project website: [https://www.westmouthbay.com/fedleave-application/](h
 Author: Joshua Guthrie
 
 <p align="center">
-  <img src="assets/fedleave-logo.png" alt="FedLeave logo" width="640">
+  <img src="assets/fedleave-logo.png" alt="Use or Lose logo" width="640">
 </p>
 
 The main application is `fedleave`, a command-line leave ledger and the source of truth for every read, write, balance, and report operation. The desktop calendar, analytics interface, chart generators, yearly comparisons, and month report began as examples of applications that can be built on the CLI. They became useful in their own right, so they are included and supported as companion applications while continuing to use `fedleave` as their backend.
@@ -254,24 +254,24 @@ the source repository.
 ### Windows installation
 
 Download
-[FedLeave-Setup-Latest-Windows-x64.exe](https://github.com/joshua-guthrie/fedleave/releases/download/beta/FedLeave-Setup-Latest-Windows-x64.exe)
+[UseOrLose-Setup-Latest-Windows-x64.exe](https://github.com/joshua-guthrie/fedleave/releases/download/beta/UseOrLose-Setup-Latest-Windows-x64.exe)
 and run the installation wizard. This stable link is replaced after every
 successful `master` build. A
-[committed Git LFS mirror](https://github.com/joshua-guthrie/fedleave/raw/refs/heads/master/installers/FedLeave-Setup-Latest-Windows-x64.exe)
-is updated by the same workflow. It installs FedLeave in
-`C:\Program Files\FedLeave`, registers it in Windows Installed Apps, creates a
-FedLeave Start menu folder, and offers an optional desktop shortcut.
+[committed Git LFS mirror](https://github.com/joshua-guthrie/fedleave/raw/refs/heads/master/installers/UseOrLose-Setup-Latest-Windows-x64.exe)
+is updated by the same workflow. It installs Use or Lose in
+`C:\Program Files\Use or Lose`, registers it in Windows Installed Apps, creates a
+Use or Lose Start menu folder, and offers an optional desktop shortcut.
 
 For an unattended installation:
 
 ```bat
-FedLeave-Setup-Latest-Windows-x64.exe /S
+UseOrLose-Setup-Latest-Windows-x64.exe /S
 ```
 
 Uninstall from Windows Installed Apps, the Start menu shortcut, or run:
 
 ```bat
-"C:\Program Files\FedLeave\Uninstall.exe" /S
+"C:\Program Files\Use or Lose\Uninstall.exe" /S
 ```
 
 Upgrades and uninstall remove application files only. Leave records, reports,
@@ -321,14 +321,14 @@ remain unchanged; committed-file URLs are listed in
 
 Both installers include **`fedleave-mcp`**, a local Model Context Protocol
 server. It is a general-purpose interface to the full CLI for authorized
-autonomous agents, assistants, and IDEs. Agents can discover every FedLeave CLI
+autonomous agents, assistants, and IDEs. Agents can discover every Use or Lose CLI
 command, inspect balances and reports, modify/delete records, import/export
 backups, apply rollover, and select alternate datastores. The tools and
 their typed arguments are generated from the CLI, so they follow CLI upgrades.
 All calculations and file updates still run through `fedleave`.
 
 Configure your MCP client to launch `fedleave-mcp` over **stdio**. On Windows
-the executable is `C:\Program Files\FedLeave\fedleave-mcp.exe`; on Linux use
+the executable is `C:\Program Files\Use or Lose\fedleave-mcp.exe`; on Linux use
 `/usr/local/bin/fedleave-mcp`. The client starts and stops it on demand. There is
 no background service, network listener, separate Python installation, or
 OpenClaw dependency.
@@ -388,7 +388,7 @@ source tree and dependency boundaries.
 The commands below build from source for development and packaging.
 They are separate from the prebuilt end-user installers above.
 
-FedLeave now uses two platform entry scripts only:
+Use or Lose now uses two platform entry scripts only:
 
 - `scripts/LinuxInstall.sh`
 - `scripts/WindowsInstall.bat`
@@ -413,7 +413,7 @@ scripts\WindowsInstall.bat
 ```
 
 After the Windows build completes, answer `y` to install the contents of
-`dist\fedleave-Windows` in `C:\Program Files\fedleave` and create FedLeave
+`dist\fedleave-Windows` in `C:\Program Files\fedleave` and create Use or Lose
 Calendar shortcuts on the public Desktop and all-users Start Menu. Windows
 will display its normal administrator approval prompt if the terminal is not
 already elevated. Answering `n` leaves the completed bundle in `dist` without
@@ -447,8 +447,8 @@ On Windows these launchers are in the packaged output and keep the same names wi
 
 - `fedleave`
 - `fedleave-mcp`
-- `FedLeaveCalendar`
-- `FedLeaveAnalytics`
+- `UseOrLoseCalendar`
+- `UseOrLoseAnalytics`
 - `AnnualLeaveChartForTheYear`
 - `SickLeaveChartForTheYear`
 - `CreditHoursChartForTheYear`
@@ -464,7 +464,7 @@ On Windows these launchers are in the packaged output and keep the same names wi
 - `OvertimeYearlyComparison`
 - `fedleaveMonthReportGraphic`
 
-Important: command names are case-sensitive on Linux. For example, `fedleave` and `FedLeaveCalendar` are different commands.
+Important: command names are case-sensitive on Linux. For example, `fedleave` and `UseOrLoseCalendar` are different commands.
 
 ## Commands
 
@@ -523,7 +523,7 @@ fedleave import-data --input fedleave_backup.json --merge --dry-run --json
 fedleave import-data --input fedleave_backup.json --merge --expected-fingerprint REVIEWED_HASH
 ```
 
-The preview does no writes. Its JSON includes `status`, `preview_fingerprint`, `changes`, `affected_years`, `warnings` and `conflicts`. A ready preview exits zero. A conflict exits 2, identifies the affected year and date where applicable, and preserves both copies. A missing backup exits 1 and an unreadable JSON file exits 3. Use `--overwrite` in place of `--merge` to review and explicitly replace only the files included in the backup. FedLeave keeps pre-replacement copies in the datastore's backups directory. If an import is interrupted and FedLeave reports `RECOVERY_REQUIRED`, run `fedleave import-data --recover` using the same data directory to restore the prior complete store.
+The preview does no writes. Its JSON includes `status`, `preview_fingerprint`, `changes`, `affected_years`, `warnings` and `conflicts`. A ready preview exits zero. A conflict exits 2, identifies the affected year and date where applicable, and preserves both copies. A missing backup exits 1 and an unreadable JSON file exits 3. Use `--overwrite` in place of `--merge` to review and explicitly replace only the files included in the backup. Use or Lose keeps pre-replacement copies in the datastore's backups directory. If an import is interrupted and Use or Lose reports `RECOVERY_REQUIRED`, run `fedleave import-data --recover` using the same data directory to restore the prior complete store.
 
 Validate and normalize stored JSON data:
 
@@ -533,30 +533,30 @@ fedleave validate --data-dir ~/.local/share/fedleave --apply
 
 Older leave-year files are migrated automatically. Voided transactions and stored audit-history fields are removed from the active data file on startup or when a custom data store is loaded; the normal pre-write backup is created first.
 
-## GUI Application: FedLeave Calendar
+## GUI Application: Use or Lose Calendar
 
-FedLeave Calendar is a cross-platform PySide6 desktop GUI for the `fedleave` backend. It displays the current month, calendar day values, pay days, pay-period endings, pay-period summaries, and as-of-today balances using `fedleave month --json`.
+Use or Lose Calendar is a cross-platform PySide6 desktop GUI for the `fedleave` backend. It displays the current month, calendar day values, pay days, pay-period endings, pay-period summaries, and as-of-today balances using `fedleave month --json`.
 
 The GUI does not read or edit leave JSON files directly. Reads and writes go through the selected `fedleave` executable. Day edits call `fedleave set-day --authoritative --json`, then the month is reloaded from the backend.
 
-Calendar uses the stored start and end dates to find the ledger for a day. When Today or a selected future action needs a missing ledger, Calendar offers setup and resumes the original action after confirmed creation. The setup suggests the adjacent predecessor when carryover is available. Browsing a month performs a read. CLI callers create years explicitly with `fedleave init` or `fedleave rollover`. The desktop **Import FedLeave Data** dialog previews Merge or Replace and explains blocking conflicts before offering a separate Replace review.
+Calendar uses the stored start and end dates to find the ledger for a day. When Today or a selected future action needs a missing ledger, Calendar offers setup and resumes the original action after confirmed creation. The setup suggests the adjacent predecessor when carryover is available. Browsing a month performs a read. CLI callers create years explicitly with `fedleave init` or `fedleave rollover`. The desktop **Import Use or Lose Data** dialog previews Merge or Replace and explains blocking conflicts before offering a separate Replace review.
 
 In packaged builds, the GUI looks for `fedleave` in the sibling `fedleave` application directory inside the same platform tree, or in any explicit backend path you configure.
 On Windows, select the installed `fedleave.exe` as a custom backend. Batch (`.bat`/`.cmd`) backends are rejected because Windows can interpret their arguments through a shell. Linux executable scripts remain supported.
 
 Screenshots:
 
-![FedLeave Calendar main window](examples/fedleave-calendar-main-screen.png)
+![Use or Lose Calendar main window](examples/fedleave-calendar-main-screen.png)
 
-![FedLeave Calendar day editor](examples/fedleave-calendar-edit-leave.png)
+![Use or Lose Calendar day editor](examples/fedleave-calendar-edit-leave.png)
 
-![FedLeave Calendar preferences](examples/fedleave-calendar-preferences.png)
+![Use or Lose Calendar preferences](examples/fedleave-calendar-preferences.png)
 
-![FedLeave Calendar force balance dialog](examples/fedleave-calendar-force-balance.png)
+![Use or Lose Calendar force balance dialog](examples/fedleave-calendar-force-balance.png)
 
-![FedLeave Calendar expiring leave dialog](examples/fedleave-calendar-expiring-leave.png)
+![Use or Lose Calendar expiring leave dialog](examples/fedleave-calendar-expiring-leave.png)
 
-![FedLeave Calendar transactions dialog](examples/fedleave-calendar-transactions.png)
+![Use or Lose Calendar transactions dialog](examples/fedleave-calendar-transactions.png)
 
 Current GUI features:
 
@@ -578,7 +578,7 @@ Run from source:
 
 ```bash
 pip install -e ".[gui]"
-FedLeaveCalendar
+UseOrLoseCalendar
 ```
 
 Consolidated build/install entry points:
@@ -595,12 +595,12 @@ Build-only mode (useful for CI or local packaging validation):
 
 ```bash
 ./scripts/LinuxInstall.sh --unattended --build-only --verbose
-./dist/fedleave-Ubuntu/FedLeaveCalendar
+./dist/fedleave-Ubuntu/UseOrLoseCalendar
 ```
 
 ```bat
 scripts\WindowsInstall.bat --unattended --build-only --verbose
-dist\fedleave-Windows\FedLeaveCalendar.exe
+dist\fedleave-Windows\UseOrLoseCalendar.exe
 ```
 
 The consolidated scripts build one suite per platform under `dist/`. All 17
@@ -666,8 +666,8 @@ After installing NSIS, compile the Windows installer from `cmd.exe`:
 for /f %V in ('python installer\package.py version') do set VERSION=%V
 for /f %V in ('python installer\package.py numeric-version') do set NUMERIC_VERSION=%V
 mkdir artifacts
-makensis /DVERSION=%VERSION% /DNUMERIC_VERSION=%NUMERIC_VERSION% /DSOURCE_DIR=%CD%\dist\fedleave-Windows /DOUTPUT_DIR=%CD%\artifacts installer\windows\FedLeave.nsi
-python installer\package.py checksum artifacts\FedLeave-Setup-%VERSION%-Windows-x64.exe
+makensis /DVERSION=%VERSION% /DNUMERIC_VERSION=%NUMERIC_VERSION% /DSOURCE_DIR=%CD%\dist\fedleave-Windows /DOUTPUT_DIR=%CD%\artifacts installer\windows\Use or Lose.nsi
+python installer\package.py checksum artifacts\UseOrLose-Setup-%VERSION%-Windows-x64.exe
 ```
 
 Package validation fails if any command declared in `project.scripts`, its
@@ -703,7 +703,7 @@ updated only after both platform installers pass and publish. The semantic
 project version remains manually controlled; every successful `master` push
 automatically advances the rolling build identity instead.
 
-In FedLeave Calendar, **File > Preferences > Software updates** includes
+In Use or Lose Calendar, **File > Preferences > Software updates** includes
 **Check for updates automatically**, enabled by default. Clear it and choose
 **Save** to disable startup and periodic update checks; the choice persists
 across restarts in the per-user GUI settings, separately from leave data.
@@ -894,7 +894,7 @@ Commands and common options:
 		Notes:
 			- The importer reads the WMS clocking HTML report directly and maps each supported WMS leave code through a single rule table in `fedleave/wms_import.py`.
 			- Matching transactions in the target leave year are replaced authoritatively; automatic accrual transactions and unrelated transaction categories are left alone.
-			- If the report belongs to a leave year that does not yet exist, FedLeave creates that leave year file before importing the transactions.
+			- If the report belongs to a leave year that does not yet exist, Use or Lose creates that leave year file before importing the transactions.
 			- Unsupported leave codes raise an error so new WMS leave types can be added explicitly rather than silently misfiled.
 			- Import failures provide a copyable diagnostic, GitHub issue URL, and instructions to attach the original HTML report.
 
@@ -1063,12 +1063,12 @@ Yearly comparison apps:
 
 The chart apps are intentionally not provided for Holiday, Admin Leave, LWOP, Military Leave, Court Leave, Religious Comp, or Restored Annual.
 
-### Companion Application: FedLeaveAnalytics
+### Companion Application: UseOrLoseAnalytics
 
-`FedLeaveAnalytics` is the read-only companion for seasonality, calendar
+`UseOrLoseAnalytics` is the read-only companion for seasonality, calendar
 heatmaps, overtime, compensatory-time, credit-hour analysis, and cumulative
 usage. Launch it directly, or choose **Analysis > Analytics...** in
-`FedLeaveCalendar`; the calendar passes its selected backend, leave year, font
+`UseOrLoseCalendar`; the calendar passes its selected backend, leave year, font
 size, PDF folder, and exact resolved data directory.
 
 The pages are Summary, Seasonality, Calendar Heatmap, Overtime, Comp,
@@ -1082,31 +1082,31 @@ diagnostics in the user interface.
 Summary provides the headline leave-use, overtime, comp-time, credit-hour, and
 data-quality measures for the selected leave year:
 
-![FedLeave Analytics summary](examples/fedleave-analytics-main.png)
+![Use or Lose Analytics summary](examples/fedleave-analytics-main.png)
 
 Seasonality compares leave use and work patterns by month, weekday, and pay
 period, with a chart and the exact values shown together:
 
-![FedLeave Analytics seasonality](examples/fedleave-analytics-seasonality.png)
+![Use or Lose Analytics seasonality](examples/fedleave-analytics-seasonality.png)
 
 Calendar Heatmap shows when leave was used or time was earned. Its selector only
 offers leave types and directions that have non-zero data. Choose **Year at a
 Glance** for the continuous week-column heatmap, or **Monthly Calendars** to see
 the whole leave year as separate month-by-month calendar grids:
 
-![FedLeave Analytics calendar heatmap](examples/fedleave-analytics-calendar-heatmap.png)
+![Use or Lose Analytics calendar heatmap](examples/fedleave-analytics-calendar-heatmap.png)
 
 Overtime, Comp, and Credit explains earned, used, paid-out, forfeited, expired,
 and outstanding hours, including monthly charts and supporting tables:
 
-![FedLeave Analytics overtime, comp, and credit analysis](examples/fedleave-analytics-overtime-comp-credit.png)
+![Use or Lose Analytics overtime, comp, and credit analysis](examples/fedleave-analytics-overtime-comp-credit.png)
 
 Double-click a table row to inspect the transactions supporting that result:
 
-![FedLeave Analytics supporting-transactions dialog](examples/fedleave-analytics-supporting-transactions.png)
+![Use or Lose Analytics supporting-transactions dialog](examples/fedleave-analytics-supporting-transactions.png)
 
 ```bash
-FedLeaveAnalytics --backend /path/to/fedleave --year 2026 \
+UseOrLoseAnalytics --backend /path/to/fedleave --year 2026 \
     --data-dir /path/to/fedleave-data --pdf-folder /path/to/reports
 ```
 
@@ -1138,7 +1138,7 @@ instructions at this view.
 #### What-if Planner
 
 Choose **Analysis > Planning > What-if Planner...** in the calendar.
-`FedLeaveAnalytics --view planning` opens the same view directly; there is no
+`UseOrLoseAnalytics --view planning` opens the same view directly; there is no
 separate planner executable or CLI planning command.
 
 The planner compares the unchanged **Scheduled baseline** with a session-only
@@ -1290,7 +1290,7 @@ The `AnnualLeaveChartForTheYear` application requires `fedleave` to be in one of
 2. In the system PATH
 3. Beside the companion executable in the shared distribution suite
 
-If `fedleave` cannot be found, the application exits with a helpful error explaining that the current FedLeave suite and its companion applications must remain together.
+If `fedleave` cannot be found, the application exits with a helpful error explaining that the current Use or Lose suite and its companion applications must remain together.
 
 ### Companion Application: SickLeaveChartForTheYear
 
@@ -1327,7 +1327,7 @@ The `SickLeaveChartForTheYear` application requires `fedleave` to be in one of t
 2. In the system PATH
 3. Beside the companion executable in the shared distribution suite
 
-If `fedleave` cannot be found, the application exits with a helpful error explaining that the current FedLeave suite and its companion applications must remain together.
+If `fedleave` cannot be found, the application exits with a helpful error explaining that the current Use or Lose suite and its companion applications must remain together.
 
 ### Companion Application: CreditHoursChartForTheYear
 
@@ -1359,7 +1359,7 @@ The `CreditHoursChartForTheYear` application requires `fedleave` to be in one of
 2. In the system PATH
 3. Beside the companion executable in the shared distribution suite
 
-If `fedleave` cannot be found, the application exits with a helpful error explaining that the current FedLeave suite and its companion applications must remain together.
+If `fedleave` cannot be found, the application exits with a helpful error explaining that the current Use or Lose suite and its companion applications must remain together.
 
 ### Companion Application: CompTimeChartForTheYear
 
@@ -1391,7 +1391,7 @@ The `CompTimeChartForTheYear` application requires `fedleave` to be in one of th
 2. In the system PATH
 3. Beside the companion executable in the shared distribution suite
 
-If `fedleave` cannot be found, the application exits with a helpful error explaining that the current FedLeave suite and its companion applications must remain together.
+If `fedleave` cannot be found, the application exits with a helpful error explaining that the current Use or Lose suite and its companion applications must remain together.
 
 ### Companion Application: TravelCompChartForTheYear
 
@@ -1423,7 +1423,7 @@ The `TravelCompChartForTheYear` application requires `fedleave` to be in one of 
 2. In the system PATH
 3. Beside the companion executable in the shared distribution suite
 
-If `fedleave` cannot be found, the application exits with a helpful error explaining that the current FedLeave suite and its companion applications must remain together.
+If `fedleave` cannot be found, the application exits with a helpful error explaining that the current Use or Lose suite and its companion applications must remain together.
 
 ### Companion Application: TimeOffAwardChartForTheYear
 
@@ -1455,7 +1455,7 @@ The `TimeOffAwardChartForTheYear` application requires `fedleave` to be in one o
 2. In the system PATH
 3. Beside the companion executable in the shared distribution suite
 
-If `fedleave` cannot be found, the application exits with a helpful error explaining that the current FedLeave suite and its companion applications must remain together.
+If `fedleave` cannot be found, the application exits with a helpful error explaining that the current Use or Lose suite and its companion applications must remain together.
 
 ## Yearly Comparison Companion Applications
 

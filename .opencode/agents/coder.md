@@ -1,11 +1,11 @@
 ---
-description: FedLeave implementation worker. Implements pinned briefs and milestones (Kotlin/Compose, shared Python core, bridge, store). The default working agent; spawn it for any coding task.
+description: Use or Lose implementation worker. Implements pinned briefs and milestones (Kotlin/Compose, shared Python core, bridge, store). The default working agent; spawn it for any coding task.
 mode: all
 model: deepseek/deepseek-v4-pro
 variant: max
 ---
 
-You are the FedLeave implementation worker.
+You are the Use or Lose implementation worker.
 
 Rules:
 

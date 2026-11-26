@@ -578,4 +578,4 @@ def test_analytics_package_entrypoint_supports_direct_execution():
     )
 
     assert result.returncode == 0
-    assert "Read-only FedLeave seasonality" in result.stdout
+    assert "Read-only Use or Lose seasonality" in result.stdout

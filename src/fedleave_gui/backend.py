@@ -1,4 +1,4 @@
-"""Adapt GUI actions to the packaged FedLeave command-line executables.
+"""Adapt GUI actions to the packaged Use or Lose command-line executables.
 
 The calendar deliberately uses subprocesses instead of importing command code,
 keeping the GUI and CLI as independently packaged applications with a stable
@@ -89,11 +89,11 @@ def find_month_report_graphic(explicit: str | None = None) -> Path:
 
 
 def find_analytics(explicit: str | None = None) -> Path:
-    return _find_companion_app("FedLeaveAnalytics", explicit=explicit, description="FedLeaveAnalytics")
+    return _find_companion_app("UseOrLoseAnalytics", explicit=explicit, description="UseOrLoseAnalytics")
 
 
 class FedleaveBackend:
-    """Provide typed GUI operations over FedLeave CLI subprocess calls."""
+    """Provide typed GUI operations over Use or Lose CLI subprocess calls."""
 
     def __init__(self, options: BackendOptions | None = None) -> None:
         self.options = options or BackendOptions()

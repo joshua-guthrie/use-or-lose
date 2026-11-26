@@ -10,4 +10,4 @@ The task changes only `sample.py`. Produce exactly `"+3"` for `render_label(3)`.
 
 ## Expected evidence
 
-Use the protected policy, run journal and check harness to record both baseline and candidate results. Record the resulting candidate and QA identity for the separate review. Use different disposable runs for the blocked sandbox case, restart checkpoint, and wrong-candidate review case. Apply the [OR01 acceptance matrix](../chapters/05-quality/05-03-orchestrator-verification.md#offline-pilot-cases). No Android, FedLeave ledger, or external provider access is needed for this fixture.
+Use the protected policy, run journal and check harness to record both baseline and candidate results. Record the resulting candidate and QA identity for the separate review. Use different disposable runs for the blocked sandbox case, restart checkpoint, and wrong-candidate review case. Apply the [OR01 acceptance matrix](../chapters/05-quality/05-03-orchestrator-verification.md#offline-pilot-cases). No Android, Use or Lose ledger, or external provider access is needed for this fixture.

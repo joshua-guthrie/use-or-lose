@@ -19,7 +19,7 @@ def _create_shortcut(shortcut_path: Path, target_path: Path, working_directory: 
             "shortcut.TargetPath = WScript.Arguments(1)",
             "shortcut.WorkingDirectory = WScript.Arguments(2)",
             'shortcut.IconLocation = WScript.Arguments(1) & ",0"',
-            'shortcut.Description = "FedLeave Calendar"',
+            'shortcut.Description = "Use or Lose Calendar"',
             "shortcut.Save",
             "",
         ]
@@ -61,7 +61,7 @@ def install_system(
     public_profile = Path(os.environ.get("PUBLIC", r"C:\Users\Public"))
     target = install_dir or program_files / "fedleave"
     desktop = desktop_dir or public_profile / "Desktop"
-    start_menu = start_menu_dir or program_data / "Microsoft" / "Windows" / "Start Menu" / "Programs" / "FedLeave"
+    start_menu = start_menu_dir or program_data / "Microsoft" / "Windows" / "Start Menu" / "Programs" / "UseOrLose"
     staging = target.with_name(f"{target.name}.staging")
     backup = target.with_name(f"{target.name}.previous")
 
@@ -82,7 +82,7 @@ def install_system(
             backup.rename(target)
         raise
 
-    calendar = target / "FedLeaveCalendar.exe"
+    calendar = target / "UseOrLoseCalendar.exe"
     if not calendar.is_file():
         if target.exists():
             shutil.rmtree(target)
@@ -91,8 +91,8 @@ def install_system(
         raise FileNotFoundError(f"Packaged calendar executable was not found: {calendar}")
 
     try:
-        _create_shortcut(desktop / "FedLeave Calendar.lnk", calendar, calendar.parent)
-        _create_shortcut(start_menu / "FedLeave Calendar.lnk", calendar, calendar.parent)
+        _create_shortcut(desktop / "Use or Lose Calendar.lnk", calendar, calendar.parent)
+        _create_shortcut(start_menu / "Use or Lose Calendar.lnk", calendar, calendar.parent)
     except Exception:
         if target.exists():
             shutil.rmtree(target)

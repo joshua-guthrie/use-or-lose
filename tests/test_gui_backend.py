@@ -234,7 +234,7 @@ def test_gui_backend_reports_version_and_executable_path(tmp_path: Path):
 
 
 def test_find_fedleave_uses_bundled_backend_directory(tmp_path: Path, monkeypatch):
-    app_executable = _bundle_executable(tmp_path / "FedLeaveCalendar", "FedLeaveCalendar")
+    app_executable = _bundle_executable(tmp_path / "UseOrLoseCalendar", "UseOrLoseCalendar")
     backend_executable = _bundle_executable(tmp_path / "fedleave", "fedleave")
 
     monkeypatch.setattr(sys, "argv", [str(app_executable)])
@@ -249,7 +249,7 @@ def test_find_fedleave_uses_bundled_backend_directory(tmp_path: Path, monkeypatc
 
 
 def test_find_month_report_graphic_uses_bundled_backend_directory(tmp_path: Path, monkeypatch):
-    app_executable = _bundle_executable(tmp_path / "FedLeaveCalendar", "FedLeaveCalendar")
+    app_executable = _bundle_executable(tmp_path / "UseOrLoseCalendar", "UseOrLoseCalendar")
     report_executable = _bundle_executable(tmp_path / "fedleaveMonthReportGraphic", "fedleaveMonthReportGraphic")
 
     monkeypatch.setattr(sys, "argv", [str(app_executable)])
@@ -301,7 +301,7 @@ def test_run_chart_app_uses_bundled_companion_executable(tmp_path: Path, monkeyp
 
 
 def test_find_fedleave_reports_search_paths_when_missing(tmp_path: Path, monkeypatch):
-    app_executable = _bundle_executable(tmp_path / "FedLeaveCalendar", "FedLeaveCalendar")
+    app_executable = _bundle_executable(tmp_path / "UseOrLoseCalendar", "UseOrLoseCalendar")
 
     monkeypatch.setattr(sys, "argv", [str(app_executable)])
     monkeypatch.setattr(

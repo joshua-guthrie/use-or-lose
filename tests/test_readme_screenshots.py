@@ -60,7 +60,7 @@ def test_readme_identifies_fedleave_as_main_and_analytics_as_a_companion() -> No
 
     assert "The main application is `fedleave`" in text
     companion_section = text.split("## Companion Applications", 1)[1]
-    assert "### Companion Application: FedLeaveAnalytics" in companion_section
+    assert "### Companion Application: UseOrLoseAnalytics" in companion_section
     assert "Analysis > Analytics..." in companion_section
     for page in ("Summary", "Seasonality", "Calendar Heatmap", "Overtime, Comp, and Credit"):
         assert page in companion_section

@@ -6,10 +6,10 @@
     "screens": [
       {
         "id": "LEAVE-YEAR-SETUP",
-        "title": "Welcome to FedLeave",
+        "title": "Welcome to Use or Lose",
         "subtitle": "Set up a leave year to start recording leave.",
         "items": [
-          {"type": "card", "text": "Restore existing leave", "body": "Use a FedLeave backup from your computer or previous phone.", "note": 1},
+          {"type": "card", "text": "Restore existing leave", "body": "Use a Use or Lose backup from your computer or previous phone.", "note": 1},
           {"type": "action", "text": "Restore backup"},
           {"type": "action", "text": "Set up leave year", "emphasis": false, "note": 2}
         ]
@@ -147,7 +147,7 @@
         "title": "Balances & date",
         "subtitle": "Requested date · Thursday, Jan 22, 2026",
         "items": [
-          {"type": "card", "text": "Balance unavailable", "body": "FedLeave could not read this date's leave year.", "warning": true, "note": 3},
+          {"type": "card", "text": "Balance unavailable", "body": "Use or Lose could not read this date's leave year.", "warning": true, "note": 3},
           {"type": "action", "text": "Retry"},
           {"type": "action", "text": "Choose date", "emphasis": false}
         ]

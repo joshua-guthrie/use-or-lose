@@ -1,5 +1,5 @@
 # -*- mode: python ; coding: utf-8 -*-
-"""Build all FedLeave entry points into one shared onedir collection."""
+"""Build all Use or Lose entry points into one shared onedir collection."""
 
 import argparse
 import json

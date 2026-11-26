@@ -46,7 +46,7 @@ def check_for_updates(
         PUBLISHED_BUILD_URL,
         headers={
             "Accept": "text/plain",
-            "User-Agent": f"FedLeave/{current_version} ({current_build[:12] or 'legacy'})",
+            "User-Agent": f"Use or Lose/{current_version} ({current_build[:12] or 'legacy'})",
         },
     )
     try:
@@ -68,8 +68,8 @@ def check_for_updates(
             "release_url": OFFICIAL_PROJECT_URL,
             "assets": [],
             "instructions": (
-                "Visit the official FedLeave project webpage for the current Windows and Linux "
-                "installation instructions. Close all FedLeave applications before upgrading. "
+                "Visit the official Use or Lose project webpage for the current Windows and Linux "
+                "installation instructions. Close all Use or Lose applications before upgrading. "
                 "Your leave data directory is preserved during an upgrade."
             ),
         }

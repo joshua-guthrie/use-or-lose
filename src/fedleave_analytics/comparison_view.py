@@ -252,7 +252,7 @@ class ComparisonWidget(QWidget):
             rows,
             columns,
             self.pdf_folder,
-            f"fedleave-cumulative-usage-{self.year}",
+            f"use-or-lose-cumulative-usage-{self.year}",
             export_target=lambda path: export_file(path, data_store),
         )
         self._charts.append(chart)

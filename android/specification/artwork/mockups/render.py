@@ -1,4 +1,4 @@
-"""Render editable phone mockups to PNG for the FedLeave Android specification."""
+"""Render editable phone mockups to PNG for the Use or Lose Android specification."""
 
 import argparse
 import json
@@ -105,7 +105,7 @@ class Screen:
         if toolbar := self.screen.get("toolbar"):
             self.toolbar(toolbar)
         else:
-            self.text(self.left, self.cursor, "FedLeave", 13, PRIMARY, bold=True)
+            self.text(self.left, self.cursor, "Use or Lose", 13, PRIMARY, bold=True)
             top_action = self.screen.get("top_action")
             self.text(self.inner_right, self.cursor, top_action or "9:41", 13, PRIMARY if top_action else MUTED,
                       bool(top_action), "ra")
@@ -155,7 +155,7 @@ class Screen:
         if self.screen.get("compact_header"):
             self.text(label_x, self.cursor - 3, self.screen["title"], 21, bold=True)
         else:
-            self.text(label_x, self.cursor, "FedLeave", 13, PRIMARY, bold=True)
+            self.text(label_x, self.cursor, "Use or Lose", 13, PRIMARY, bold=True)
         if "share" in actions:
             x = self.inner_right - 9
             points = ((x - 7, y), (x + 7, y - 7), (x + 7, y + 7))

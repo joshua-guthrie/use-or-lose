@@ -24,9 +24,9 @@ def check_for_updates_command(
         return
     if result["update_available"]:
         console.print(
-            f"[green]FedLeave {result['latest_version']} is available[/green] (installed: {result['current_version']})."
+            f"[green]Use or Lose {result['latest_version']} is available[/green] (installed: {result['current_version']})."
         )
         console.print(f"Official project webpage: {result['release_url']}")
         console.print(result["instructions"])
     else:
-        console.print(f"FedLeave {result['current_version']} is current.")
+        console.print(f"Use or Lose {result['current_version']} is current.")

@@ -89,7 +89,7 @@ class ArgumentError(MonthReportError):
 
 
 class FedleaveMissingError(MonthReportError):
-    """The report could not locate its FedLeave CLI backend."""
+    """The report could not locate its Use or Lose CLI backend."""
 
     exit_code = 3
 
@@ -179,7 +179,7 @@ def parse_args(argv: list[str] | None = None) -> Options:
     """Validate command-line input and return normalized report options."""
     parser = argparse.ArgumentParser(
         prog="fedleaveMonthReportGraphic",
-        description="Generate a landscape FedLeave graphical month report.",
+        description="Generate a landscape Use or Lose graphical month report.",
         epilog=HELP_EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
@@ -258,7 +258,7 @@ def find_fedleave(explicit: Path | None = None) -> Path:
     raise FedleaveMissingError(
         "fedleave executable not found.\n\n"
         f"Searched:\n{details}\n\n"
-        "Install the current FedLeave suite or pass --fedleave PATH."
+        "Install the current Use or Lose suite or pass --fedleave PATH."
     )
 
 
@@ -450,7 +450,7 @@ def render_svg(data: ReportData, width: int) -> str:
     month_json = data.month_json
     month_name = calendar.month_name[int(month_json.get("month", data.today.month))]
     year = int(month_json.get("year", data.today.year))
-    title = f"FedLeave Month Report - {month_name} {year}"
+    title = f"Use or Lose Month Report - {month_name} {year}"
     generated = (
         data.generated_at.strftime("%B %-d, %Y %H:%M")
         if not sys.platform.startswith("win")
@@ -779,7 +779,7 @@ def render_png(data: ReportData, output: Path, width: int) -> None:
     text(
         28,
         18,
-        f"FedLeave Month Report - {calendar.month_name[int(data.month_json.get('month', 1))]} {data.month_json.get('year')}",
+        f"Use or Lose Month Report - {calendar.month_name[int(data.month_json.get('month', 1))]} {data.month_json.get('year')}",
         font_obj=title_font,
     )
     text(1892, 24, f"Generated: {data.generated_at:%B %d, %Y %H:%M}", fill=MUTED, anchor="ra")

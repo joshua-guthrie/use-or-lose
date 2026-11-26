@@ -47,9 +47,9 @@ def test_update_check_reports_new_published_build_and_instructions() -> None:
     assert result["latest_version"] == "0.2.1.dev0+gbbbbbbbb"
     assert result["latest_build"] == LATEST_BUILD
     assert result["release_url"] == OFFICIAL_PROJECT_URL
-    assert "official FedLeave project webpage" in result["instructions"]
+    assert "official Use or Lose project webpage" in result["instructions"]
     assert requests[0][0].full_url.endswith("/installers/BUILD.txt")
-    assert requests[0][0].get_header("User-agent") == f"FedLeave/0.2.1.dev0+gaaaaaaaa ({CURRENT_BUILD[:12]})"
+    assert requests[0][0].get_header("User-agent") == f"Use or Lose/0.2.1.dev0+gaaaaaaaa ({CURRENT_BUILD[:12]})"
 
 
 def test_update_check_reports_matching_published_build_as_current() -> None:

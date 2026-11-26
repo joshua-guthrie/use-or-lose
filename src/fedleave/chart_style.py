@@ -1,4 +1,4 @@
-"""Shared visual constants and line rendering for FedLeave charts."""
+"""Shared visual constants and line rendering for Use or Lose charts."""
 
 from __future__ import annotations
 

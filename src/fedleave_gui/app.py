@@ -1,4 +1,4 @@
-"""Create the Qt application and start the FedLeave calendar window."""
+"""Create the Qt application and start the Use or Lose calendar window."""
 
 from __future__ import annotations
 
@@ -24,7 +24,7 @@ def main(argv: list[str] | None = None) -> int:
         parser.add_argument("--data-dir", required=True)
         options = parser.parse_args(arguments)
     app = QApplication.instance() or QApplication(argv or sys.argv)
-    app.setApplicationName("FedLeave Calendar")
+    app.setApplicationName("Use or Lose Calendar")
     app.setOrganizationName("fedleave")
     app.setWindowIcon(window_icon())
     window = (

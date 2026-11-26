@@ -1,14 +1,14 @@
-# FedLeave Android multi-model development orchestrator · planning revision 1.5
+# Use or Lose Android multi-model development orchestrator · planning revision 1.5
 
-This is the staged revision of `FedLeave_Multi_Model_Development_Orchestrator_Specification_v1.4.md` from November 22, 2026. The v1.4 source has SHA-256 `8ad047952f956ffb39ed0d73fc2c0c19d7ddb6ecce971ec8c767a8471f8a4e9c`. The proposal below retains the original goals and revises the rollout, trust boundaries, and completion criteria. The [orchestration specification](../orchestration.md) indexes the governing chapters.
+This is the staged revision of `Use or Lose_Multi_Model_Development_Orchestrator_Specification_v1.4.md` from November 22, 2026. The v1.4 source has SHA-256 `8ad047952f956ffb39ed0d73fc2c0c19d7ddb6ecce971ec8c767a8471f8a4e9c`. The proposal below retains the original goals and revises the rollout, trust boundaries, and completion criteria. The [orchestration specification](../orchestration.md) indexes the governing chapters.
 
 ## 1. Purpose and scope
 
-Test whether FedLeave can use a lower-cost model for bounded implementation while preserving the product specification, mockups, accounting, and desktop compatibility. Keep design and review with the stronger model. Give the worker an assignment that can be completed with pinned evidence and without the design conversation.
+Test whether Use or Lose can use a lower-cost model for bounded implementation while preserving the product specification, mockups, accounting, and desktop compatibility. Keep design and review with the stronger model. Give the worker an assignment that can be completed with pinned evidence and without the design conversation.
 
 The proposed tool is a local Python CLI, provisionally `fedleave-orch`, with a deterministic mock adapter and a later DeepSeek adapter. A run starts with a validated task, creates a disposable worktree, accepts a scoped patch, runs applicable checks, and hands the result to a separate Codex review session led by the operator. Owner approval governs product and architecture decisions, external disclosure, integration, and release.
 
-The tool is for development. FedLeave's Android app remains a local application with its existing product boundaries. The orchestrator's work does not require rewriting the desktop, changing the Android stack, or establishing production accounting interfaces during I01. Autonomous review, publishing, parallel workers, cross-machine execution, a dashboard, and notifications are deferred.
+The tool is for development. Use or Lose's Android app remains a local application with its existing product boundaries. The orchestrator's work does not require rewriting the desktop, changing the Android stack, or establishing production accounting interfaces during I01. Autonomous review, publishing, parallel workers, cross-machine execution, a dashboard, and notifications are deferred.
 
 ## 2. Documentation and ownership
 

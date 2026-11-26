@@ -1,4 +1,4 @@
-; FedLeave Windows installer.
+; Use or Lose Windows installer.
 ; Compile-time VERSION, NUMERIC_VERSION, SOURCE_DIR, and OUTPUT_DIR definitions
 ; are supplied by installer/package.py and the distribution workflow.
 
@@ -28,28 +28,28 @@ SetCompressor /SOLID lzma
   !error "Required fedleave CLI is missing from SOURCE_DIR"
 !endif
 !if ! /FileExists "${SOURCE_DIR}\fedleave-mcp.exe"
-  !error "Required FedLeave MCP executable is missing from SOURCE_DIR"
+  !error "Required Use or Lose MCP executable is missing from SOURCE_DIR"
 !endif
-!if ! /FileExists "${SOURCE_DIR}\FedLeaveCalendar.exe"
-  !error "Required FedLeave Calendar executable is missing from SOURCE_DIR"
+!if ! /FileExists "${SOURCE_DIR}\UseOrLoseCalendar.exe"
+  !error "Required Use or Lose Calendar executable is missing from SOURCE_DIR"
 !endif
-!if ! /FileExists "${SOURCE_DIR}\FedLeaveAnalytics.exe"
-  !error "Required FedLeave Analytics executable is missing from SOURCE_DIR"
+!if ! /FileExists "${SOURCE_DIR}\UseOrLoseAnalytics.exe"
+  !error "Required Use or Lose Analytics executable is missing from SOURCE_DIR"
 !endif
 
-!define PRODUCT_NAME "FedLeave"
+!define PRODUCT_NAME "Use or Lose"
 !define PRODUCT_PUBLISHER "Joshua Guthrie"
 !define PRODUCT_URL "https://www.westmouthbay.com/fedleave-application/"
-!define PRODUCT_REG_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\FedLeave"
+!define PRODUCT_REG_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\Use or Lose"
 !define MUI_ABORTWARNING
 !define MUI_ICON "..\..\assets\fedleave-icon.ico"
 !define MUI_UNICON "..\..\assets\fedleave-icon.ico"
 
 Name "${PRODUCT_NAME} ${VERSION}"
-OutFile "${OUTPUT_DIR}\FedLeave-Setup-${VERSION}-Windows-x64.exe"
-InstallDir "$PROGRAMFILES64\FedLeave"
+OutFile "${OUTPUT_DIR}\UseOrLose-Setup-${VERSION}-Windows-x64.exe"
+InstallDir "$PROGRAMFILES64\Use or Lose"
 InstallDirRegKey HKLM "${PRODUCT_REG_KEY}" "InstallLocation"
-BrandingText "FedLeave"
+BrandingText "Use or Lose"
 
 VIProductVersion "${NUMERIC_VERSION}"
 VIAddVersionKey /LANG=1033 "ProductName" "${PRODUCT_NAME}"
@@ -57,7 +57,7 @@ VIAddVersionKey /LANG=1033 "ProductVersion" "${VERSION}"
 VIAddVersionKey /LANG=1033 "FileVersion" "${VERSION}"
 VIAddVersionKey /LANG=1033 "CompanyName" "${PRODUCT_PUBLISHER}"
 VIAddVersionKey /LANG=1033 "Comments" "${PRODUCT_URL}"
-VIAddVersionKey /LANG=1033 "FileDescription" "FedLeave Setup"
+VIAddVersionKey /LANG=1033 "FileDescription" "Use or Lose Setup"
 VIAddVersionKey /LANG=1033 "LegalCopyright" "MIT License"
 
 !insertmacro MUI_PAGE_WELCOME
@@ -71,7 +71,7 @@ VIAddVersionKey /LANG=1033 "LegalCopyright" "MIT License"
 !insertmacro MUI_UNPAGE_FINISH
 !insertmacro MUI_LANGUAGE "English"
 
-Section "FedLeave application files" SEC_CORE
+Section "Use or Lose application files" SEC_CORE
   SectionIn RO
   SetShellVarContext all
   SetRegView 64
@@ -94,33 +94,33 @@ Section "FedLeave application files" SEC_CORE
   WriteRegStr HKLM "${PRODUCT_REG_KEY}" "URLInfoAbout" "${PRODUCT_URL}"
   WriteRegStr HKLM "${PRODUCT_REG_KEY}" "HelpLink" "${PRODUCT_URL}"
   WriteRegStr HKLM "${PRODUCT_REG_KEY}" "InstallLocation" "$INSTDIR"
-  WriteRegStr HKLM "${PRODUCT_REG_KEY}" "DisplayIcon" "$INSTDIR\FedLeaveCalendar.exe"
+  WriteRegStr HKLM "${PRODUCT_REG_KEY}" "DisplayIcon" "$INSTDIR\UseOrLoseCalendar.exe"
   WriteRegStr HKLM "${PRODUCT_REG_KEY}" "UninstallString" '"$INSTDIR\Uninstall.exe"'
   WriteRegStr HKLM "${PRODUCT_REG_KEY}" "QuietUninstallString" '"$INSTDIR\Uninstall.exe" /S'
   WriteRegDWORD HKLM "${PRODUCT_REG_KEY}" "NoModify" 1
   WriteRegDWORD HKLM "${PRODUCT_REG_KEY}" "NoRepair" 1
 
-  RMDir /r "$SMPROGRAMS\FedLeave"
-  CreateDirectory "$SMPROGRAMS\FedLeave"
-  CreateShortcut "$SMPROGRAMS\FedLeave\FedLeave Calendar.lnk" \
-    "$INSTDIR\FedLeaveCalendar.exe" "" \
-    "$INSTDIR\FedLeaveCalendar.exe"
-  CreateShortcut "$SMPROGRAMS\FedLeave\FedLeave Analytics.lnk" \
-    "$INSTDIR\FedLeaveAnalytics.exe" "" \
-    "$INSTDIR\FedLeaveAnalytics.exe"
-  CreateShortcut "$SMPROGRAMS\FedLeave\Uninstall FedLeave.lnk" "$INSTDIR\Uninstall.exe"
+  RMDir /r "$SMPROGRAMS\Use or Lose"
+  CreateDirectory "$SMPROGRAMS\Use or Lose"
+  CreateShortcut "$SMPROGRAMS\Use or Lose\Use or Lose Calendar.lnk" \
+    "$INSTDIR\UseOrLoseCalendar.exe" "" \
+    "$INSTDIR\UseOrLoseCalendar.exe"
+  CreateShortcut "$SMPROGRAMS\Use or Lose\Use or Lose Analytics.lnk" \
+    "$INSTDIR\UseOrLoseAnalytics.exe" "" \
+    "$INSTDIR\UseOrLoseAnalytics.exe"
+  CreateShortcut "$SMPROGRAMS\Use or Lose\Uninstall Use or Lose.lnk" "$INSTDIR\Uninstall.exe"
 SectionEnd
 
 Section /o "Desktop shortcut" SEC_DESKTOP
   SetShellVarContext all
   ; Optional in the wizard and omitted by default during /S installation.
-  CreateShortcut "$DESKTOP\FedLeave Calendar.lnk" \
-    "$INSTDIR\FedLeaveCalendar.exe" "" \
-    "$INSTDIR\FedLeaveCalendar.exe"
+  CreateShortcut "$DESKTOP\Use or Lose Calendar.lnk" \
+    "$INSTDIR\UseOrLoseCalendar.exe" "" \
+    "$INSTDIR\UseOrLoseCalendar.exe"
 SectionEnd
 
-LangString DESC_SEC_CORE ${LANG_ENGLISH} "Install FedLeave and all packaged companion applications."
-LangString DESC_SEC_DESKTOP ${LANG_ENGLISH} "Create a public Desktop shortcut for FedLeave Calendar."
+LangString DESC_SEC_CORE ${LANG_ENGLISH} "Install Use or Lose and all packaged companion applications."
+LangString DESC_SEC_DESKTOP ${LANG_ENGLISH} "Create a public Desktop shortcut for Use or Lose Calendar."
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC_CORE} $(DESC_SEC_CORE)
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC_DESKTOP} $(DESC_SEC_DESKTOP)
@@ -129,8 +129,8 @@ LangString DESC_SEC_DESKTOP ${LANG_ENGLISH} "Create a public Desktop shortcut fo
 Section "Uninstall"
   SetShellVarContext all
   SetRegView 64
-  Delete "$DESKTOP\FedLeave Calendar.lnk"
-  RMDir /r "$SMPROGRAMS\FedLeave"
+  Delete "$DESKTOP\Use or Lose Calendar.lnk"
+  RMDir /r "$SMPROGRAMS\Use or Lose"
   DeleteRegKey HKLM "${PRODUCT_REG_KEY}"
 
   ; User data is deliberately outside $INSTDIR and is never referenced here.

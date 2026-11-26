@@ -1,4 +1,4 @@
-"""Configure the Typer application shared by FedLeave CLI commands."""
+"""Configure the Typer application shared by Use or Lose CLI commands."""
 
 from __future__ import annotations
 
@@ -37,7 +37,7 @@ Primary commands:
     force-balance
                 Force one leave balance as of a date with an auditable adjustment
     check-for-updates
-                Check for a newer FedLeave release
+                Check for a newer Use or Lose release
     expirations Show expiring comp, travel comp, restored annual, PPL and optional award leave lots
     expiration-extend
                 Extend one eligible earned lot with a recorded reason

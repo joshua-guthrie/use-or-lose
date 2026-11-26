@@ -8,7 +8,7 @@ from PySide6.QtWidgets import QDialog, QDialogButtonBox, QTextBrowser, QVBoxLayo
 class AnalyticsHelpDialog(QDialog):
     def __init__(self, section="overview", parent=None):
         super().__init__(parent)
-        self.setWindowTitle("FedLeave Analytics Help")
+        self.setWindowTitle("Use or Lose Analytics Help")
         self.resize(950, 730)
         layout = QVBoxLayout(self)
         self.browser = QTextBrowser()
@@ -21,7 +21,7 @@ class AnalyticsHelpDialog(QDialog):
         except FileNotFoundError:
             self.available = False
             self.browser.setHtml(
-                "<h1>FedLeave Analytics Help</h1><p>The bundled help file is missing. Reinstall the complete FedLeave suite.</p>"
+                "<h1>Use or Lose Analytics Help</h1><p>The bundled help file is missing. Reinstall the complete Use or Lose suite.</p>"
             )
         layout.addWidget(self.browser)
         buttons = QDialogButtonBox(QDialogButtonBox.Close)

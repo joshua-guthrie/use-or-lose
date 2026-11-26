@@ -97,9 +97,9 @@ jobs:
             "/DNUMERIC_VERSION=$env:NUMERIC_VERSION" `
             "/DSOURCE_DIR=$sourceDir" `
             "/DOUTPUT_DIR=$artifactDir" `
-            "installer\windows\FedLeave.nsi"
+            "installer\windows\UseOrLose.nsi"
           if ($LASTEXITCODE -ne 0) { throw "NSIS compilation failed with exit code $LASTEXITCODE" }
-          $installer = Join-Path $artifactDir "FedLeave-Setup-$env:PACKAGE_VERSION-Windows-x64.exe"
+          $installer = Join-Path $artifactDir "UseOrLose-Setup-$env:PACKAGE_VERSION-Windows-x64.exe"
           if (-not (Test-Path $installer)) { throw "NSIS did not create $installer" }
           python installer/package.py checksum $installer
 
@@ -107,8 +107,8 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = "Stop"
-          $installer = Join-Path $PWD "artifacts\FedLeave-Setup-$env:PACKAGE_VERSION-Windows-x64.exe"
-          $installDir = Join-Path $env:ProgramFiles "FedLeave"
+          $installer = Join-Path $PWD "artifacts\UseOrLose-Setup-$env:PACKAGE_VERSION-Windows-x64.exe"
+          $installDir = Join-Path $env:ProgramFiles "UseOrLose"
           $userDataDir = Join-Path $env:LOCALAPPDATA "fedleave"
           $sentinel = Join-Path $userDataDir "ci-user-data-preserved.txt"
           New-Item -ItemType Directory -Force -Path $userDataDir | Out-Null
@@ -135,8 +135,8 @@ jobs:
         with:
           name: fedleave-windows-${{ needs.metadata.outputs.package-version }}
           path: |
-            artifacts/FedLeave-Setup-*-Windows-x64.exe
-            artifacts/FedLeave-Setup-*-Windows-x64.exe.sha256
+            artifacts/UseOrLose-Setup-*-Windows-x64.exe
+            artifacts/UseOrLose-Setup-*-Windows-x64.exe.sha256
           if-no-files-found: error
 
   linux:
@@ -192,7 +192,7 @@ jobs:
             --bundle-dir dist/fedleave-Ubuntu \
             --output-dir artifacts \
             --version "$PACKAGE_VERSION"
-          archive="artifacts/FedLeave-${PACKAGE_VERSION}-Linux-x86_64.tar.gz"
+          archive="artifacts/UseOrLose-${PACKAGE_VERSION}-Linux-x86_64.tar.gz"
           python installer/package.py check-size "$archive" --max-mib 300
           archive_size="$(du -h "$archive" | cut -f1)"
           printf '### Linux installer size\n\n- Compressed archive: %s\n- Enforced limit: 300 MiB\n' \
@@ -202,9 +202,9 @@ jobs:
         run: |
           set -Eeuo pipefail
           extract_dir="$(mktemp -d)"
-          tar -xzf "artifacts/FedLeave-${PACKAGE_VERSION}-Linux-x86_64.tar.gz" -C "$extract_dir"
-          python installer/package.py validate-bundle --platform linux --bundle-dir "$extract_dir/FedLeave"
-          "$extract_dir/FedLeave/fedleave" --version
+          tar -xzf "artifacts/UseOrLose-${PACKAGE_VERSION}-Linux-x86_64.tar.gz" -C "$extract_dir"
+          python installer/package.py validate-bundle --platform linux --bundle-dir "$extract_dir/UseOrLose"
+          "$extract_dir/UseOrLose/fedleave" --version
 
       - name: Validate and exercise bootstrap installer
         run: |
@@ -214,12 +214,12 @@ jobs:
           bin_dir="$RUNNER_TEMP/fedleave-bin"
           rolling_dir="$RUNNER_TEMP/fedleave-rolling-assets"
           mkdir "$rolling_dir"
-          cp "artifacts/FedLeave-${PACKAGE_VERSION}-Linux-x86_64.tar.gz" \
-            "$rolling_dir/FedLeave-Latest-Linux-x86_64.tar.gz"
+          cp "artifacts/UseOrLose-${PACKAGE_VERSION}-Linux-x86_64.tar.gz" \
+            "$rolling_dir/UseOrLose-Latest-Linux-x86_64.tar.gz"
           (
             cd "$rolling_dir"
-            sha256sum FedLeave-Latest-Linux-x86_64.tar.gz \
-              > FedLeave-Latest-Linux-x86_64.tar.gz.sha256
+            sha256sum UseOrLose-Latest-Linux-x86_64.tar.gz \
+              > UseOrLose-Latest-Linux-x86_64.tar.gz.sha256
           )
           installer/linux/install.sh \
             --unattended \
@@ -235,8 +235,8 @@ jobs:
         with:
           name: fedleave-linux-${{ needs.metadata.outputs.package-version }}
           path: |
-            artifacts/FedLeave-*-Linux-x86_64.tar.gz
-            artifacts/FedLeave-*-Linux-x86_64.tar.gz.sha256
+            artifacts/UseOrLose-*-Linux-x86_64.tar.gz
+            artifacts/UseOrLose-*-Linux-x86_64.tar.gz.sha256
             installer/linux/install.sh
           if-no-files-found: error
 
@@ -287,10 +287,10 @@ jobs:
           set -Eeuo pipefail
           mkdir rolling-assets
           mapfile -t windows_installers < <(
-            find release-assets -type f -name 'FedLeave-Setup-*-Windows-x64.exe' -print
+            find release-assets -type f -name 'UseOrLose-Setup-*-Windows-x64.exe' -print
           )
           mapfile -t linux_archives < <(
-            find release-assets -type f -name 'FedLeave-*-Linux-x86_64.tar.gz' -print
+            find release-assets -type f -name 'UseOrLose-*-Linux-x86_64.tar.gz' -print
           )
           mapfile -t bootstrap_installers < <(
             find release-assets -type f -path '*/installer/linux/install.sh' -print
@@ -307,15 +307,15 @@ jobs:
             printf 'Expected one Linux bootstrap, found %s\n' "${#bootstrap_installers[@]}" >&2
             exit 1
           }
-          cp "${windows_installers[0]}" rolling-assets/FedLeave-Setup-Latest-Windows-x64.exe
-          cp "${linux_archives[0]}" rolling-assets/FedLeave-Latest-Linux-x86_64.tar.gz
+          cp "${windows_installers[0]}" rolling-assets/UseOrLose-Setup-Latest-Windows-x64.exe
+          cp "${linux_archives[0]}" rolling-assets/UseOrLose-Latest-Linux-x86_64.tar.gz
           cp "${bootstrap_installers[0]}" rolling-assets/install.sh
           (
             cd rolling-assets
-            sha256sum FedLeave-Setup-Latest-Windows-x64.exe \
-              > FedLeave-Setup-Latest-Windows-x64.exe.sha256
-            sha256sum FedLeave-Latest-Linux-x86_64.tar.gz \
-              > FedLeave-Latest-Linux-x86_64.tar.gz.sha256
+            sha256sum UseOrLose-Setup-Latest-Windows-x64.exe \
+              > UseOrLose-Setup-Latest-Windows-x64.exe.sha256
+            sha256sum UseOrLose-Latest-Linux-x86_64.tar.gz \
+              > UseOrLose-Latest-Linux-x86_64.tar.gz.sha256
           )
 
       - name: Replace rolling beta-channel assets
@@ -362,10 +362,10 @@ jobs:
           set -Eeuo pipefail
           while IFS=$'\t' read -r asset_id asset_name; do
             case "$asset_name" in
-              FedLeave-Setup-Latest-Windows-x64.exe|\
-              FedLeave-Setup-Latest-Windows-x64.exe.sha256|\
-              FedLeave-Latest-Linux-x86_64.tar.gz|\
-              FedLeave-Latest-Linux-x86_64.tar.gz.sha256|\
+              UseOrLose-Setup-Latest-Windows-x64.exe|\
+              UseOrLose-Setup-Latest-Windows-x64.exe.sha256|\
+              UseOrLose-Latest-Linux-x86_64.tar.gz|\
+              UseOrLose-Latest-Linux-x86_64.tar.gz.sha256|\
               install.sh)
                 ;;
               *)
@@ -387,10 +387,17 @@ jobs:
           git lfs version
           git lfs install --local
           mkdir -p installers
-          cp rolling-assets/FedLeave-Setup-Latest-Windows-x64.exe installers/
-          cp rolling-assets/FedLeave-Setup-Latest-Windows-x64.exe.sha256 installers/
-          cp rolling-assets/FedLeave-Latest-Linux-x86_64.tar.gz installers/
-          cp rolling-assets/FedLeave-Latest-Linux-x86_64.tar.gz.sha256 installers/
+          # The rolling set is a single named generation: drop the previous
+          # brand's installers so the commit contains only the current names.
+          git rm -q --ignore-unmatch \
+            installers/FedLeave-Setup-Latest-Windows-x64.exe \
+            installers/FedLeave-Setup-Latest-Windows-x64.exe.sha256 \
+            installers/FedLeave-Latest-Linux-x86_64.tar.gz \
+            installers/FedLeave-Latest-Linux-x86_64.tar.gz.sha256 || true
+          cp rolling-assets/UseOrLose-Setup-Latest-Windows-x64.exe installers/
+          cp rolling-assets/UseOrLose-Setup-Latest-Windows-x64.exe.sha256 installers/
+          cp rolling-assets/UseOrLose-Latest-Linux-x86_64.tar.gz installers/
+          cp rolling-assets/UseOrLose-Latest-Linux-x86_64.tar.gz.sha256 installers/
           cp rolling-assets/install.sh installers/install.sh
           chmod +x installers/install.sh
           printf 'source_commit=%s\nversion=%s\n' \

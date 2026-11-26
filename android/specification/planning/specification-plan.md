@@ -1,11 +1,11 @@
-# Plan for writing the FedLeave Android specification
+# Plan for writing the Use or Lose Android specification
 
-Use this plan to turn the existing FedLeave desktop product into a detailed, reviewable specification for an Android phone app. The specification will define the behavior, annotate the screens, settle the technical decisions, and identify the tests that prove parity. Review and approve this plan before drafting the specification.
+Use this plan to turn the existing Use or Lose desktop product into a detailed, reviewable specification for an Android phone app. The specification will define the behavior, annotate the screens, settle the technical decisions, and identify the tests that prove parity. Review and approve this plan before drafting the specification.
 
 ## What we want to build
 
-- A phone-friendly FedLeave app with the same leave-accounting behavior and a mobile way to perform every workflow in scope for the first release.
-- Private on-device storage for leave records, comments, settings, and working files. Use the existing FedLeave JSON formats so the phone and the Linux and Windows desktop apps can exchange backups. Ordinary use should work offline.
+- A phone-friendly Use or Lose app with the same leave-accounting behavior and a mobile way to perform every workflow in scope for the first release.
+- Private on-device storage for leave records, comments, settings, and working files. Use the existing Use or Lose JSON formats so the phone and the Linux and Windows desktop apps can exchange backups. Ordinary use should work offline.
 - **Share** for supported graphs, report images, and backups. Open the Android Sharesheet so the user can choose a compatible app, such as messaging or email.
 - A consistent, polished interface that is comfortable on a small screen. Each function in scope must have an annotated screen or an annotated flow that shows how the user performs it.
 
@@ -15,7 +15,7 @@ Use a short `specification.md` as an index with requirements by topic under `sec
 
 | Chapter | What to write |
 | --- | --- |
-| Product and scope | Who uses FedLeave, the most common phone tasks, supported devices, offline expectations, and the decisions needed for parity. |
+| Product and scope | Who uses Use or Lose, the most common phone tasks, supported devices, offline expectations, and the decisions needed for parity. |
 | Feature parity | A row for each existing function, its proposed phone workflow or other disposition, and the evidence needed to verify it. |
 | Navigation and screens | A navigation map, annotated screen images, interaction rules, and accessibility and visual design standards. |
 | Rules and architecture | The calculation contract, how the Android app and desktop CLI use core logic, and the cases that must produce identical results. |
@@ -26,7 +26,7 @@ Use a short `specification.md` as an index with requirements by topic under `sec
 
 ## Start with the desktop app as the reference
 
-Pin the source revision and published build used to establish parity. Use the revision recorded in `installers/BUILD.txt` when starting the inventory. Consult the README, desktop menus, CLI help and entry points, behavior tests, and relevant open and closed GitHub issues. Mark whether each issue describes shipped behavior, a new Android requirement, or a deferred item. Verify what exists in the reference build when the issue or changelog describes an older feature. [FedLeave README](../../../README.md) · [Architecture](../../../docs/ARCHITECTURE.md) · [Build identity](../../../installers/BUILD.txt) · [GitHub issue history](https://github.com/joshua-guthrie/fedleave/issues?q=is%3Aissue)
+Pin the source revision and published build used to establish parity. Use the revision recorded in `installers/BUILD.txt` when starting the inventory. Consult the README, desktop menus, CLI help and entry points, behavior tests, and relevant open and closed GitHub issues. Mark whether each issue describes shipped behavior, a new Android requirement, or a deferred item. Verify what exists in the reference build when the issue or changelog describes an older feature. [Use or Lose README](../../../README.md) · [Architecture](../../../docs/ARCHITECTURE.md) · [Build identity](../../../installers/BUILD.txt) · [GitHub issue history](https://github.com/joshua-guthrie/fedleave/issues?q=is%3Aissue)
 
 ### GitHub issues reflected in this draft
 
@@ -53,7 +53,7 @@ Break the first inventory into groups that can be finished independently.
 - **Calendar and ledger.** Today, month and day navigation, pay days and pay periods, balances, daily entries and free-text comments, transaction history, dated leave entries, corrections and voids, and force balance.
 - **Leave-year rules.** Manual starting balances, carryover and reconciliation, accrual schedules and changes, caps, expirations and use-or-lose, lot allocation, all supported leave categories, and paid parental leave and FMLA.
 - **Reports.** Analytics sections and their filters, source transaction drill-downs, yearly charts and comparisons, and month report graphics. Record the desktop What-if Planner as deferred for the first Android release.
-- **Backups, sharing, and settings.** Compatible FedLeave backup and restore, locally generated or restored holiday dates, report and backup sharing, presentation preferences, help, and about. Check which report formats the desktop actually makes available. Android's inbound file workflow is limited to restoring FedLeave backups.
+- **Backups, sharing, and settings.** Compatible Use or Lose backup and restore, locally generated or restored holiday dates, report and backup sharing, presentation preferences, help, and about. Check which report formats the desktop actually makes available. Android's inbound file workflow is limited to restoring Use or Lose backups.
 
 ## Design the phone screens
 
@@ -67,7 +67,7 @@ Use the [selected Calendar mockup](../chapters/01-calendar/01-01-main-screen.md)
 
 | Style option | What to compare |
 | --- | --- |
-| Fixed Material 3 palette | Consistent FedLeave colors in light and dark mode. The sample uses this direction so dates, balances, and primary actions are easy to compare. |
+| Fixed Material 3 palette | Consistent Use or Lose colors in light and dark mode. The sample uses this direction so dates, balances, and primary actions are easy to compare. |
 | System dynamic color | Match the user's system palette where supported, with fixed light and dark colors as a fallback. Verify that pay-period and chart distinctions remain easy to read. |
 | Material 3 Expressive | Try stronger typography and more varied shapes for selected actions. Keep dense balance rows and the month grid easy to scan. |
 
@@ -83,7 +83,7 @@ Define what **looks good and is easy to use** in observable terms. Specify a con
 
 Start with **Kotlin** for the language and **Jetpack Compose with Material 3** for the phone interface. Kotlin is Google's recommended starting point for native Android, and Compose can preview screens in Android Studio. Use **Android Studio** as the IDE, which is the application you use to edit, build, run, and debug the app. [Android's Kotlin-first guidance](https://developer.android.com/kotlin/first) · [Jetpack Compose](https://developer.android.com/compose)
 
-**Keep the existing desktop command lines.** Put more of the leave behavior behind callable library functions where it currently lives in command handlers. Keep the desktop CLI as an adapter that calls those functions and preserves its existing command names, options, and JSON output. FedLeave already has independently callable Python calculation and persistence code. Android calls the core through a typed app interface. Use ordinary app language in every Android screen, message, and help topic. [Existing architecture and compatibility policy](../../../docs/ARCHITECTURE.md)
+**Keep the existing desktop command lines.** Put more of the leave behavior behind callable library functions where it currently lives in command handlers. Keep the desktop CLI as an adapter that calls those functions and preserves its existing command names, options, and JSON output. Use or Lose already has independently callable Python calculation and persistence code. Android calls the core through a typed app interface. Use ordinary app language in every Android screen, message, and help topic. [Existing architecture and compatibility policy](../../../docs/ARCHITECTURE.md)
 
 Have the specification compare these two paths for Android and record the decision.
 
@@ -94,10 +94,10 @@ Record tradeoffs in duplication, portability, packaging size, and maintenance. L
 
 ## Plan local JSON storage, backup, and sharing
 
-- **Working data.** Use the existing FedLeave JSON datastore format as the canonical phone store inside app-private storage. Use the desktop schemas and layout for `config.json`, `leave_years/<year>.json`, and `holiday_cache/<key>.json`. Define safe writes, recovery, and preservation of these files on app updates. [Desktop JSON storage](../../../src/fedleave/storage.py)
+- **Working data.** Use the existing Use or Lose JSON datastore format as the canonical phone store inside app-private storage. Use the desktop schemas and layout for `config.json`, `leave_years/<year>.json`, and `holiday_cache/<key>.json`. Define safe writes, recovery, and preservation of these files on app updates. [Desktop JSON storage](../../../src/fedleave/storage.py)
 - **Leave-year setup.** Define how the app creates a missing year when the user opens Calendar for the current date or performs an action in a future year. Decide when to confirm creation, how to determine the year and starting balances, and what cancellation does to the original action. Keep explicit creation as the desktop CLI behavior. Test creation of each missing year and preservation of any existing year. [Leave-year setup issue](https://github.com/joshua-guthrie/fedleave/issues/149)
 - **Backup and restore.** Write and read the desktop CLI's existing portable JSON archive with `schema_version: 1`, including the existing `config`, `leave_years`, and `holiday_cache` fields. Accept the existing single-leave-year JSON backup supported by the desktop importer. Require round trips in both directions using the existing Linux and Windows GUI backup and import flows. Compare records, transaction IDs, supported history, settings, and holiday data. Define import preview, merge or replace choices, and complete validation before changing the active ledger. Use the Android file picker to select a backup to restore. Test interrupted and invalid restores, and explain recovery after uninstall or a phone change. [Desktop archive contract](../../../src/fedleave/commands/data.py) · [Desktop Calendar backup controls](../../../src/fedleave_gui/main_window.py#L1920) · [Android file picker](https://developer.android.com/training/data-storage/shared/documents-files)
-- **Sharing experience.** Sketch **Share** for eligible reports and graphs and **Share backup** from the data screen. Prepare a PNG for a chart or report image, a PDF where supported, or the standard JSON backup, then open the Android Sharesheet. The user chooses the receiving app. Give that app temporary read access to the prepared copy and define when FedLeave can safely clean up its app-private working file. Show cancellation and preparation errors in the flow. Keep the canonical data store private and treat the receiving app's delivery or storage as its responsibility. [Android Sharesheet](https://developer.android.com/develop/ui/compose/sharing/send) · [Android secure file sharing](https://developer.android.com/training/secure-file-sharing)
+- **Sharing experience.** Sketch **Share** for eligible reports and graphs and **Share backup** from the data screen. Prepare a PNG for a chart or report image, a PDF where supported, or the standard JSON backup, then open the Android Sharesheet. The user chooses the receiving app. Give that app temporary read access to the prepared copy and define when Use or Lose can safely clean up its app-private working file. Show cancellation and preparation errors in the flow. Keep the canonical data store private and treat the receiving app's delivery or storage as its responsibility. [Android Sharesheet](https://developer.android.com/develop/ui/compose/sharing/send) · [Android secure file sharing](https://developer.android.com/training/secure-file-sharing)
 - **Privacy and offline behavior.** Define which data stays on the device. Configure and verify exclusions for automatic cloud backup and OS-managed device-to-device transfer where supported. Record any optional network feature, such as requesting a holiday calendar, and the data it sends. Use synthetic data in screenshots, logs, bug reports, and testing. [Android Auto Backup and device transfer](https://developer.android.com/identity/data/autobackup)
 
 ## Plan beginner setup and testing

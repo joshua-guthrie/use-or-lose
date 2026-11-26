@@ -1,6 +1,6 @@
 # Architecture
 
-FedLeave is one distribution containing a command-line application, two Qt
+Use or Lose is one distribution containing a command-line application, two Qt
 applications, report renderers, and compatibility entry points. Importable
 Python code lives under `src/`; repository-root directories contain project
 metadata, documentation, tests, assets, installers, and build orchestration.

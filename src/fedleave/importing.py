@@ -1,4 +1,4 @@
-"""Plan canonical FedLeave imports without writing files or depending on a CLI."""
+"""Plan canonical Use or Lose imports without writing files or depending on a CLI."""
 
 from __future__ import annotations
 

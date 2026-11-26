@@ -174,7 +174,7 @@ open class BalanceLayoutTest : CalendarUiTestBase() {
         composeRule.onNodeWithText("Show January 22").performClick()
         composeRule.onNodeWithText("Balance unavailable").assertIsDisplayed()
         composeRule.onNodeWithText(
-            "FedLeave could not read this date's leave year.",
+            "Use or Lose could not read this date's leave year.",
         ).assertIsDisplayed()
 
         bridge.failBalances = false

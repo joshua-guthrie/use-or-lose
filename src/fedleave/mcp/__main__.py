@@ -14,8 +14,8 @@ from fedleave import __version__
 
 
 def main():
-    parser = argparse.ArgumentParser(description="FedLeave MCP server (local stdio)")
-    parser.add_argument("--version", action="version", version=f"fedleave-mcp {__version__}")
+    parser = argparse.ArgumentParser(description="Use or Lose MCP server (local stdio)")
+    parser.add_argument("--version", action="version", version=f"use-or-lose-mcp {__version__}")
     parser.add_argument(
         "--config",
         type=Path,
@@ -39,7 +39,7 @@ def main():
     except KeyboardInterrupt:
         pass
     except Exception as exc:
-        logging.error("FedLeave MCP startup failed: %s", exc)
+        logging.error("Use or Lose MCP startup failed: %s", exc)
         raise SystemExit(2) from None
 
 

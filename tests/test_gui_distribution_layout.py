@@ -32,8 +32,8 @@ def test_manifest_lists_all_project_scripts():
 
     expected_apps = [
         "fedleave",
-        "FedLeaveCalendar",
-        "FedLeaveAnalytics",
+        "UseOrLoseCalendar",
+        "UseOrLoseAnalytics",
         "AnnualLeaveChartForTheYear",
         "SickLeaveChartForTheYear",
         "CreditHoursChartForTheYear",

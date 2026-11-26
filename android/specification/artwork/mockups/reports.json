@@ -236,7 +236,7 @@
         "title": "Share",
         "subtitle": "Android system sheet · illustrative",
         "items": [
-          {"type": "card", "text": "FedLeave January 2026", "body": "PDF document", "note": 4},
+          {"type": "card", "text": "Use or Lose January 2026", "body": "PDF document", "note": 4},
           {"type": "row", "text": "Email", "value": "›"},
           {"type": "row", "text": "Messaging", "value": "›"},
           {"type": "row", "text": "Nearby sharing", "value": "›"},

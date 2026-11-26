@@ -597,7 +597,7 @@ class PreferencesDialog(QDialog):
         self.automatic_update_checks = QCheckBox("Check for updates automatically")
         self.automatic_update_checks.setChecked(settings.automatic_update_checks)
         self.automatic_update_checks.setToolTip(
-            "Check for a newer FedLeave build at most once per day. "
+            "Check for a newer Use or Lose build at most once per day. "
             "When disabled, Help > Check for Updates remains available."
         )
         self.expiration_reminders = QLineEdit(
@@ -1036,7 +1036,7 @@ class ChangeAccrualDialog(QDialog):
         layout = QVBoxLayout(self)
         description = QLabel(
             "Change the annual leave accrual rate starting on the selected date. "
-            "FedLeave will update future automatic annual leave accrual transactions for that leave year."
+            "Use or Lose will update future automatic annual leave accrual transactions for that leave year."
         )
         description.setWordWrap(True)
         layout.addWidget(description)
@@ -1078,7 +1078,7 @@ class ForceBalanceDialog(QDialog):
         self.setModal(True)
         layout = QVBoxLayout(self)
         description = QLabel(
-            "Set the exact balance for one leave category on a date. FedLeave records the difference "
+            "Set the exact balance for one leave category on a date. Use or Lose records the difference "
             "as an auditable adjustment that affects that date and all later dates."
         )
         description.setWordWrap(True)
@@ -1404,7 +1404,7 @@ class MainWindow(QMainWindow):
         self.yearly_comparison_actions: dict[str, QAction] = {}
         self._leave_chart_windows: list[LeaveChartDialog] = []
         self._analytics_processes: list[subprocess.Popen[Any]] = []
-        self.setWindowTitle("FedLeave Calendar")
+        self.setWindowTitle("Use or Lose Calendar")
         self.resize(1320, 860)
         self._build_ui()
 
@@ -1592,8 +1592,8 @@ class MainWindow(QMainWindow):
         self._action(tools_menu, "Expiring Leave Status...", self.show_expirations)
         self._action(tools_menu, "Reconcile Carryover...", self.reconcile_carryover)
         self._action(tools_menu, "Validate Data", self.validate_data)
-        self._action(tools_menu, "Export FedLeave Data...", self.export_data)
-        self._action(tools_menu, "Import FedLeave Data...", self.import_data)
+        self._action(tools_menu, "Export Use or Lose Data...", self.export_data)
+        self._action(tools_menu, "Import Use or Lose Data...", self.import_data)
         import_external_menu = tools_menu.addMenu("Import From External App")
         self._action(import_external_menu, "FRC-E WMS HTTP Leave Report", self.import_wms_http_leave_report)
         help_menu = self.menuBar().addMenu("Help")
@@ -1601,7 +1601,7 @@ class MainWindow(QMainWindow):
         self._action(help_menu, "Leave Abbreviations", self.show_abbreviations)
         self._action(help_menu, "Official Project Website", self.open_project_website)
         self._action(help_menu, "Check for Updates...", self.check_for_updates)
-        self._action(help_menu, "About FedLeave Calendar", self.about_gui)
+        self._action(help_menu, "About Use or Lose Calendar", self.about_gui)
 
     def _action(self, menu: Any, text: str, callback: Any) -> QAction:
         action = QAction(text, self)
@@ -2082,7 +2082,7 @@ class MainWindow(QMainWindow):
 
     def export_data(self) -> None:
         path, _ = QFileDialog.getSaveFileName(
-            self, "Export FedLeave Data", "fedleave_backup.json", "JSON files (*.json)"
+            self, "Export Use or Lose Data", "fedleave_backup.json", "JSON files (*.json)"
         )
         if not path:
             return
@@ -2091,11 +2091,11 @@ class MainWindow(QMainWindow):
         except BackendError as exc:
             QMessageBox.warning(self, "Export Failed", str(exc))
             return
-        QMessageBox.information(self, "Export FedLeave Data", "Export complete.")
+        QMessageBox.information(self, "Export Use or Lose Data", "Export complete.")
 
     def _select_import_mode(self) -> str | None:
         prompt = QMessageBox(self)
-        prompt.setWindowTitle("Import FedLeave Data")
+        prompt.setWindowTitle("Import Use or Lose Data")
         prompt.setIcon(QMessageBox.Question)
         prompt.setText("How should the selected backup be imported?")
         prompt.setInformativeText(
@@ -2180,7 +2180,7 @@ class MainWindow(QMainWindow):
         return mode if dialog.exec() == QMessageBox.Ok else None
 
     def import_data(self) -> None:
-        path, _ = QFileDialog.getOpenFileName(self, "Import FedLeave Data", "", "JSON files (*.json)")
+        path, _ = QFileDialog.getOpenFileName(self, "Import Use or Lose Data", "", "JSON files (*.json)")
         if not path:
             return
         import_option = self._select_import_mode()
@@ -2329,8 +2329,8 @@ class MainWindow(QMainWindow):
                 installed_label = f"{installed_label} ({current_build[:8]})"
             QMessageBox.information(
                 self,
-                "FedLeave Update Available",
-                f"FedLeave {latest_label} is available (installed: {installed_label}).\n\n"
+                "Use or Lose Update Available",
+                f"Use or Lose {latest_label} is available (installed: {installed_label}).\n\n"
                 f"Download: {result.get('release_url', '')}\n\n{result.get('instructions', '')}",
             )
             self.settings.last_update_notified_version = notification_id
@@ -2420,7 +2420,7 @@ class MainWindow(QMainWindow):
             analytics = find_analytics()
             backend = self.backend.executable_path()
         except BackendError as exc:
-            QMessageBox.warning(self, "FedLeave Analytics", str(exc))
+            QMessageBox.warning(self, "Use or Lose Analytics", str(exc))
             return
         command = [
             str(analytics),
@@ -2439,7 +2439,7 @@ class MainWindow(QMainWindow):
         try:
             process = subprocess.Popen(command)
         except OSError as exc:
-            QMessageBox.warning(self, "FedLeave Analytics", str(exc))
+            QMessageBox.warning(self, "Use or Lose Analytics", str(exc))
             return
         self._analytics_processes.append(process)
 
@@ -2527,7 +2527,7 @@ class MainWindow(QMainWindow):
 
     def save_pdf(self) -> None:
         folder = self.settings.pdf_export_folder or str(Path.home())
-        default = str(Path(folder) / f"fedleave-{self.year}-{self.month:02d}.pdf")
+        default = str(Path(folder) / f"use-or-lose-{self.year}-{self.month:02d}.pdf")
         path, _ = QFileDialog.getSaveFileName(self, "Save Month as PDF", default, "PDF files (*.pdf)")
         if not path:
             return
@@ -2551,7 +2551,7 @@ class MainWindow(QMainWindow):
         webbrowser.open(OFFICIAL_PROJECT_URL)
 
     def about_gui(self) -> None:
-        self._show_html_file("about-fedleave-calendar.html", "About FedLeave Calendar")
+        self._show_html_file("about-fedleave-calendar.html", "About Use or Lose Calendar")
 
     def _show_html_file(self, filename: str, title: str) -> None:
         path = help_file(filename)

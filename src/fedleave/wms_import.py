@@ -1,4 +1,4 @@
-"""Parse FRC-E WMS clocking-report HTML into FedLeave transactions."""
+"""Parse FRC-E WMS clocking-report HTML into Use or Lose transactions."""
 
 from __future__ import annotations
 
@@ -31,7 +31,7 @@ class WmsImportError(ValueError):
             "WMS IMPORT COULD NOT CONTINUE",
             "",
             f"Problem: {self}",
-            f"FedLeave version: {__version__}",
+            f"Use or Lose version: {__version__}",
             f"Platform: {platform.system()} {platform.release()}",
         ]
         if input_path is not None:
@@ -42,7 +42,7 @@ class WmsImportError(ValueError):
         lines.extend(
             [
                 "",
-                "Please report this WMS format to FedLeave:",
+                "Please report this WMS format to Use or Lose:",
                 f"1. Open {WMS_SUPPORT_URL}",
                 "2. Copy and paste this complete diagnostic into the issue.",
                 "3. Attach the original WMS HTML report so the importer can be updated.",
@@ -80,7 +80,7 @@ class WmsImportReport:
 
 @dataclass(frozen=True)
 class _WmsRule:
-    """Map a WMS leave code to FedLeave category and direction values."""
+    """Map a WMS leave code to Use or Lose category and direction values."""
 
     category: str
     direction: str

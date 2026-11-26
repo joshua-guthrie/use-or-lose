@@ -1,4 +1,4 @@
-"""Build the analytics GUI and load normalized data from the FedLeave CLI."""
+"""Build the analytics GUI and load normalized data from the Use or Lose CLI."""
 
 from __future__ import annotations
 
@@ -334,7 +334,7 @@ class AnalyticsWindow(QMainWindow):
         self._default_notice_text = "No data loaded yet."
         self._closing = False
 
-        self.setWindowTitle("FedLeave Analytics")
+        self.setWindowTitle("Use or Lose Analytics")
         self.resize(1320, 860)
         font = self.font()
         font.setPointSize(font_size)
@@ -645,7 +645,7 @@ class AnalyticsWindow(QMainWindow):
         self.notice_label.setText("Data could not be loaded. The tables below are not current.")
         QMessageBox.critical(
             self,
-            "FedLeave Analytics",
+            "Use or Lose Analytics",
             f"Could not load analytics data for leave year {self.year}.\n\n{message}",
         )
 
@@ -964,7 +964,7 @@ class AnalyticsWindow(QMainWindow):
         slug: str,
     ) -> None:
         clean_slug = re.sub(r"[^a-z0-9]+", "-", slug.lower()).strip("-")
-        base_name = f"fedleave-{clean_slug}-{self.data['year'] if self.data else self.year}"
+        base_name = f"use-or-lose-{clean_slug}-{self.data['year'] if self.data else self.year}"
         data_dir = get_default_data_dir(Path(self.data_dir).expanduser() if self.data_dir else None)
         window = AnalyticsChartWindow(
             title,
@@ -1146,7 +1146,7 @@ class AnalyticsWindow(QMainWindow):
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        description="Read-only FedLeave seasonality and lifecycle analytics.",
+        description="Read-only Use or Lose seasonality and lifecycle analytics.",
         epilog=HELP_EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )

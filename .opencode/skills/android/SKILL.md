@@ -1,9 +1,9 @@
 ---
 name: android
-description: FedLeave Android app development. Use when working on the android/ directory, Gradle or Android SDK commands, Kotlin/Compose screens, the Chaquopy Python bridge, the app-private JSON store, or Android milestones I01-I20 and their QA/review/passdown flow.
+description: Use or Lose Android app development. Use when working on the android/ directory, Gradle or Android SDK commands, Kotlin/Compose screens, the Chaquopy Python bridge, the app-private JSON store, or Android milestones I01-I20 and their QA/review/passdown flow.
 ---
 
-# FedLeave Android development
+# Use or Lose Android development
 
 ## Toolchain on this machine
 

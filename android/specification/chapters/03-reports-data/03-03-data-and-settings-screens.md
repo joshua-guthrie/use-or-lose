@@ -24,7 +24,7 @@ Settings groups week and display preferences, leave-year maintenance, holiday an
 
 ## Manual payroll review
 
-This workflow is for correcting or marking one existing ledger entry as verified after you compare it with a timecard or pay statement you have open elsewhere. You read the payroll record yourself and type the verified hours. The app uses only the entries already saved in FedLeave. It does not import statements, find payroll discrepancies automatically, or reconcile an entire pay period.
+This workflow is for correcting or marking one existing ledger entry as verified after you compare it with a timecard or pay statement you have open elsewhere. You read the payroll record yourself and type the verified hours. The app uses only the entries already saved in Use or Lose. It does not import statements, find payroll discrepancies automatically, or reconcile an entire pay period.
 
 ![Choose a stored transaction and review the manually entered change](../../artwork/mockups/settings-reconcile.png)
 

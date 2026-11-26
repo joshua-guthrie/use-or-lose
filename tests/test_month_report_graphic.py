@@ -150,7 +150,7 @@ def test_windows_executable_detection_rejects_extensionless_binary(monkeypatch, 
 def test_render_svg_omits_private_transaction_fields_and_zero_values():
     svg = render_svg(_report_data(), 1920)
 
-    assert "FedLeave Month Report - July 2026" in svg
+    assert "Use or Lose Month Report - July 2026" in svg
     assert ">A<" in svg
     assert ">-2<" in svg
     assert "Private appointment" not in svg

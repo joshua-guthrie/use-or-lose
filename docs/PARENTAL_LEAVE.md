@@ -1,6 +1,6 @@
 # Paid Parental Leave and FMLA tracking
 
-FedLeave records employee-entered and agency-confirmed information. A displayed
+Use or Lose records employee-entered and agency-confirmed information. A displayed
 amount does not establish eligibility, approval, qualifying service, or an
 intermittent-use agreement. Check those with the agency. The application does
 not track a return-to-work service obligation or separation dates.

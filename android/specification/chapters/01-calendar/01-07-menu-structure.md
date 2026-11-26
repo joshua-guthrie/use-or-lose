@@ -2,7 +2,7 @@
 
 Use these screens for the owner's navigation review. The Reports entry point and direct Calendar Share are decided. The owner approved these labels, routes, and Back behavior on November 23, 2026; see [checkpoint 29](../../passdowns/29-menu-review-approval.md).
 
-Open FedLeave on **Calendar**. The bottom bar reads **Calendar · Reports · Settings** in that order. **Reports is where you go for all analytics.** Tap **Reports** at the bottom and choose the chart or report you want. Tap **Settings** at the bottom for preferences, leave-year maintenance, backups, and Help. The upper-left **Menu** is a short list of Calendar commands. The upper-right **Share calendar PDF** button acts on the month shown in Calendar.
+Open Use or Lose on **Calendar**. The bottom bar reads **Calendar · Reports · Settings** in that order. **Reports is where you go for all analytics.** Tap **Reports** at the bottom and choose the chart or report you want. Tap **Settings** at the bottom for preferences, leave-year maintenance, backups, and Help. The upper-left **Menu** is a short list of Calendar commands. The upper-right **Share calendar PDF** button acts on the month shown in Calendar.
 
 | From the Calendar main screen | What opens |
 | --- | --- |
@@ -55,13 +55,13 @@ For a plotted report, tap its chart to open the full-screen view. Back returns t
 | **Accounting and leave years** | **Leave years**, **Accounting settings**, **Leave-year maintenance**, **Expiring leave**, **Paid parental leave**, and **FMLA tracking**. |
 | **Holidays and reminders** | **Holidays** for the local holiday list and offline regeneration, and **Expiration reminders** for reminder thresholds. |
 | **Data and backups** | **Share backup**, **Restore backup**, and **Check data**. Check data links to carryover review and specific recovery or repair when applicable. |
-| **Help and about** | Opens the offline **Help** index. Choose **Set up a leave year**, **Record or correct leave**, **Share or restore a backup**, **Leave abbreviations**, **Calendar date markers**, or **About FedLeave**. |
+| **Help and about** | Opens the offline **Help** index. Choose **Set up a leave year**, **Record or correct leave**, **Share or restore a backup**, **Leave abbreviations**, **Calendar date markers**, or **About Use or Lose**. |
 
 ![Expanded Settings sections showing the Accounting and leave years and Holidays and reminders lists](../../artwork/mockups/settings-navigation.png)
 
 **Leave years** opens the year chooser and setup. Choosing an existing year explicitly goes to Calendar in that year and keeps the balance cutoff. **Accounting settings** opens the work tour, increment, accrual defaults and rules. **Leave-year maintenance** has **Correct opening balance**, **Force Balance**, **Change accrual**, and **Annual use or lose**. **Expiring leave** links to lot details and approved extensions.
 
-To look up a date symbol, tap **Calendar → Settings → Help and about → Calendar date markers**. The Help article shows each symbol beside its meaning. Back returns to Help, then to Settings. **About FedLeave** shows the version and project website. [Settings screen details](../03-reports-data/03-03-data-and-settings-screens.md) · [Date markers Help mockup](../../artwork/mockups/settings-calendar-markers-help.png)
+To look up a date symbol, tap **Calendar → Settings → Help and about → Calendar date markers**. The Help article shows each symbol beside its meaning. Back returns to Help, then to Settings. **About Use or Lose** shows the version and project website. [Settings screen details](../03-reports-data/03-03-data-and-settings-screens.md) · [Date markers Help mockup](../../artwork/mockups/settings-calendar-markers-help.png)
 
 ## Navigation behavior for review
 

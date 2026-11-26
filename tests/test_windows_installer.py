@@ -97,7 +97,7 @@ def test_windows_unattended_install_skips_prompt_when_already_elevated(tmp_path,
 def test_windows_helper_installs_bundle_and_creates_both_shortcuts(tmp_path, monkeypatch):
     module = _load_module("windows_install_helper", HELPER_PATH)
     source = tmp_path / "dist" / "fedleave-Windows"
-    calendar = source / "FedLeaveCalendar.exe"
+    calendar = source / "UseOrLoseCalendar.exe"
     calendar.parent.mkdir(parents=True)
     calendar.write_bytes(b"calendar")
     (source / "fedleave.exe").write_bytes(b"backend")
@@ -106,7 +106,7 @@ def test_windows_helper_installs_bundle_and_creates_both_shortcuts(tmp_path, mon
     target.mkdir(parents=True)
     (target / "old.txt").write_text("old", encoding="utf-8")
     desktop = tmp_path / "Public" / "Desktop"
-    start_menu = tmp_path / "ProgramData" / "Start Menu" / "FedLeave"
+    start_menu = tmp_path / "ProgramData" / "Start Menu" / "Use or Lose"
     shortcuts: list[tuple[Path, Path, Path]] = []
     monkeypatch.setattr(
         module,
@@ -116,14 +116,14 @@ def test_windows_helper_installs_bundle_and_creates_both_shortcuts(tmp_path, mon
 
     module.install_system(source, target, desktop, start_menu)
 
-    installed_calendar = target / "FedLeaveCalendar.exe"
+    installed_calendar = target / "UseOrLoseCalendar.exe"
     assert installed_calendar.read_bytes() == b"calendar"
     assert (target / "fedleave.exe").read_bytes() == b"backend"
     assert not (target / "old.txt").exists()
     assert not target.with_name("fedleave.previous").exists()
     assert shortcuts == [
-        (desktop / "FedLeave Calendar.lnk", installed_calendar, installed_calendar.parent),
-        (start_menu / "FedLeave Calendar.lnk", installed_calendar, installed_calendar.parent),
+        (desktop / "Use or Lose Calendar.lnk", installed_calendar, installed_calendar.parent),
+        (start_menu / "Use or Lose Calendar.lnk", installed_calendar, installed_calendar.parent),
     ]
 
 

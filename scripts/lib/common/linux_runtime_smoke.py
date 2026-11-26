@@ -1,7 +1,7 @@
 """Launch the released CLI, Calendar and Analytics on an independent Linux host.
 
 Only standard library modules are used so the test container need not install
-FedLeave or Qt. Every application uses the extracted archive's own runtime.
+Use or Lose or Qt. Every application uses the extracted archive's own runtime.
 """
 
 from __future__ import annotations
@@ -58,9 +58,9 @@ def smoke(bundle: Path) -> None:
             }
 
         before = hashes()
-        for application in ("FedLeaveCalendar", "FedLeaveAnalytics"):
+        for application in ("UseOrLoseCalendar", "UseOrLoseAnalytics"):
             command = [bundle / application, "--smoke-test", "--backend", cli, "--data-dir", data]
-            if application == "FedLeaveAnalytics":
+            if application == "UseOrLoseAnalytics":
                 command += ["--year", today.year]
             run(command)
         if hashes() != before:
@@ -70,7 +70,7 @@ def smoke(bundle: Path) -> None:
 
 def release_archive(artifact_dir: Path) -> Path:
     """Uploads with multiple roots preserve artifacts/ inside the downloaded zip."""
-    archives = sorted(artifact_dir.rglob("FedLeave-*-Linux-x86_64.tar.gz"))
+    archives = sorted(artifact_dir.rglob("UseOrLose-*-Linux-x86_64.tar.gz"))
     if len(archives) != 1:
         raise RuntimeError(f"Expected exactly one Linux archive under {artifact_dir}; found {len(archives)}")
     return archives[0]
@@ -88,4 +88,4 @@ if __name__ == "__main__":
         archive = release_archive(options.archive_dir.resolve())
         with tempfile.TemporaryDirectory(prefix="fedleave-extracted-") as folder:
             subprocess.run(["tar", "-xzf", str(archive), "-C", folder], check=True)
-            smoke(Path(folder) / "FedLeave")
+            smoke(Path(folder) / "UseOrLose")

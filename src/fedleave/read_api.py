@@ -1,4 +1,4 @@
-"""Versioned read-only facade over canonical FedLeave store files.
+"""Versioned read-only facade over canonical Use or Lose store files.
 
 Every function takes a complete snapshot of parsed store files, an explicit
 request, and an explicit local date. The facade never opens paths, locks,

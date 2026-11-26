@@ -11,7 +11,7 @@ mode = "console"
 hidden_imports = ["fedleave.cli", "mcp.server.lowlevel", "mcp.server.stdio", "portalocker"]
 collect_all = ["mcp", "mcp_types", "jsonschema_specifications", "portalocker"]
 
-[FedLeaveCalendar]
+[UseOrLoseCalendar]
 mode = "windowed"
 icon = "assets/fedleave-icon.ico"
 add_data = ["help:help", "assets:assets"]
@@ -24,7 +24,7 @@ hidden_imports = [
   "shiboken6.Shiboken",
 ]
 
-[FedLeaveAnalytics]
+[UseOrLoseAnalytics]
 mode = "windowed"
 icon = "assets/fedleave-icon.ico"
 hidden_imports = ["PySide6.QtCore", "PySide6.QtGui", "PySide6.QtWidgets", "PySide6.QtPrintSupport", "shiboken6", "shiboken6.Shiboken"]

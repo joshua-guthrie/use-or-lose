@@ -1,4 +1,4 @@
-"""Build, validate, install, repair, and remove FedLeave application suites.
+"""Build, validate, install, repair, and remove Use or Lose application suites.
 
 Platform entry scripts normalize their environment and delegate here so Linux
 and Windows share target discovery, PyInstaller configuration, and lifecycle
@@ -674,7 +674,7 @@ class InstallerEngine:
     def _confirm_windows_install(self) -> bool:
         try:
             response = input(
-                "Build complete. Install FedLeave in C:\\Program Files\\fedleave "
+                "Build complete. Install Use or Lose in C:\\Program Files\\fedleave "
                 "and create Desktop and Start Menu shortcuts? [y/N]: "
             )
         except EOFError:

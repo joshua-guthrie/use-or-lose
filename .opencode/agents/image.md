@@ -1,5 +1,5 @@
 ---
-description: Image inspection for FedLeave. Spawn whenever a visual comparison is required: annotated mockups vs app screenshots, evidence PNGs, chart or report renders. Reads images and reports differences in text.
+description: Image inspection for Use or Lose. Spawn whenever a visual comparison is required: annotated mockups vs app screenshots, evidence PNGs, chart or report renders. Reads images and reports differences in text.
 mode: all
 model: deepseek/deepseek-flash
 variant: max

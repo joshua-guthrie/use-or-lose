@@ -1,4 +1,4 @@
-"""Initialize, validate, import, export, and describe FedLeave data stores."""
+"""Initialize, validate, import, export, and describe Use or Lose data stores."""
 
 from __future__ import annotations
 
@@ -355,7 +355,7 @@ def _report_import(plan: ImportPlan, json_output: bool, *, preview: bool) -> Non
                 console.print(f"{change['action']}: {change['file']}", markup=False)
             console.print(f"Preview fingerprint: {plan.preview_fingerprint}")
         elif not plan.conflicts:
-            console.print("Imported FedLeave data." if plan.writes else "FedLeave data is already up to date.")
+            console.print("Imported Use or Lose data." if plan.writes else "Use or Lose data is already up to date.")
 
     if plan.conflicts:
         raise typer.Exit(2)

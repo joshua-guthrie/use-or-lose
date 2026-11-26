@@ -1,6 +1,6 @@
-# FedLeave for Android
+# Use or Lose for Android
 
-The phone app for FedLeave. It shares the desktop accounting core, keeps its working data in private desktop-compatible JSON, and reaches reports through native Compose screens. This directory is the Android Gradle root and the home of the phone specification, implementation briefs, fixtures and evidence.
+The phone app for Use or Lose. It shares the desktop accounting core, keeps its working data in private desktop-compatible JSON, and reaches reports through native Compose screens. This directory is the Android Gradle root and the home of the phone specification, implementation briefs, fixtures and evidence.
 
 ## Status
 

@@ -50,7 +50,7 @@ def _fake_bundle(module, root: Path, platform: str = "linux") -> Path:
 
 def _rolling_linux_assets(module, bundle: Path, artifacts: Path, version: str) -> None:
     archive, checksum = module.create_linux_archive(bundle, artifacts, version)
-    rolling_archive = artifacts / "FedLeave-Latest-Linux-x86_64.tar.gz"
+    rolling_archive = artifacts / "UseOrLose-Latest-Linux-x86_64.tar.gz"
     archive.replace(rolling_archive)
     checksum.unlink()
     module.write_checksum(rolling_archive)
@@ -148,7 +148,7 @@ def test_linux_publication_requires_pinned_build_abi_audit_and_independent_runti
 
 
 @pytest.mark.parametrize(
-    "relative", ["FedLeave-test-Linux-x86_64.tar.gz", "artifacts/FedLeave-test-Linux-x86_64.tar.gz"]
+    "relative", ["UseOrLose-test-Linux-x86_64.tar.gz", "artifacts/UseOrLose-test-Linux-x86_64.tar.gz"]
 )
 def test_runtime_smoke_discovers_flat_and_preserved_artifact_layouts(tmp_path, relative):
     spec = importlib.util.spec_from_file_location(
@@ -162,7 +162,7 @@ def test_runtime_smoke_discovers_flat_and_preserved_artifact_layouts(tmp_path, r
     archive.parent.mkdir(parents=True, exist_ok=True)
     archive.write_bytes(b"fixture")
     assert module.release_archive(tmp_path) == archive
-    (tmp_path / "FedLeave-other-Linux-x86_64.tar.gz").write_bytes(b"fixture")
+    (tmp_path / "UseOrLose-other-Linux-x86_64.tar.gz").write_bytes(b"fixture")
     with pytest.raises(RuntimeError, match="found 2"):
         module.release_archive(tmp_path)
 
@@ -177,10 +177,10 @@ def test_linux_archive_has_stable_root_and_matching_checksum(tmp_path: Path) -> 
         names = handle.getnames()
         assert all(member.uid == member.gid == 0 for member in handle)
         assert all(not member.mode & 0o6022 for member in handle if not member.issym())
-        version_file = handle.extractfile("FedLeave/VERSION")
+        version_file = handle.extractfile("UseOrLose/VERSION")
         version = version_file.read() if version_file is not None else None
-    assert names[0] == "FedLeave"
-    assert "FedLeave/fedleave" in names
+    assert names[0] == "UseOrLose"
+    assert "UseOrLose/fedleave" in names
     assert version == b"0.2.0\n"
     digest = hashlib.sha256(archive.read_bytes()).hexdigest()
     assert checksum.read_text(encoding="utf-8") == f"{digest}  {archive.name}\n"
@@ -204,10 +204,10 @@ def test_distribution_workflow_publishes_only_master_to_rolling_channel() -> Non
     assert "\n    tags:\n" not in workflow
     assert 'check-size "$archive" --max-mib 300' in workflow
     for asset_name in (
-        "FedLeave-Setup-Latest-Windows-x64.exe",
-        "FedLeave-Setup-Latest-Windows-x64.exe.sha256",
-        "FedLeave-Latest-Linux-x86_64.tar.gz",
-        "FedLeave-Latest-Linux-x86_64.tar.gz.sha256",
+        "UseOrLose-Setup-Latest-Windows-x64.exe",
+        "UseOrLose-Setup-Latest-Windows-x64.exe.sha256",
+        "UseOrLose-Latest-Linux-x86_64.tar.gz",
+        "UseOrLose-Latest-Linux-x86_64.tar.gz.sha256",
         "install.sh",
     ):
         assert asset_name in workflow
@@ -222,8 +222,8 @@ def test_large_committed_installer_mirrors_use_git_lfs() -> None:
     attributes = (ROOT / ".gitattributes").read_text(encoding="utf-8")
 
     for artifact in (
-        "installers/FedLeave-Setup-Latest-Windows-x64.exe",
-        "installers/FedLeave-Latest-Linux-x86_64.tar.gz",
+        "installers/UseOrLose-Setup-Latest-Windows-x64.exe",
+        "installers/UseOrLose-Latest-Linux-x86_64.tar.gz",
     ):
         assert f"{artifact} filter=lfs diff=lfs merge=lfs -text" in attributes
 
@@ -318,7 +318,7 @@ def test_bootstrap_installs_local_verified_release_without_python(tmp_path: Path
     assert result.returncode == 0, result.stderr or result.stdout
     assert (install_root / "current").is_symlink()
     assert (bin_dir / "fedleave").is_symlink()
-    assert (bin_dir / "FedLeaveCalendar").is_symlink()
+    assert (bin_dir / "UseOrLoseCalendar").is_symlink()
     assert (install_root / "releases" / "0.2.0" / "fedleave").is_file()
 
 
@@ -355,7 +355,7 @@ def test_bootstrap_migrates_legacy_fedleave_command_wrappers(tmp_path: Path) -> 
     )
 
     assert result.returncode == 0, result.stderr or result.stdout
-    assert "Migrating legacy FedLeave command wrapper" in result.stdout
+    assert "Migrating legacy Use or Lose command wrapper" in result.stdout
     assert legacy_wrapper.is_symlink()
     assert legacy_wrapper.readlink() == install_root / "current" / "fedleave"
 
@@ -391,7 +391,7 @@ def test_bootstrap_preserves_unrelated_regular_commands(tmp_path: Path) -> None:
     )
 
     assert result.returncode != 0
-    assert "not owned by FedLeave" in result.stderr
+    assert "not owned by Use or Lose" in result.stderr
     assert unrelated.read_text(encoding="utf-8") == original
 
 
@@ -401,7 +401,7 @@ def test_bootstrap_checksum_failure_does_not_create_install_root(tmp_path: Path)
     bundle = _fake_bundle(module, tmp_path / "bundle")
     artifacts = tmp_path / "assets"
     _rolling_linux_assets(module, bundle, artifacts, "0.2.0")
-    archive = artifacts / "FedLeave-Latest-Linux-x86_64.tar.gz"
+    archive = artifacts / "UseOrLose-Latest-Linux-x86_64.tar.gz"
     checksum = archive.with_name(archive.name + ".sha256")
     checksum.write_text(f"{'0' * 64}  {archive.name}\n", encoding="utf-8")
     install_root = tmp_path / "must-not-exist"

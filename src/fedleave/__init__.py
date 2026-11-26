@@ -1,4 +1,4 @@
-"""Expose the FedLeave version and embedded source-build identity."""
+"""Expose the Use or Lose version and embedded source-build identity."""
 
 from __future__ import annotations
 

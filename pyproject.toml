@@ -68,8 +68,8 @@ TravelCompYearlyComparison = "yearly_leave_comparison_chart.travel_comp:main"
 TimeOffAwardYearlyComparison = "yearly_leave_comparison_chart.time_off_award:main"
 OvertimeYearlyComparison = "yearly_leave_comparison_chart.overtime:main"
 fedleaveMonthReportGraphic = "fedleave_month_report_graphic.__main__:main"
-FedLeaveCalendar = "fedleave_gui.__main__:main"
-FedLeaveAnalytics = "fedleave_analytics.app:main"
+UseOrLoseCalendar = "fedleave_gui.__main__:main"
+UseOrLoseAnalytics = "fedleave_analytics.app:main"
 
 [build-system]
 requires = ["setuptools>=84.1.0", "wheel>=0.46.2"]

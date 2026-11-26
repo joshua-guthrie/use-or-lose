@@ -25,7 +25,7 @@ class SetupVisualCaptureTest : CalendarUiTestBase() {
 
     private fun waitForWelcome() {
         composeRule.waitUntil(timeoutMillis = 30_000) {
-            composeRule.onAllNodesWithText("Welcome to FedLeave").fetchSemanticsNodes().isNotEmpty()
+            composeRule.onAllNodesWithText("Welcome to Use or Lose").fetchSemanticsNodes().isNotEmpty()
         }
     }
 

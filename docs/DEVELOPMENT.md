@@ -1,6 +1,6 @@
 # Development
 
-FedLeave supports Python 3.11 and later. Create and activate a virtual
+Use or Lose supports Python 3.11 and later. Create and activate a virtual
 environment, then install the single authoritative development extra:
 
 ```bash

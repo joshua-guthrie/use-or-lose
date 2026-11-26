@@ -33,7 +33,7 @@ class SetupFlowTest : CalendarUiTestBase() {
 
     private fun waitForWelcome() {
         composeRule.waitUntil(timeoutMillis = 30_000) {
-            composeRule.onAllNodesWithText("Welcome to FedLeave").fetchSemanticsNodes().isNotEmpty()
+            composeRule.onAllNodesWithText("Welcome to Use or Lose").fetchSemanticsNodes().isNotEmpty()
         }
     }
 
@@ -67,7 +67,7 @@ class SetupFlowTest : CalendarUiTestBase() {
         waitForWelcome()
         composeRule.onNodeWithTag("welcome_setup").performClick()
         composeRule.onNodeWithText("Cancel").performClick()
-        composeRule.onNodeWithText("Welcome to FedLeave").assertIsDisplayed()
+        composeRule.onNodeWithText("Welcome to Use or Lose").assertIsDisplayed()
         // The store is still empty: reopening setup works.
         composeRule.onNodeWithTag("welcome_setup").performClick()
         composeRule.onNodeWithText("Set up leave year").assertIsDisplayed()

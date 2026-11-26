@@ -66,8 +66,8 @@ def test_tools_menu_hides_internal_data_folder(monkeypatch):
         "Expiring Leave Status...",
         "Reconcile Carryover...",
         "Validate Data",
-        "Export FedLeave Data...",
-        "Import FedLeave Data...",
+        "Export Use or Lose Data...",
+        "Import Use or Lose Data...",
         "Import From External App",
     ]
     assert "Open Preferences Folder" not in labels
@@ -100,7 +100,7 @@ def test_analytics_view_action_launches_companion_with_current_context(monkeypat
     window = MainWindow()
     window.year = 2027
     backend_path = tmp_path / "fedleave"
-    analytics_path = tmp_path / "FedLeaveAnalytics"
+    analytics_path = tmp_path / "UseOrLoseAnalytics"
     calls = []
     monkeypatch.setattr(window.backend, "executable_path", lambda: backend_path)
     monkeypatch.setattr("fedleave_gui.main_window.find_analytics", lambda: analytics_path)
@@ -132,7 +132,7 @@ def test_analytics_view_action_passes_resolved_default_data_directory(monkeypatc
     monkeypatch.setattr("fedleave_gui.main_window.get_default_data_dir", lambda _data_dir=None: tmp_path / "data")
     window = MainWindow()
     backend_path = tmp_path / "fedleave"
-    analytics_path = tmp_path / "FedLeaveAnalytics"
+    analytics_path = tmp_path / "UseOrLoseAnalytics"
     calls = []
     monkeypatch.setattr(window.backend, "executable_path", lambda: backend_path)
     monkeypatch.setattr("fedleave_gui.main_window.find_analytics", lambda: analytics_path)
@@ -155,7 +155,7 @@ def test_planning_menu_launches_existing_analytics_with_exact_context(monkeypatc
     )
     window = MainWindow()
     window.year = 2026
-    backend, analytics = tmp_path / "selected backend", tmp_path / "FedLeaveAnalytics"
+    backend, analytics = tmp_path / "selected backend", tmp_path / "UseOrLoseAnalytics"
     calls = []
     monkeypatch.setattr(window.backend, "executable_path", lambda: backend)
     monkeypatch.setattr("fedleave_gui.main_window.find_analytics", lambda: analytics)
@@ -668,7 +668,7 @@ def test_help_menu_hides_backend_about_action(monkeypatch):
         "Leave Abbreviations",
         "Official Project Website",
         "Check for Updates...",
-        "About FedLeave Calendar",
+        "About Use or Lose Calendar",
     ]
 
 

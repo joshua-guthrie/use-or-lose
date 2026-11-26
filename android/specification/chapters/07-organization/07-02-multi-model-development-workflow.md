@@ -1,6 +1,6 @@
 # Chapter 07.02 · Multi-model development workflow
 
-The orchestrator supports the people and models building FedLeave. The [Android product specification](../../specification.md), [QA gates](../05-quality/05-02-quality-gates.md) and [repository working rules](../../../../AGENTS.md) govern the work.
+The orchestrator supports the people and models building Use or Lose. The [Android product specification](../../specification.md), [QA gates](../05-quality/05-02-quality-gates.md) and [repository working rules](../../../../AGENTS.md) govern the work.
 
 ## Roles and delegation
 
@@ -16,7 +16,7 @@ The orchestrator supports the people and models building FedLeave. The [Android 
 | Class | Examples and eligibility |
 | --- | --- |
 | R0 | Mechanical edits to authorized implementation files. Reuse existing decisions. A brief can cite the rule and record why a separate design is unnecessary. |
-| R1 | An isolated component, display adapter, or pure helper within an approved interface. Eligible for the first live FedLeave trial following the offline and provider gates. |
+| R1 | An isolated component, display adapter, or pure helper within an approved interface. Eligible for the first live Use or Lose trial following the offline and provider gates. |
 | R2 | Bridge integration, cross-screen state ownership, concurrency, or a data adapter with broader callers. Require integration and recovery cases, an approved detailed design, and explicit admission by the design owner. Keep exploratory work such as I02 under the design owner. |
 | R3 | Shared accounting and leave-policy semantics, canonical writes or migrations, backup and restore, security policy, installer publication, and signing. Keep these Sol-led through the pilot. Any later delegation requires explicit owner approval for that task and enhanced independent review. |
 

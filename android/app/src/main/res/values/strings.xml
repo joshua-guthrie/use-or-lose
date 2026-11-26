@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">FedLeave</string>
+    <string name="app_name">Use or Lose</string>
 
     <!-- Calendar main screen -->
     <string name="calendar_title">Calendar</string>
@@ -28,7 +28,7 @@
         <item quantity="other">%1$d balances</item>
     </plurals>
     <string name="balances_unavailable_title">Balance unavailable</string>
-    <string name="balances_unavailable_body">FedLeave could not read this date\'s leave year.</string>
+    <string name="balances_unavailable_body">Use or Lose could not read this date\'s leave year.</string>
     <string name="balances_retry">Retry</string>
     <string name="balances_projected_note">Includes dated leave and accruals through %1$s.</string>
     <string name="period_card">Pay period %1$d \u00b7 Details %2$s</string>
@@ -44,10 +44,10 @@
     <string name="next_month">Next month</string>
 
     <!-- Leave-year setup -->
-    <string name="welcome_title">Welcome to FedLeave</string>
+    <string name="welcome_title">Welcome to Use or Lose</string>
     <string name="welcome_subtitle">Set up a leave year to start recording leave.</string>
     <string name="welcome_restore_card">Restore existing leave</string>
-    <string name="welcome_restore_body">Use a FedLeave backup from your computer or previous phone.</string>
+    <string name="welcome_restore_body">Use a Use or Lose backup from your computer or previous phone.</string>
     <string name="welcome_restore">Restore backup</string>
     <string name="restore_placeholder_note">Restore backup comes in a later build.</string>
     <string name="welcome_setup">Set up leave year</string>

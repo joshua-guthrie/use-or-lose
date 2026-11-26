@@ -1,6 +1,6 @@
 # Chapter 07.04 · Orchestrator execution
 
-Implement a deterministic, local Python CLI separate from the Android app and the FedLeave ledger CLI. The initial target is Linux using one task at a time. Record the supported Python and Git versions and the actual isolation backend in the pilot brief before implementation. Mock mode uses local fixtures and needs no external service or Android tooling. [Staged delivery](../06-delivery/06-03-orchestrator-pilot-milestones.md)
+Implement a deterministic, local Python CLI separate from the Android app and the Use or Lose ledger CLI. The initial target is Linux using one task at a time. Record the supported Python and Git versions and the actual isolation backend in the pilot brief before implementation. Mock mode uses local fixtures and needs no external service or Android tooling. [Staged delivery](../06-delivery/06-03-orchestrator-pilot-milestones.md)
 
 ## Trusted settings and task manifest
 

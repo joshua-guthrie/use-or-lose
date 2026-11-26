@@ -175,7 +175,7 @@ async def smoke(command: str, args: list[str], expected_names=None, *, restricte
             }
             subprocess.run(
                 [
-                    str(sibling / ("FedLeaveAnalytics" + suffix)),
+                    str(sibling / ("UseOrLoseAnalytics" + suffix)),
                     "--smoke-test",
                     "--backend",
                     str(sibling / ("fedleave" + suffix)),

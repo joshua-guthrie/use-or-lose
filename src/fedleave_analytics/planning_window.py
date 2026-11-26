@@ -47,7 +47,7 @@ class PlanningWindow(QMainWindow):
         self._closing = False
 
         self.help_section_name = TOOL
-        self.setWindowTitle(f"FedLeave {TITLE}")
+        self.setWindowTitle(f"Use or Lose {TITLE}")
         self.resize(1320, 860)
         font = self.font()
         font.setPointSize(font_size)

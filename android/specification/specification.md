@@ -1,4 +1,4 @@
-# FedLeave Android specification
+# Use or Lose Android specification
 
 ## Specification revisions
 
@@ -8,10 +8,11 @@ Each change updates the governing chapter, mockup annotation, parity row and acc
 | --- | --- | --- | --- |
 | 1.0 | November 23, 2026 | Approved baseline: menu review, Calendar main screen, implementation approval through I06. | Owner approvals through checkpoint 31 |
 | 1.1 | November 24, 2026 | Calendar grid revision: the day cells fill the space between the month selector and the bottom bar with one uniform cell height computed per device; the grid keeps its base font size regardless of the system font scale; the full-width day list becomes a manual **Full list** mode opened by a small control above the bottom bar (the automatic large-text switch is removed; the automatic narrow-width switch stays); the grid scrolls instead of clipping when a row cannot fit. | Owner review, November 24, 2026 |
+| 1.2 | November 25, 2026 | Product rename: the application is **Use or Lose** (spelled "Lose"). All user-visible branding changes from FedLeave: Android app label and screen wordmarks, the desktop windows and dialogs, the CLI banners, the PDF report title, and the mockup boards. Internal identifiers stay: the `fedleave` CLI command, the Python package name, the `com.westmouthbay.fedleave` app ID, the app-private data directory, and the `use-or-lose-YYYY-MM.pdf` share filename (updated from `fedleave-YYYY-MM.pdf` to match the renamed product). | Owner decision, November 25, 2026 |
 
 ## Product and reference build
 
-FedLeave for Android brings the desktop leave-accounting workflows in scope for the first release to a phone. The user can check a balance, inspect the calendar, and manage leave locally. The phone interface uses Android's Sharesheet for user-initiated sharing of reports, images, and compatible backups.
+Use or Lose for Android brings the desktop leave-accounting workflows in scope for the first release to a phone. The user can check a balance, inspect the calendar, and manage leave locally. The phone interface uses Android's Sharesheet for user-initiated sharing of reports, images, and compatible backups.
 
 The approved [specification plan](planning/specification-plan.md) sets the scope and review milestones. Each parity row identifies the desktop behavior, the Android surface, and the acceptance case that will prove it.
 
@@ -49,6 +50,6 @@ Use the [feature parity matrix](verification/feature-parity.md) to trace a deskt
 ## Decisions carried into the first release
 
 - Use Kotlin and Compose with Material 3 as the starting stack. Scope the first release using the [GitHub issue decisions](planning/specification-plan.md#github-issues-reflected-in-this-draft). The What-if Planner is deferred. Android's interface and help use app language, and MCP and AI are outside the Android scope.
-- Keep the phone's working datastore in private, desktop-compatible JSON. A user opens the system file picker to restore a compatible FedLeave backup. Use the Sharesheet for backups and reports. Calendar Share automatically generates the desktop-equivalent month PDF and hands it off as an attachment. Printing is outside Android scope.
+- Keep the phone's working datastore in private, desktop-compatible JSON. A user opens the system file picker to restore a compatible Use or Lose backup. Use the Sharesheet for backups and reports. Calendar Share automatically generates the desktop-equivalent month PDF and hands it off as an attachment. Printing is outside Android scope.
 - Use one Calendar balance panel for today, any selected date, and a pay-period closing date. Show future balances as projections. The [Calendar section](chapters/01-calendar/01-02-balances.md) defines the first slice and the decisions that still need review.
 - Present effective leave entries the same way on every date. Use the date, leave type, direction and hours in Calendar, forms, transaction history, report tables, charts, shared graphics and TalkBack. Retain compatible stored statuses for accounting and interoperability. [Dated entry rules](chapters/02-ledger/02-01-ledger-and-leave-years.md#edit-and-review-leave)

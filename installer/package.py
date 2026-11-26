@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Create and validate FedLeave release artifacts.
+"""Create and validate Use or Lose release artifacts.
 
 The project version and executable list are read from pyproject.toml so the
 Windows installer, Linux archive, and CI workflow cannot drift independently.
@@ -196,10 +196,10 @@ def create_linux_archive(bundle_dir: Path, output_dir: Path, version: str) -> tu
     if not SAFE_VERSION.fullmatch(version):
         raise PackagingError(f"Version is unsafe for artifact filenames: {version!r}")
     output_dir.mkdir(parents=True, exist_ok=True)
-    archive = output_dir / f"FedLeave-{version}-Linux-x86_64.tar.gz"
+    archive = output_dir / f"UseOrLose-{version}-Linux-x86_64.tar.gz"
     pending_archive = archive.with_name(archive.name + ".tmp")
     pending_archive.unlink(missing_ok=True)
-    # "FedLeave" is intentionally version independent. The bootstrap installer
+    # "UseOrLose" is intentionally version independent. The bootstrap installer
     # supplies the versioned /opt destination after checksum verification.
     try:
         with tarfile.open(pending_archive, "w:gz", format=tarfile.PAX_FORMAT, dereference=False) as tar:
@@ -210,9 +210,9 @@ def create_linux_archive(bundle_dir: Path, output_dir: Path, version: str) -> tu
                 member.mode &= ~0o6022
                 return member
 
-            tar.add(bundle_dir, arcname="FedLeave", recursive=True, filter=release_metadata)
+            tar.add(bundle_dir, arcname="UseOrLose", recursive=True, filter=release_metadata)
             version_bytes = f"{version}\n".encode()
-            version_info = tarfile.TarInfo("FedLeave/VERSION")
+            version_info = tarfile.TarInfo("UseOrLose/VERSION")
             version_info.size = len(version_bytes)
             version_info.mode = 0o644
             tar.addfile(version_info, io.BytesIO(version_bytes))

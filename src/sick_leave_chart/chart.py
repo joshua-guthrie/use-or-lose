@@ -89,7 +89,7 @@ Error: fedleave application not found.
 
 The SickLeaveChartForTheYear application requires fedleave to be installed.
 
-Install the current FedLeave suite and keep its companion applications together.
+Install the current Use or Lose suite and keep its companion applications together.
 
 Searched:
 {details}

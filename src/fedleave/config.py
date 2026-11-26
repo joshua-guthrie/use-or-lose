@@ -1,4 +1,4 @@
-"""Define persisted configuration schemas and initialize a FedLeave data store.
+"""Define persisted configuration schemas and initialize a Use or Lose data store.
 
 Pydantic models describe the JSON shape while initialization coordinates the
 configuration, leave-year ledger, pay periods, accruals, and holiday cache.

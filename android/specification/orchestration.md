@@ -1,4 +1,4 @@
-# FedLeave Android development orchestration
+# Use or Lose Android development orchestration
 
 The orchestrator is a proposed local development tool for testing bounded coding delegation. The [Android product specification](specification.md) defines what ships on the phone. Product and architecture decisions, candidate review, and release approvals follow the existing project process.
 

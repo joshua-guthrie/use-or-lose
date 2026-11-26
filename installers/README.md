@@ -6,11 +6,11 @@ This directory is the repository mirror of the most recent successful
 Stable committed-file URLs:
 
 - Windows installer:
-  <https://github.com/joshua-guthrie/fedleave/raw/refs/heads/master/installers/FedLeave-Setup-Latest-Windows-x64.exe>
+  <https://github.com/joshua-guthrie/fedleave/raw/refs/heads/master/installers/UseOrLose-Setup-Latest-Windows-x64.exe>
 - Linux bootstrap:
   <https://raw.githubusercontent.com/joshua-guthrie/fedleave/master/installers/install.sh>
 - Linux archive:
-  <https://github.com/joshua-guthrie/fedleave/raw/refs/heads/master/installers/FedLeave-Latest-Linux-x86_64.tar.gz>
+  <https://github.com/joshua-guthrie/fedleave/raw/refs/heads/master/installers/UseOrLose-Latest-Linux-x86_64.tar.gz>
 
 The Windows installer and Linux archive are stored with Git LFS because each
 exceeds GitHub's 100 MiB regular-Git file limit. The `BUILD.txt` file identifies

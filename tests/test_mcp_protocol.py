@@ -60,7 +60,7 @@ def test_analytics_smoke_resolves_source_scripts_and_installed_siblings(tmp_path
     scripts.mkdir(parents=True)
     monkeypatch.setattr(module.sysconfig, "get_path", lambda name: str(scripts))
     assert module.application_directory(str(tmp_path / "Python/python.exe"), ["-m", "fedleave.mcp"]) == scripts
-    installed = tmp_path / "Installed FedLeave"
+    installed = tmp_path / "Installed Use or Lose"
     assert module.application_directory(str(installed / "fedleave-mcp.exe"), []) == installed
 
 
