@@ -1,6 +1,6 @@
 # Chapter 01.06 · Force Balance
 
-Use **Calendar → Menu → Force Balance** when you know the correct balance for one leave type on a date. The adjustment brings that date to the entered target while keeping the original clocking entries. **Settings → Accounting and leave years → Leave-year maintenance → Force Balance** opens the same form. [Calendar menu](01-05-menu-and-pdf.md#open-the-calendar-menu) · [Desktop command](../../../../src/fedleave/commands/forced_balance.py)
+Use **Calendar → Menu → Force Balance** when you know the correct balance for one leave type on a date. The adjustment brings that date to the entered target while keeping the original clocking entries. **Settings → Accounting and leave years → Leave-year maintenance → Force Balance** opens the same form. [Calendar menu](01-05-menu-and-pdf.md#open-the-calendar-menu) · [Desktop command](../../../../src/useorlose/commands/forced_balance.py)
 
 ![Android date picker and Force Balance form with leave type, current balance, target and reason](../../artwork/mockups/calendar-force-balance-form.png)
 

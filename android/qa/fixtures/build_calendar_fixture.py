@@ -78,7 +78,7 @@ def cli_env() -> dict[str, str]:
 
 def run_cli(*args: str, data_dir: Path) -> None:
     subprocess.run(
-        [sys.executable, "-m", "fedleave", *args, "--data-dir", str(data_dir)],
+        [sys.executable, "-m", "useorlose", *args, "--data-dir", str(data_dir)],
         cwd=ROOT,
         env=cli_env(),
         check=True,
@@ -474,7 +474,7 @@ def main() -> None:
                 },
                 "generator_environment": {
                     "python": sys.version.split()[0],
-                    "fedleave": version("fedleave"),
+                    "use-or-lose": version("use-or-lose"),
                     "pydantic": version("pydantic"),
                     "holidays": version("holidays"),
                 },

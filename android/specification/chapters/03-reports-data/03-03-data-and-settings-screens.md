@@ -36,7 +36,7 @@ The example shows two separate annual leave entries on January 13. Entry `202601
 | 2 | Enter the exact verified hours and reason. The review shows the chosen date, leave type, record ID and a before-and-after comparison. |
 | 3 | **Save reconciliation** updates the selected row in place and marks it reconciled. The save keeps the record ID and the other entries. Cancel returns to the caller without changing the ledger. |
 
-**Decision for review.** Keep **Reconcile entry** as a dedicated action if payroll verification is a recurring task and the reconciled status helps you distinguish entries you checked. If the useful part is changing the hours on a known entry, **Correct entry** already covers that job. Use **Force Balance** when you trust the total on a date and want one adjustment while keeping the original entries. [Ordinary correction](../02-ledger/02-01-ledger-and-leave-years.md#edit-and-review-leave) · [Force Balance](../01-calendar/01-06-force-balance.md) · [Desktop reconciliation behavior](../../../../src/fedleave/commands/transactions.py#L456)
+**Decision for review.** Keep **Reconcile entry** as a dedicated action if payroll verification is a recurring task and the reconciled status helps you distinguish entries you checked. If the useful part is changing the hours on a known entry, **Correct entry** already covers that job. Use **Force Balance** when you trust the total on a date and want one adjustment while keeping the original entries. [Ordinary correction](../02-ledger/02-01-ledger-and-leave-years.md#edit-and-review-leave) · [Force Balance](../01-calendar/01-06-force-balance.md) · [Desktop reconciliation behavior](../../../../src/useorlose/commands/transactions.py#L456)
 
 ## Calendar, holidays, and reminders
 

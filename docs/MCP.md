@@ -1,6 +1,6 @@
 # Use or Lose MCP integration
 
-`fedleave-mcp` is an efficient, typed, discoverable interface to the **full
+`use-or-lose-mcp` is an efficient, typed, discoverable interface to the **full
 Use or Lose CLI** for authorized autonomous agents, assistants, IDEs, and automation
 programs. The CLI remains authoritative for application behavior. MCP adapts
 that interface; it does not add a separate application approval authority.
@@ -29,14 +29,14 @@ needed only if you choose the example developer clients below.
 ## Install and connect
 
 Install the normal [Windows or Linux package](../README.md#installation).
-The server is a sibling of `fedleave`:
+The server is a sibling of `use-or-lose`:
 
 | Platform | Command | Default leave data |
 | --- | --- | --- |
-| Windows | `C:\Program Files\Use or Lose\fedleave-mcp.exe` | `%LOCALAPPDATA%\fedleave` |
-| Linux | `/usr/local/bin/fedleave-mcp` | `$XDG_DATA_HOME/fedleave`, otherwise `~/.local/share/fedleave` |
+| Windows | `C:\Program Files\UseOrLose\use-or-lose-mcp.exe` | `%LOCALAPPDATA%\UseOrLose` |
+| Linux | `/usr/local/bin/use-or-lose-mcp` | `$XDG_DATA_HOME/use-or-lose`, otherwise `~/.local/share/use-or-lose` |
 
-Linux command links point through `/opt/fedleave/current` to the active release.
+Linux command links point through `/opt/use-or-lose/current` to the active release.
 Run the connector under the leave-data owner's normal user account. It needs
 no administrator account or service identity. Absolute executable paths
 allow it to run from any working directory.
@@ -51,8 +51,8 @@ Linux:
 ```json
 {
   "mcpServers": {
-    "fedleave": {
-      "command": "/usr/local/bin/fedleave-mcp",
+    "use-or-lose-mcp": {
+      "command": "/usr/local/bin/use-or-lose-mcp",
       "args": []
     }
   }
@@ -64,8 +64,8 @@ Windows:
 ```json
 {
   "mcpServers": {
-    "fedleave": {
-      "command": "C:\\Program Files\\Use or Lose\\fedleave-mcp.exe",
+    "use-or-lose-mcp": {
+      "command": "C:\\Program Files\\Use or Lose\\use-or-lose-mcp.exe",
       "args": []
     }
   }
@@ -82,8 +82,8 @@ For an optional policy, add `"args": ["--config", "/absolute/path/policy.json"]`
 variable `USE_OR_LOSE_MCP_CONFIG`. `--config` takes precedence. Explicitly supplied
 missing/invalid files, invalid field types, and unknown configuration keys fail
 startup on stderr; they never fall back to full access.
-`fedleave-mcp --version` prints the build version and exits;
-`fedleave-mcp --inventory` prints a strict parity report and exits. These are
+`use-or-lose-mcp --version` prints the build version and exits;
+`use-or-lose-mcp --inventory` prints a strict parity report and exits. These are
 diagnostic invocations, separate from normal protocol traffic.
 
 ## Full access and optional restricted profiles
@@ -114,7 +114,7 @@ For a new read-only connector, a policy can be as small as:
 ```json
 {
   "mode": "read_only",
-  "data_dir": "/home/alex/.local/share/fedleave"
+  "data_dir": "/home/alex/.local/share/use-or-lose"
 }
 ```
 
@@ -123,7 +123,7 @@ For a restricted connector that authorizes ordinary writes:
 ```json
 {
   "mode": "unattended",
-  "data_dir": "/home/alex/.local/share/fedleave"
+  "data_dir": "/home/alex/.local/share/use-or-lose"
 }
 ```
 
@@ -149,14 +149,14 @@ correct, and import approved reports:
 ```json
 {
   "mode": "unattended",
-  "data_dir": "/home/alex/.local/share/fedleave",
+  "data_dir": "/home/alex/.local/share/use-or-lose",
   "allowed_tools": [
-    "fedleave_balance", "fedleave_list", "fedleave_years", "fedleave_add",
-    "fedleave_reconcile", "fedleave_correct", "fedleave_import_wms_http"
+    "use_or_lose_balance", "use_or_lose_list", "use_or_lose_years", "use_or_lose_add",
+    "use_or_lose_reconcile", "use_or_lose_correct", "use_or_lose_import_wms_http"
   ],
   "allow_imports": true,
   "file_read_roots": ["/home/alex/Use or LoseReports/incoming"],
-  "audit_log": "/home/alex/.config/fedleave/mcp-audit.jsonl"
+  "audit_log": "/home/alex/.config/use-or-lose/mcp-audit.jsonl"
 }
 ```
 
@@ -214,7 +214,7 @@ Reports, discovery and previews resolve legacy history, missing accruals,
 expiration events and linked carryovers on private snapshots. They never persist
 maintenance changes or create missing lock files/directories. Existing shared
 locks coordinate with CLI writers. Read-only connectors can inspect legacy data
-without a separate maintenance pass. `fedleave_snapshot` exposes the same
+without a separate maintenance pass. `use_or_lose_snapshot` exposes the same
 canonical state to chart/analytics consumers. Creation and reconciliation preview
 flags are side-effect-free; explicit apply remains governed by launch policy.
 Full-access children clear inherited MCP datastore pins/write guards;
@@ -237,7 +237,7 @@ untrusted data, and annotations are guidance rather than authorization controls.
 Authentication and authorization for any remotely reachable agent
 belong to its external bridge; Use or Lose opens no remote endpoint.
 
-An agent that can already execute `fedleave` directly under the same account
+An agent that can already execute `use-or-lose` directly under the same account
 can bypass MCP-only restrictions. A client without shell access may receive
 substantial authority solely through MCP, so optional profiles are meaningful
 for that deployment. The trusted boundary is the OS user/process configuration
@@ -247,8 +247,8 @@ or application files using the account's filesystem permissions; MCP policy is
 not an OS sandbox. Tools cannot supply a new policy or executable/environment
 override as command arguments.
 
-Backups remain the user's or agent's responsibility. `fedleave_export_data`
-creates a portable backup; `fedleave_import_data` restores/imports archives and
+Backups remain the user's or agent's responsibility. `use_or_lose_export_data`
+creates a portable backup; `use_or_lose_import_data` restores/imports archives and
 single-year backups, including overwrite when requested. Consider exporting a
 backup before high-impact work. MCP never inserts an automatic backup, restore,
 or confirmation workflow; the CLI's existing storage backups remain unchanged.
@@ -256,13 +256,13 @@ or confirmation workflow; the CLI's existing storage backups remain unchanged.
 ## Discovery, arguments, and results
 
 `tools/list` is generated from the real Typer/Click registry at startup.
-There is one stable tool per executable command path, plus `fedleave_version`.
+There is one stable tool per executable command path, plus `use_or_lose_version`.
 The current inventory has **33 tools and 306 parameter entries**, including
 inherited parameters and automatically registered help options. The 32 CLI
 command paths include the compatibility alias `use-or-loose`.
 
 Tool names normalize the full path: `starting-balance set` becomes
-`fedleave_starting_balance_set`. Collisions receive deterministic hash suffixes.
+`use_or_lose_starting_balance_set`. Collisions receive deterministic hash suffixes.
 Types, required fields, defaults, help, repeated values, tuple arity, ranges,
 choices, flags, and inverted flags come from CLI metadata. String options whose
 valid values are checked inside CLI business code remain strings in JSON
@@ -291,37 +291,37 @@ allows eager help/version requests without normally required command arguments.
 Example `tools/call` parameter objects (SDKs provide the protocol envelope):
 
 ```json
-{"name":"fedleave_balance","arguments":{"year":2026,"as_of":"2026-07-01"}}
+{"name":"use_or_lose_balance","arguments":{"year":2026,"as_of":"2026-07-01"}}
 ```
 
 ```json
-{"name":"fedleave_add","arguments":{"date":"2026-07-01","category":"annual","used":2,"description":"Appointment"}}
+{"name":"use_or_lose_add","arguments":{"date":"2026-07-01","category":"annual","used":2,"description":"Appointment"}}
 ```
 
 ```json
-{"name":"fedleave_set_day","arguments":{"date":"2026-07-02","authoritative":true,"annual":-4,"annual_comment":"Leave","sick":0}}
+{"name":"use_or_lose_set_day","arguments":{"date":"2026-07-02","authoritative":true,"annual":-4,"annual_comment":"Leave","sick":0}}
 ```
 
 ```json
-{"name":"fedleave_starting_balance_set","arguments":{"year":2026,"category":"annual","hours":120,"reason":"Opening balance"}}
+{"name":"use_or_lose_starting_balance_set","arguments":{"year":2026,"category":"annual","hours":120,"reason":"Opening balance"}}
 ```
 
 Full-access examples, without any permission switches or file roots:
 
 ```json
-{"name":"fedleave_export_data","arguments":{"output":"/home/alex/Backups/leave backup.json"}}
+{"name":"use_or_lose_export_data","arguments":{"output":"/home/alex/Backups/leave backup.json"}}
 ```
 
 ```json
-{"name":"fedleave_import_data","arguments":{"input":"C:\\Users\\Alex\\Backups\\leave.json","overwrite":true,"data_dir":"C:\\Users\\Alex\\Use or LoseTest"}}
+{"name":"use_or_lose_import_data","arguments":{"input":"C:\\Users\\Alex\\Backups\\leave.json","overwrite":true,"data_dir":"C:\\Users\\Alex\\Use or LoseTest"}}
 ```
 
 ```json
-{"name":"fedleave_void","arguments":{"id":"20260701-001","reason":"Entered in error"}}
+{"name":"use_or_lose_void","arguments":{"id":"20260701-001","reason":"Entered in error"}}
 ```
 
 ```json
-{"name":"fedleave_rollover","arguments":{"from_year":2026,"to_year":2027,"preview":false}}
+{"name":"use_or_lose_rollover","arguments":{"from_year":2026,"to_year":2027,"preview":false}}
 ```
 
 For commands that register `--json`, omission of `json_output` automatically
@@ -357,7 +357,7 @@ from mcp import Client, StdioServerParameters
 
 async def main():
     parameters = StdioServerParameters(
-        command="/usr/local/bin/fedleave-mcp",
+        command="/usr/local/bin/use-or-lose-mcp",
         args=[],  # No policy: full CLI authority for this OS user.
         cwd="/home/alex",
     )
@@ -365,7 +365,7 @@ async def main():
         tools = await client.list_tools()
         print([tool.name for tool in tools.tools])
         result = await client.call_tool(
-            "fedleave_balance", {"year": 2026, "as_of": "2026-07-01"}
+            "use_or_lose_balance", {"year": 2026, "as_of": "2026-07-01"}
         )
         if result.is_error:
             raise RuntimeError(result.structured_content)
@@ -387,11 +387,11 @@ Node runtime installed, run:
 
 ```bash
 npx -y @modelcontextprotocol/inspector@2.12.0 --cli \
-  --config client.json --server fedleave --method tools/list
+  --config client.json --server use-or-lose --method tools/list
 
 npx -y @modelcontextprotocol/inspector@2.12.0 --cli \
-  --config client.json --server fedleave --method tools/call \
-  --tool-name fedleave_balance --tool-args-json '{"year":2026}'
+  --config client.json --server use-or-lose --method tools/call \
+  --tool-name use_or_lose_balance --tool-args-json '{"year":2026}'
 ```
 
 `client.json` is the Inspector's connection configuration. Its `args` can be
@@ -412,7 +412,7 @@ Use or Lose remains the same standard stdio server used by other clients.
 
 ## Synchronization, limits, and operations
 
-Every CLI leaf command holds an OS-backed `.fedleave.lock` in its canonical
+Every CLI leaf command holds an OS-backed `.use-or-lose.lock` in its canonical
 data directory for the entire command invocation. Startup migrations also
 acquire that lock. The MCP parent does not acquire a competing lock, avoiding
 parent/child deadlocks. Existing GUI ledger writes use CLI subprocesses and
@@ -425,7 +425,7 @@ directories have independent locks. These are advisory locks on local
 filesystems; old Use or Lose binaries and third-party direct storage writers do
 not participate. Upgrade all writers and do not share a writable store with
 older uncoordinated processes. Custom Python storage users must hold
-`fedleave.locking.datastore_lock` around their entire read/modify/write operation.
+`useorlose.locking.datastore_lock` around their entire read/modify/write operation.
 Network filesystem locking semantics are outside the validated deployment.
 
 The policy accepts `timeout_seconds` (default 60, maximum 3600),
@@ -486,10 +486,10 @@ Adding a command or parameter requires no new MCP tool functions.
 Run the checks from an editable developer installation:
 
 ```bash
-python -m fedleave.mcp --inventory > mcp-inventory.json
+python -m useorlose.mcp --inventory > mcp-inventory.json
 pytest -q tests/test_mcp_catalog.py tests/test_mcp_execution.py \
   tests/test_mcp_policy.py tests/test_mcp_protocol.py tests/test_datastore_locking.py
-python scripts/lib/common/mcp_smoke.py --server /absolute/path/to/fedleave-mcp
+python scripts/lib/common/mcp_smoke.py --server /absolute/path/to/use-or-lose-mcp
 ```
 
 The smoke client initializes a temporary store, checks complete discovery,

@@ -32,7 +32,7 @@ The pinned versions below were verified by I01's report. A clean-sync launch fro
 
 | Item | Value |
 | --- | --- |
-| Application ID | `com.westmouthbay.fedleave` (owner-approved) |
+| Application ID | `com.westmouthbay.useorlose` (owner-approved) |
 | Android Gradle Plugin / Gradle | 8.13.2 / 8.14.3 (wrapper) |
 | Kotlin / Compose BOM / Material 3 | 2.2.20 / 2025.06.01 / from BOM |
 | JDK | 21 to run Gradle; source/target 17 |
@@ -93,7 +93,7 @@ flowchart LR
 | Layer | Responsibility | Governing design |
 | --- | --- | --- |
 | Compose UI | Screens, navigation, accessibility, view state, lifecycle, clock injection, chart rendering, Sharesheet and document picker. | [Calendar](specification/chapters/01-calendar/01-01-main-screen.md) and [Reports](specification/chapters/03-reports-data/03-02-report-screens.md) |
-| Kotlin bridge | One typed in-process interface to the Python core: `app/src/main/java/com/westmouthbay/fedleave/core/` (`CoreBridge`, `CoreModels`, `CoreError`, `TimeSource`, `AppDependencies`) over the Chaquopy module `fedleave_probe`. The Calendar state machine lives in `.../calendar/` (`CalendarViewModel`, `CalendarUiState`, `CalendarDisplaySettings`), the screens in `calendar/` and the navigation host in `ui/`. | [Core and compatibility](specification/chapters/04-architecture/04-01-core-and-compatibility.md) |
+| Kotlin bridge | One typed in-process interface to the Python core: `app/src/main/java/com/westmouthbay/useorlose/core/` (`CoreBridge`, `CoreModels`, `CoreError`, `TimeSource`, `AppDependencies`) over the Chaquopy module `useorlose_probe`. The Calendar state machine lives in `.../calendar/` (`CalendarViewModel`, `CalendarUiState`, `CalendarDisplaySettings`), the screens in `calendar/` and the navigation host in `ui/`. | [Core and compatibility](specification/chapters/04-architecture/04-01-core-and-compatibility.md) |
 | Shared Python core | Accounting rules, eligibility, accrual, leave-year boundaries, carryover, lots, parental windows, report inputs. Lives in the repository's root `src/`. | [Responsibilities and data flow](specification/chapters/04-architecture/04-01-core-and-compatibility.md#responsibilities-and-data-flow) |
 | Private store | Canonical `config.json`, `leave_years/<year>.json` and `holiday_cache/*.json` in internal no-backup storage. One serialized writer, immutable read snapshots, candidate validation and generation recovery. | [Device storage](specification/chapters/04-architecture/04-02-device-storage.md) |
 | Desktop | Existing CLI and GUI entry points remain the compatibility baseline and share the same accounting rules and datastore schema. | [Architecture](../docs/ARCHITECTURE.md) |

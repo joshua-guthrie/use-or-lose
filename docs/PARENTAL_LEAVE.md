@@ -13,10 +13,10 @@ Entering a later date would incorrectly extend the computed deadline. There is
 no separate credit/event date or birth/adoption/foster category.
 
 ```bash
-fedleave add --date 2026-09-01 --category ppl --earned 480 --description "Agency-confirmed entitlement"
-fedleave add --date 2026-10-01 --category ppl --used 8
-fedleave reconcile --date 2026-10-01 --category ppl --direction used --hours 8 --reason "Actual leave taken"
-fedleave add --date 2026-10-15 --category fmla --used 8
+use-or-lose add --date 2026-09-01 --category ppl --earned 480 --description "Agency-confirmed entitlement"
+use-or-lose add --date 2026-10-01 --category ppl --used 8
+use-or-lose reconcile --date 2026-10-01 --category ppl --direction used --hours 8 --reason "Actual leave taken"
+use-or-lose add --date 2026-10-15 --category fmla --used 8
 ```
 
 Supply `--data-dir` on every command when using an alternate store. `--year` may

@@ -10,11 +10,11 @@ adb_bin="${ANDROID_HOME:-$HOME/Android/Sdk}/platform-tools/adb"
 mkdir -p "$out"
 
 remote_dir="files/qa/I05-02"
-"$adb_bin" shell "run-as com.westmouthbay.fedleave ls $remote_dir" < /dev/null 2>/dev/null |
+"$adb_bin" shell "run-as com.westmouthbay.useorlose ls $remote_dir" < /dev/null 2>/dev/null |
     tr -d '\r' | grep '\.png$' |
 while read -r name; do
     # /dev/null on stdin: adb must not consume the piped file names.
-    "$adb_bin" shell "run-as com.westmouthbay.fedleave cat $remote_dir/$name" < /dev/null > "$out/$name"
+    "$adb_bin" shell "run-as com.westmouthbay.useorlose cat $remote_dir/$name" < /dev/null > "$out/$name"
 done
 
 echo "pulled $(find "$out" -maxdepth 1 -name '*.png' | wc -l) captures to $out"

@@ -7,18 +7,18 @@ metadata, documentation, tests, assets, installers, and build orchestration.
 
 ## Source map
 
-- `src/fedleave/` owns leave-year data, validation, calculations, storage, and
-  the Typer command application. `fedleave.commands` contains command adapters;
+- `src/useorlose/` owns leave-year data, validation, calculations, storage, and
+  the Typer command application. `useorlose.commands` contains command adapters;
   calculation and persistence code remains independently callable below it.
-- `src/fedleave/mcp/` discovers the CLI registry, generates tool schemas, enforces
+- `src/useorlose/mcp/` discovers the CLI registry, generates tool schemas, enforces
   trusted launch-time policies, and invokes the sibling CLI through stdio MCP.
   It uses the official Python MCP SDK and contains no leave calculations.
-- `src/fedleave_gui/` owns the calendar GUI and its subprocess adapter to the
-  `fedleave` command. It does not duplicate leave calculations.
-- `src/fedleave_analytics/` owns read-only analytics calculations and their Qt
+- `src/useorlose_gui/` owns the calendar GUI and its subprocess adapter to the
+  `use-or-lose` command. It does not duplicate leave calculations.
+- `src/useorlose_analytics/` owns read-only analytics calculations and their Qt
   presentation.
 - `src/*_chart/`, `src/yearly_leave_comparison_chart/`, and
-  `src/fedleave_month_report_graphic/` are maintained compatibility packages
+  `src/useorlose_month_report_graphic/` are maintained compatibility packages
   for the published companion commands.
 - `scripts/lib/common/application_manifest.toml` is the authoritative map from
   `pyproject.toml` console commands to PyInstaller settings.
@@ -27,13 +27,13 @@ metadata, documentation, tests, assets, installers, and build orchestration.
 
 ## Dependency direction
 
-The core `fedleave` package must not import a GUI package. GUI and report
+The core `use-or-lose` package must not import a GUI package. GUI and report
 packages may call or import core code. Installer and build code discovers
 application entry points from `pyproject.toml` instead of maintaining another
 command list. Runtime, optional, test, and build dependencies are likewise
 declared only in `pyproject.toml`.
 
-The GUI normally invokes the CLI through its sibling `fedleave` executable.
+The GUI normally invokes the CLI through its sibling `use-or-lose` executable.
 This keeps the packaged applications consistent with direct CLI use and makes
 the subprocess boundary explicit. Executable discovery checks the active
 interpreter or bundle directory before `PATH`.
@@ -126,7 +126,7 @@ partially restored graph. Queries only recompute effects on private copies.
 
 ## Seasonality selections
 
-`fedleave_analytics.seasonality` owns the validated category/activity/grouping
+`useorlose_analytics.seasonality` owns the validated category/activity/grouping
 selection and pure result used only by the Seasonality tab. Backend registry
 metadata supplies supported categories, including zero-activity choices and
 conditional PPL support. Original credits are distinguished from carryover,
@@ -145,7 +145,7 @@ sibling CLI and checks that the selected datastore hashes remain unchanged.
 
 ## Read-only planning foundation
 
-`fedleave.planning` owns schema-v1 `Scenario`/`ScenarioOperation` definitions,
+`useorlose.planning` owns schema-v1 `Scenario`/`ScenarioOperation` definitions,
 validation/import, and the typed `ProjectionResult` contract with method version
 `daily-closing-canonical-v1`. Its only inputs are snapshot data, a definition,
 and an injected current date. It accepts no repository, path for persistence,
@@ -177,7 +177,7 @@ outcomes; invalid inputs are structured row-level validation errors. No dates
 are optimized or moved. Historical cutoffs do not reconstruct historical
 knowledge; current past planned/requested rows remain unresolved.
 
-`fedleave_analytics.planning_model` owns the session and table view model.
+`useorlose_analytics.planning_model` owns the session and table view model.
 Tables and charts consume the same projection result.
 `planning_view` hosts the What-if Planner and `planning_window` wraps it in a
 standalone window separate from Analytics. Calendar's Analysis > Planning entry
@@ -208,13 +208,13 @@ canonical leave records.
 `action_help` supplies short descriptions for the What-if Planner actions.
 File > Help/F1 in a planning window opens `help_view` at that window's tool
 section; Analytics File > Help/F1 opens the overview. The
-self-contained `fedleave_analytics/help.html` is package data (wheel/sdist and
+self-contained `useorlose_analytics/help.html` is package data (wheel/sdist and
 PyInstaller collect-all), so it requires no network, website or source checkout.
 Installed companion smoke checks load the actual bundled help document.
 
 ## Cumulative usage
 
-`fedleave.usage_comparison` is a pure descriptive model over defensive snapshot
+`useorlose.usage_comparison` is a pure descriptive model over defensive snapshot
 copies. Canonical transaction effects select physical `used` rows; openings,
 accruals and disposals never enter usage. It returns one running total of
 effective used hours from the year start through every represented date, using

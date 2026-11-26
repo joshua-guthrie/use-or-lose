@@ -8,7 +8,7 @@ plugins {
 val bridgePythonSrc = layout.buildDirectory.dir("generated/bridge-python")
 
 val prepareBridgePython by tasks.registering(Sync::class) {
-    from(rootProject.file("../src/fedleave")) {
+    from(rootProject.file("../src/useorlose")) {
         include("__init__.py")
         include("categories.py")
         include("transaction_effects.py")
@@ -21,21 +21,21 @@ val prepareBridgePython by tasks.registering(Sync::class) {
         include("parental.py")
         include("read_api.py")
         include("rule_defaults.py")
-        into("fedleave")
+        into("useorlose")
     }
     from(rootProject.file("bridge/src")) {
-        include("fedleave_probe.py")
-        include("fedleave_creation.py")
+        include("useorlose_probe.py")
+        include("useorlose_creation.py")
     }
     into(bridgePythonSrc)
 }
 
 android {
-    namespace = "com.westmouthbay.fedleave"
+    namespace = "com.westmouthbay.useorlose"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.westmouthbay.fedleave"
+        applicationId = "com.westmouthbay.useorlose"
         minSdk = 26
         targetSdk = 36
         versionCode = 1

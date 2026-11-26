@@ -1,12 +1,12 @@
-package com.westmouthbay.fedleave.calendar
+package com.westmouthbay.useorlose.calendar
 
-import com.westmouthbay.fedleave.core.TimeSource
+import com.westmouthbay.useorlose.core.TimeSource
 
 /**
  * Debug-build developer configuration for Calendar tests and fixtures:
  * the frozen local date and the pinned calendar fixture asset list. Device
  * tests import the store through
- * `com.westmouthbay.fedleave.storage.DeveloperFixture` and freeze the clock
+ * `com.westmouthbay.useorlose.storage.DeveloperFixture` and freeze the clock
  * with [fixtureTimeSource].
  */
 object CalendarDeveloperConfig {

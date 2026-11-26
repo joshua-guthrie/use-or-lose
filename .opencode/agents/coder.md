@@ -18,4 +18,4 @@ Rules:
 - Commit each verified increment locally. Never push to `master` without the owner, and remember any source push triggers the Distribution workflow.
 - Record QA in `android/qa/reports/Ixx.md`, resume notes in `android/implementation/passdowns/Ixx.md`, and update the root `passdown.md` and `android/README.md` in the same change when setup, commands, architecture or layout change.
 - For any visual or mockup comparison, spawn the `image` agent with the mockup and screenshot paths; do not claim a visual pass yourself.
-- Accounting semantics in `src/fedleave/`, storage generations, restore, release and R3 surfaces belong to the planner/Sol. Implement them only after explicit approval.
+- Accounting semantics in `src/useorlose/`, storage generations, restore, release and R3 surfaces belong to the planner/Sol. Implement them only after explicit approval.
