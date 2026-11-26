@@ -1,4 +1,4 @@
-"""Expose rolling-installer update checks through the command line."""
+"""Expose release update checks through the command line."""
 
 from __future__ import annotations
 

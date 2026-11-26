@@ -1,4 +1,4 @@
-"""Compare the installed build identity with the published rolling installer."""
+"""Compare the installed build identity with the published release installer."""
 
 from __future__ import annotations
 

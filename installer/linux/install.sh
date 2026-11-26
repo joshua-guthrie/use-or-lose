@@ -190,7 +190,7 @@ resolve_download() {
 
 download_archive() {
   local output="$1" url="$2"
-  # The rolling archive is large enough that a silent download looks frozen.
+  # The release archive is large enough that a silent download looks frozen.
   # Show curl's progress bar only when the user has an interactive terminal;
   # unattended/CI runs stay quiet and readable in captured logs.
   if [[ -t 2 ]]; then

@@ -5,7 +5,7 @@ import subprocess
 
 import pytest
 
-from test_release_packaging import BOOTSTRAP, _fake_bundle, _load_packaging_module, _rolling_linux_assets
+from test_release_packaging import BOOTSTRAP, _fake_bundle, _load_packaging_module, _stable_linux_assets
 
 
 @pytest.mark.skipif(os.name == "nt", reason="Linux bootstrap")
@@ -13,7 +13,7 @@ def test_bootstrap_reinstalls_verified_bytes_before_running_existing_release(tmp
     package = _load_packaging_module()
     bundle = _fake_bundle(package, tmp_path / "bundle")
     assets = tmp_path / "assets"
-    _rolling_linux_assets(package, bundle, assets, "0.2.0")
+    _stable_linux_assets(package, bundle, assets)
     install = tmp_path / "install"
     existing = install / "releases" / "0.2.0"
     existing.mkdir(parents=True)
@@ -48,7 +48,7 @@ def test_bootstrap_rejects_escaping_bundle_link_before_installation(tmp_path):
     outside.write_text("untouched")
     (bundle / "escape").symlink_to(outside)
     assets = tmp_path / "assets"
-    _rolling_linux_assets(package, bundle, assets, "0.2.0")
+    _stable_linux_assets(package, bundle, assets)
     install = tmp_path / "install"
     result = subprocess.run(
         [

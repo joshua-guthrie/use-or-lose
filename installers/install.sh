@@ -5,9 +5,10 @@ set -Eeuo pipefail
 # never clones the repository and never requires Python or build tools.
 
 readonly REPOSITORY="joshua-guthrie/use-or-lose"
+readonly CURRENT_RELEASE_VERSION="1.0.0"
 readonly DEFAULT_INSTALL_ROOT="/opt/fedleave"
 readonly DEFAULT_BIN_DIR="/usr/local/bin"
-readonly TOP_LEVEL_DIRECTORY="FedLeave"
+readonly TOP_LEVEL_DIRECTORY="UseOrLose"
 
 INSTALL_ROOT="$DEFAULT_INSTALL_ROOT"
 BIN_DIR="$DEFAULT_BIN_DIR"
@@ -21,11 +22,11 @@ STAGING_DIR=""
 SUDO=()
 
 log() {
-  printf '[FedLeave] %s\n' "$*"
+  printf '[Use or Lose] %s\n' "$*"
 }
 
 die() {
-  printf '[FedLeave] ERROR: %s\n' "$*" >&2
+  printf '[Use or Lose] ERROR: %s\n' "$*" >&2
   exit 1
 }
 
@@ -40,7 +41,7 @@ cleanup() {
 
 on_error() {
   local exit_code=$?
-  printf '[FedLeave] ERROR: installation failed near line %s (exit %s).\n' "${BASH_LINENO[0]}" "$exit_code" >&2
+  printf '[Use or Lose] ERROR: installation failed near line %s (exit %s).\n' "${BASH_LINENO[0]}" "$exit_code" >&2
   exit "$exit_code"
 }
 
@@ -49,7 +50,7 @@ trap on_error ERR
 
 usage() {
   cat <<'EOF'
-Install the latest successful FedLeave master build for 64-bit Debian/Ubuntu.
+Install the latest successful Use or Lose master build for 64-bit Debian/Ubuntu.
 
 Official project website:
   https://www.westmouthbay.com/fedleave-application/
@@ -62,7 +63,7 @@ Usage:
 
 Options:
   --unattended             Run without interactive input.
-  --version VERSION        Install a legacy versioned package instead of the rolling build.
+  --version VERSION        Install a specific release instead of the current stable release.
   --install-root PATH      Installation root (default: /opt/fedleave).
   --bin-dir PATH           Command-link directory (default: /usr/local/bin).
   --asset-base-url URL     Override the release asset directory (primarily for testing).
@@ -116,7 +117,7 @@ detect_platform() {
   [[ "$(uname -s)" == "Linux" ]] || die "Only Linux is supported by this installer."
   case "$(uname -m)" in
     x86_64|amd64) ;;
-    *) die "Unsupported CPU architecture: $(uname -m). FedLeave requires x86_64." ;;
+    *) die "Unsupported CPU architecture: $(uname -m). Use or Lose requires x86_64." ;;
   esac
 
   [[ -r /etc/os-release ]] || die "Cannot identify this Linux distribution."
@@ -177,19 +178,19 @@ install_runtime_tools() {
 }
 
 resolve_download() {
+  local version="${RELEASE_VERSION:-$CURRENT_RELEASE_VERSION}"
+  ARCHIVE_NAME="UseOrLose-${version}-Linux-x86_64.tar.gz"
+  DOWNLOAD_BASE_URL="${ASSET_BASE_URL:-https://github.com/${REPOSITORY}/releases/download/v${version}}"
   if [[ -n "$RELEASE_VERSION" ]]; then
-    ARCHIVE_NAME="FedLeave-${RELEASE_VERSION}-Linux-x86_64.tar.gz"
-    DOWNLOAD_BASE_URL="${ASSET_BASE_URL:-https://github.com/${REPOSITORY}/releases/download/v${RELEASE_VERSION}}"
-    return
+    log "Installing Use or Lose ${version}."
+  else
+    log "Installing the current stable release, Use or Lose ${version}."
   fi
-  ARCHIVE_NAME="FedLeave-Latest-Linux-x86_64.tar.gz"
-  DOWNLOAD_BASE_URL="${ASSET_BASE_URL:-https://github.com/${REPOSITORY}/releases/download/beta}"
-  log "Using the rolling package from the latest successful master push."
 }
 
 download_archive() {
   local output="$1" url="$2"
-  # The rolling archive is large enough that a silent download looks frozen.
+  # The release archive is large enough that a silent download looks frozen.
   # Show curl's progress bar only when the user has an interactive terminal;
   # unattended/CI runs stay quiet and readable in captured logs.
   if [[ -t 2 ]]; then
@@ -387,7 +388,7 @@ install_release() {
 
   local -a optional_commands=(
     fedleave-mcp
-    FedLeaveCalendar FedLeaveAnalytics
+    UseOrLoseCalendar UseOrLoseAnalytics
     AnnualLeaveChartForTheYear SickLeaveChartForTheYear
     CreditHoursChartForTheYear CompTimeChartForTheYear
     TravelCompChartForTheYear TimeOffAwardChartForTheYear
@@ -410,11 +411,11 @@ install_release() {
       if [[ -L "$link" ]]; then
         existing_target="$(readlink "$link")"
         [[ "$existing_target" == "$INSTALL_ROOT/current/"* ]] ||
-          die "Refusing to replace command link not owned by FedLeave: $link"
+          die "Refusing to replace command link not owned by Use or Lose: $link"
       elif is_legacy_fedleave_wrapper "$link" "$command"; then
-        log "Migrating legacy FedLeave command wrapper: $link"
+        log "Migrating legacy Use or Lose command wrapper: $link"
       else
-        die "Refusing to replace non-symbolic-link command not owned by FedLeave: $link"
+        die "Refusing to replace non-symbolic-link command not owned by Use or Lose: $link"
       fi
     fi
     # Command links target "current", not a version, so the final atomic link
@@ -429,8 +430,8 @@ install_release() {
   run_privileged mv -Tf "$pending_link" "$current_link"
 
   "$BIN_DIR/fedleave" --version >/dev/null 2>&1 || "$BIN_DIR/fedleave" --help >/dev/null
-  log "FedLeave ${RELEASE_VERSION} installed successfully."
-  log "Launch the calendar with: FedLeaveCalendar"
+  log "Use or Lose ${RELEASE_VERSION} installed successfully."
+  log "Launch the calendar with: UseOrLoseCalendar"
   log "Use the command line with: fedleave --help"
   log "Previous release directories remain available beneath $releases_dir."
 }

@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from test_release_packaging import BOOTSTRAP, _fake_bundle, _load_packaging_module, _rolling_linux_assets
+from test_release_packaging import BOOTSTRAP, _fake_bundle, _load_packaging_module, _stable_linux_assets
 
 
 @pytest.mark.skipif(
@@ -28,7 +28,7 @@ def test_privileged_bootstrap_removes_ordinary_user_write_access():
         bundle = _fake_bundle(package, root / "bundle")
         (bundle / "shared-runtime").symlink_to("_internal/runtime.dat")
         assets = root / "assets"
-        _rolling_linux_assets(package, bundle, assets, "0.2.0")
+        _stable_linux_assets(package, bundle, assets)
         for mode in ("user", "root"):
             target = root / mode
             command = [
