@@ -18,12 +18,11 @@ The approved [specification plan](planning/specification-plan.md) sets the scope
 
 | Desktop reference | Pinned identity |
 | --- | --- |
-| GitHub stable release | `beta`, build `0.2.2.dev0+g7041ce9e` |
-| Source revision | `7041ce9e9921dd4c407595ed3269de1aca43e699` |
-| Installer mirror revision | `80313ff` |
+| Current stable release | `v1.0.0` ("Use or Lose 1.0.0"), desktop only, November 26, 2026 |
+| Fixture parity source | `7041ce9e9921dd4c407595ed3269de1aca43e699` (historical build the fixtures were verified against) |
 | Baseline check | Verified November 20, 2026 against the release record, tag, and installer build metadata. |
 
-Use the pinned source to resolve differences between the older documentation and shipped behavior. Record a baseline change before updating results or parity expectations. [Stable release](https://github.com/joshua-guthrie/use-or-lose/releases/tag/beta) · [Pinned source](https://github.com/joshua-guthrie/use-or-lose/tree/7041ce9e9921dd4c407595ed3269de1aca43e699) · [Installer build identity](../../installers/BUILD.txt)
+Use the pinned fixture source to resolve differences between the older documentation and shipped behavior. Record a baseline change before updating results or parity expectations. The current fixtures stay pinned to the historical revision until the next parity pass re-verifies them against v1.0.0. [Stable release](https://github.com/joshua-guthrie/use-or-lose/releases/tag/v1.0.0) · [Pinned source](https://github.com/joshua-guthrie/use-or-lose/tree/7041ce9e9921dd4c407595ed3269de1aca43e699) · [Installer build identity](../../installers/BUILD.txt)
 
 ## Specification index
 
