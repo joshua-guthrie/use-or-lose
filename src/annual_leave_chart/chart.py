@@ -82,7 +82,7 @@ def find_useorlose_app() -> Path:
         if is_executable(candidate):
             return candidate
 
-    useorlose_in_path = shutil.which("useorlose")
+    useorlose_in_path = shutil.which("use-or-lose")
     if useorlose_in_path:
         return Path(useorlose_in_path)
 
@@ -90,9 +90,9 @@ def find_useorlose_app() -> Path:
     raise SystemExit(
         f"""
         
-Error: useorlose application not found.
+Error: use-or-lose application not found.
 
-The AnnualLeaveChartForTheYear application requires useorlose to be installed.
+The AnnualLeaveChartForTheYear application requires use-or-lose to be installed.
 
 Install the current Use or Lose suite and keep its companion applications together.
 
