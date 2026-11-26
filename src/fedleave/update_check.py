@@ -11,7 +11,7 @@ from . import __build_commit__, __version__
 from .network import read_bounded
 from .project_info import OFFICIAL_PROJECT_URL
 
-PUBLISHED_BUILD_URL = "https://raw.githubusercontent.com/joshua-guthrie/fedleave/master/installers/BUILD.txt"
+PUBLISHED_BUILD_URL = "https://raw.githubusercontent.com/joshua-guthrie/use-or-lose/master/installers/BUILD.txt"
 UPDATE_METADATA_MAX_BYTES = 64 * 1024
 
 

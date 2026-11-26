@@ -1,11 +1,19 @@
 name: Distribution
 
 on:
-  push:
-    branches:
-      - "**"
-  pull_request:
+  # Builds and releases are on demand only: dispatch with a release version
+  # to publish a desktop release, or run a development artifact validation.
   workflow_dispatch:
+    inputs:
+      release_version:
+        description: 'Release version (e.g. 1.0.0). Empty builds a development artifact without publishing.'
+        required: false
+        default: ''
+      make_release:
+        description: 'Publish a GitHub release with the desktop installers (no Android artifacts)'
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: read
@@ -30,12 +38,17 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Resolve development version
+      - name: Resolve build version
         id: version
         shell: bash
         run: |
           set -Eeuo pipefail
-          package_version="$(python installer/package.py version --development --sha "$GITHUB_SHA")"
+          release_version="${{ github.event.inputs.release_version }}"
+          if [[ -n "$release_version" ]]; then
+            package_version="$release_version"
+          else
+            package_version="$(python installer/package.py version --development --sha "$GITHUB_SHA")"
+          fi
           numeric_version="$(python installer/package.py numeric-version --version "$package_version")"
           echo "package-version=$package_version" >> "$GITHUB_OUTPUT"
           echo "numeric-version=$numeric_version" >> "$GITHUB_OUTPUT"
@@ -262,18 +275,20 @@ jobs:
             python3 /work/scripts/lib/common/linux_runtime_smoke.py --archive-dir /work/artifacts
           '
 
-  publish-latest:
-    name: Publish latest master installers
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+  release:
+    name: Publish desktop release
+    if: github.event.inputs.make_release == 'true'
     needs: [metadata, windows, linux, linux-compatibility]
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    env:
+      PACKAGE_VERSION: ${{ needs.metadata.outputs.package-version }}
+      SOURCE_COMMIT: ${{ github.sha }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          lfs: false
 
       - uses: actions/download-artifact@v4
         with:
@@ -281,134 +296,59 @@ jobs:
           path: release-assets
           merge-multiple: true
 
-      - name: Prepare stable rolling assets
+      - name: Prepare desktop release assets
         shell: bash
         run: |
           set -Eeuo pipefail
-          mkdir rolling-assets
-          mapfile -t windows_installers < <(
-            find release-assets -type f -name 'UseOrLose-Setup-*-Windows-x64.exe' -print
-          )
-          mapfile -t linux_archives < <(
-            find release-assets -type f -name 'UseOrLose-*-Linux-x86_64.tar.gz' -print
-          )
-          mapfile -t bootstrap_installers < <(
-            find release-assets -type f -path '*/installer/linux/install.sh' -print
-          )
-          [[ "${#windows_installers[@]}" -eq 1 ]] || {
-            printf 'Expected one Windows installer, found %s\n' "${#windows_installers[@]}" >&2
+          mkdir release
+          windows_installer=$(find release-assets -type f -name 'UseOrLose-Setup-*-Windows-x64.exe' -print)
+          linux_archive=$(find release-assets -type f -name 'UseOrLose-*-Linux-x86_64.tar.gz' -print)
+          [[ -n "$windows_installer" ]] && [[ -n "$linux_archive" ]] || {
+            echo "Missing desktop artifacts" >&2
             exit 1
           }
-          [[ "${#linux_archives[@]}" -eq 1 ]] || {
-            printf 'Expected one Linux archive, found %s\n' "${#linux_archives[@]}" >&2
-            exit 1
-          }
-          [[ "${#bootstrap_installers[@]}" -eq 1 ]] || {
-            printf 'Expected one Linux bootstrap, found %s\n' "${#bootstrap_installers[@]}" >&2
-            exit 1
-          }
-          cp "${windows_installers[0]}" rolling-assets/UseOrLose-Setup-Latest-Windows-x64.exe
-          cp "${linux_archives[0]}" rolling-assets/UseOrLose-Latest-Linux-x86_64.tar.gz
-          cp "${bootstrap_installers[0]}" rolling-assets/install.sh
-          (
-            cd rolling-assets
-            sha256sum UseOrLose-Setup-Latest-Windows-x64.exe \
-              > UseOrLose-Setup-Latest-Windows-x64.exe.sha256
-            sha256sum UseOrLose-Latest-Linux-x86_64.tar.gz \
-              > UseOrLose-Latest-Linux-x86_64.tar.gz.sha256
-          )
+          cp "$windows_installer" release/
+          cp "${windows_installer}.sha256" release/
+          cp "$linux_archive" release/
+          cp "${linux_archive}.sha256" release/
+          cp installer/linux/install.sh release/install.sh
 
-      - name: Replace rolling beta-channel assets
+      - name: Create the release (desktop only, no Android artifacts)
         env:
           GH_TOKEN: ${{ github.token }}
-          BUILD_VERSION: ${{ needs.metadata.outputs.package-version }}
+        shell: bash
         run: |
           set -Eeuo pipefail
-          mapfile -t assets < <(find rolling-assets -maxdepth 1 -type f -print | sort)
-          [[ "${#assets[@]}" -eq 5 ]] || {
-            printf 'Expected 5 rolling assets, found %s\n' "${#assets[@]}" >&2
-            printf '%s\n' "${assets[@]}" >&2
-            exit 1
-          }
-          if gh release view beta --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            gh release upload beta "${assets[@]}" \
-              --clobber \
-              --repo "$GITHUB_REPOSITORY"
-          else
-            gh release create beta "${assets[@]}" \
-              --prerelease \
-              --target "$GITHUB_SHA" \
-              --title "Latest successful master build" \
-              --notes "Rolling installer channel; assets are replaced after every successful master build." \
-              --repo "$GITHUB_REPOSITORY"
+          if ! git rev-parse "v$PACKAGE_VERSION" >/dev/null 2>&1; then
+            git tag "v$PACKAGE_VERSION"
+            git push origin "v$PACKAGE_VERSION"
           fi
-          gh api --method PATCH \
-            "repos/$GITHUB_REPOSITORY/git/refs/tags/beta" \
-            -f sha="$GITHUB_SHA" \
-            -F force=true
-          notes="$(printf \
-            'Build: %s\nCommit: %s\n\nThese rolling assets are replaced after every successful master build.' \
-            "$BUILD_VERSION" "$GITHUB_SHA")"
-          gh release edit beta \
-            --title "Latest successful master build" \
-            --notes "$notes" \
-            --repo "$GITHUB_REPOSITORY"
+          gh release create "v$PACKAGE_VERSION" \
+            --title "Use or Lose $PACKAGE_VERSION" \
+            --notes "Desktop release of Use or Lose $PACKAGE_VERSION. Android artifacts are not part of this release." \
+            --target "$SOURCE_COMMIT" \
+            release/UseOrLose-Setup-*-Windows-x64.exe \
+            release/UseOrLose-Setup-*-Windows-x64.exe.sha256 \
+            release/UseOrLose-*-Linux-x86_64.tar.gz \
+            release/UseOrLose-*-Linux-x86_64.tar.gz.sha256 \
+            release/install.sh
 
-      - name: Remove obsolete beta-channel assets
+      - name: Update the committed build pointer
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -Eeuo pipefail
-          while IFS=$'\t' read -r asset_id asset_name; do
-            case "$asset_name" in
-              UseOrLose-Setup-Latest-Windows-x64.exe|\
-              UseOrLose-Setup-Latest-Windows-x64.exe.sha256|\
-              UseOrLose-Latest-Linux-x86_64.tar.gz|\
-              UseOrLose-Latest-Linux-x86_64.tar.gz.sha256|\
-              install.sh)
-                ;;
-              *)
-                gh api --method DELETE "repos/$GITHUB_REPOSITORY/releases/assets/$asset_id"
-                ;;
-            esac
-          done < <(
-            gh api "repos/$GITHUB_REPOSITORY/releases/tags/beta" \
-              --jq '.assets[] | [.id, .name] | @tsv'
-          )
-
-      - name: Commit rolling installers to master
-        env:
-          BUILD_VERSION: ${{ needs.metadata.outputs.package-version }}
-          SOURCE_COMMIT: ${{ github.sha }}
-        shell: bash
-        run: |
-          set -Eeuo pipefail
-          git lfs version
-          git lfs install --local
-          mkdir -p installers
-          # The rolling set is a single named generation: drop the previous
-          # brand's installers so the commit contains only the current names.
-          git rm -q --ignore-unmatch \
-            installers/FedLeave-Setup-Latest-Windows-x64.exe \
-            installers/FedLeave-Setup-Latest-Windows-x64.exe.sha256 \
-            installers/FedLeave-Latest-Linux-x86_64.tar.gz \
-            installers/FedLeave-Latest-Linux-x86_64.tar.gz.sha256 || true
-          cp rolling-assets/UseOrLose-Setup-Latest-Windows-x64.exe installers/
-          cp rolling-assets/UseOrLose-Setup-Latest-Windows-x64.exe.sha256 installers/
-          cp rolling-assets/UseOrLose-Latest-Linux-x86_64.tar.gz installers/
-          cp rolling-assets/UseOrLose-Latest-Linux-x86_64.tar.gz.sha256 installers/
-          cp rolling-assets/install.sh installers/install.sh
-          chmod +x installers/install.sh
+          # Only the tiny BUILD.txt is version controlled; the installer
+          # binaries live on the release and never enter the repository.
           printf 'source_commit=%s\nversion=%s\n' \
-            "$SOURCE_COMMIT" "$BUILD_VERSION" > installers/BUILD.txt
-
+            "$SOURCE_COMMIT" "$PACKAGE_VERSION" > installers/BUILD.txt
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add installers
+          git add installers/BUILD.txt
           if git diff --cached --quiet; then
-            echo "Committed installer mirrors already match this build."
-            exit 0
+            echo "BUILD.txt unchanged; nothing to commit."
+          else
+            git commit -m "Record published build $PACKAGE_VERSION"
+            git push origin HEAD:master
           fi
-          git commit -m "Build installers for ${SOURCE_COMMIT::12} [skip ci]"
-          git push origin HEAD:master

@@ -4,7 +4,7 @@ set -Eeuo pipefail
 # This bootstrap installs a checksum-verified, prebuilt PyInstaller bundle. It
 # never clones the repository and never requires Python or build tools.
 
-readonly REPOSITORY="joshua-guthrie/fedleave"
+readonly REPOSITORY="joshua-guthrie/use-or-lose"
 readonly DEFAULT_INSTALL_ROOT="/opt/fedleave"
 readonly DEFAULT_BIN_DIR="/usr/local/bin"
 readonly TOP_LEVEL_DIRECTORY="UseOrLose"
@@ -69,8 +69,8 @@ Options:
   -h, --help               Show this help.
 
 Examples:
-  curl -fsSL https://raw.githubusercontent.com/joshua-guthrie/fedleave/master/installer/linux/install.sh | bash
-  curl -fsSL https://raw.githubusercontent.com/joshua-guthrie/fedleave/master/installer/linux/install.sh | bash -s -- --unattended
+  curl -fsSL https://raw.githubusercontent.com/joshua-guthrie/use-or-lose/master/installer/linux/install.sh | bash
+  curl -fsSL https://raw.githubusercontent.com/joshua-guthrie/use-or-lose/master/installer/linux/install.sh | bash -s -- --unattended
 EOF
 }
 

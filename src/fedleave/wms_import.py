@@ -16,7 +16,7 @@ from .config import LeaveYear
 from .ledger import create_transaction
 from .payperiods import generate_pay_periods
 
-WMS_SUPPORT_URL = "https://github.com/joshua-guthrie/fedleave/issues/new"
+WMS_SUPPORT_URL = "https://github.com/joshua-guthrie/use-or-lose/issues/new"
 
 
 class WmsImportError(ValueError):

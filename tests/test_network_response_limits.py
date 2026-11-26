@@ -31,7 +31,7 @@ def test_calendar_download_bounds_actual_bytes_and_closes_response(monkeypatch, 
 
 @pytest.mark.parametrize("extra", [4, 5, 6])
 def test_update_metadata_enforces_limit_without_echoing_body(monkeypatch, extra):
-    valid = b"source_commit=" + b"a" * 40 + b"\nversion=0.2.2\n"
+    valid = b"source_commit=" + b"a" * 40 + b"\nversion=1.0.0\n"
     limit = len(valid) + 5
     monkeypatch.setattr(update_check, "UPDATE_METADATA_MAX_BYTES", limit, raising=False)
     response = BudgetResponse(valid + b"x" * extra, limit)

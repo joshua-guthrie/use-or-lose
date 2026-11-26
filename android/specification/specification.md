@@ -23,7 +23,7 @@ The approved [specification plan](planning/specification-plan.md) sets the scope
 | Installer mirror revision | `80313ff` |
 | Baseline check | Verified November 20, 2026 against the release record, tag, and installer build metadata. |
 
-Use the pinned source to resolve differences between the older documentation and shipped behavior. Record a baseline change before updating results or parity expectations. [Stable release](https://github.com/joshua-guthrie/fedleave/releases/tag/beta) · [Pinned source](https://github.com/joshua-guthrie/fedleave/tree/7041ce9e9921dd4c407595ed3269de1aca43e699) · [Installer build identity](../../installers/BUILD.txt)
+Use the pinned source to resolve differences between the older documentation and shipped behavior. Record a baseline change before updating results or parity expectations. [Stable release](https://github.com/joshua-guthrie/use-or-lose/releases/tag/beta) · [Pinned source](https://github.com/joshua-guthrie/use-or-lose/tree/7041ce9e9921dd4c407595ed3269de1aca43e699) · [Installer build identity](../../installers/BUILD.txt)
 
 ## Specification index
 

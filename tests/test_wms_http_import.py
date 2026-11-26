@@ -98,7 +98,7 @@ def test_wms_error_report_is_copyable_and_actionable() -> None:
     assert "Unsupported WMS leave code ZZ" in report
     assert "Report row:" in report
     assert "Row cells:" in report
-    assert "https://github.com/joshua-guthrie/fedleave/issues/new" in report
+    assert "https://github.com/joshua-guthrie/use-or-lose/issues/new" in report
     assert "Attach the original WMS HTML report" in report
 
 

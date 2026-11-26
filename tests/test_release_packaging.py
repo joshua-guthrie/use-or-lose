@@ -196,36 +196,40 @@ def test_artifact_size_gate_reports_regressions(tmp_path: Path) -> None:
         module.validate_file_size(artifact, 0.001)
 
 
-def test_distribution_workflow_publishes_only_master_to_rolling_channel() -> None:
+def test_distribution_workflow_publishes_only_on_explicit_dispatch() -> None:
     workflow = (ROOT / ".github" / "workflows" / "distribution.yml").read_text(encoding="utf-8")
 
-    assert "github.ref == 'refs/heads/master'" in workflow
-    assert "github.ref_type == 'tag'" not in workflow
-    assert "\n    tags:\n" not in workflow
-    assert 'check-size "$archive" --max-mib 300' in workflow
-    for asset_name in (
-        "UseOrLose-Setup-Latest-Windows-x64.exe",
-        "UseOrLose-Setup-Latest-Windows-x64.exe.sha256",
-        "UseOrLose-Latest-Linux-x86_64.tar.gz",
-        "UseOrLose-Latest-Linux-x86_64.tar.gz.sha256",
-        "install.sh",
-    ):
-        assert asset_name in workflow
-    assert "Commit rolling installers to master" in workflow
-    assert "git lfs install --local" in workflow
-    assert "git add installers" in workflow
-    assert "git push origin HEAD:master" in workflow
-    assert "[skip ci]" in workflow
+    # No automatic publication: builds are on demand only.
+    assert "workflow_dispatch:" in workflow
+    assert "  push:" not in workflow
+    assert "pull_request:" not in workflow
+    assert "make_release" in workflow
+    assert "github.event.inputs.make_release == 'true'" in workflow
+    assert "release_version" in workflow
+
+    # Desktop-only release: no Android artifacts, no rolling channel.
+    assert "gh release create" in workflow
+    assert "no Android artifacts" in workflow
+    assert "beta" not in workflow
+    assert "git lfs" not in workflow
+    assert "git add installers/BUILD.txt" in workflow
+
+    # Only the tiny build pointer is version controlled.
+    assert "installers/BUILD.txt" in workflow
 
 
-def test_large_committed_installer_mirrors_use_git_lfs() -> None:
+def test_no_installer_binaries_are_version_controlled() -> None:
     attributes = (ROOT / ".gitattributes").read_text(encoding="utf-8")
+    installers_dir = ROOT / "installers"
 
-    for artifact in (
-        "installers/UseOrLose-Setup-Latest-Windows-x64.exe",
-        "installers/UseOrLose-Latest-Linux-x86_64.tar.gz",
-    ):
-        assert f"{artifact} filter=lfs diff=lfs merge=lfs -text" in attributes
+    # Installer binaries live on the release, never in the repository.
+    assert "installers/" not in attributes
+    for name in sorted(installers_dir.iterdir()):
+        if name.is_dir():
+            continue
+        assert not name.name.endswith((".exe", ".tar.gz")), name
+    # The tiny build pointer stays committed for the update check.
+    assert (installers_dir / "BUILD.txt").is_file()
 
 
 def test_runtime_dependencies_and_bundle_manifest_remain_lean() -> None:

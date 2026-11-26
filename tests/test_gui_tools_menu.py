@@ -637,7 +637,7 @@ def test_periodic_update_alert_is_not_repeated_for_same_build(monkeypatch):
                 "current_build": "a" * 40,
                 "latest_version": "0.2.1.dev0+gbbbbbbbb",
                 "latest_build": "b" * 40,
-                "release_url": "https://github.com/joshua-guthrie/fedleave/releases/tag/v0.3.0",
+                "release_url": "https://github.com/joshua-guthrie/use-or-lose/releases/tag/v0.3.0",
                 "instructions": "Run the installer.",
             }
 

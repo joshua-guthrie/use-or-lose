@@ -254,10 +254,10 @@ the source repository.
 ### Windows installation
 
 Download
-[UseOrLose-Setup-Latest-Windows-x64.exe](https://github.com/joshua-guthrie/fedleave/releases/download/beta/UseOrLose-Setup-Latest-Windows-x64.exe)
+[UseOrLose-Setup-Latest-Windows-x64.exe](https://github.com/joshua-guthrie/use-or-lose/releases/download/beta/UseOrLose-Setup-Latest-Windows-x64.exe)
 and run the installation wizard. This stable link is replaced after every
 successful `master` build. A
-[committed Git LFS mirror](https://github.com/joshua-guthrie/fedleave/raw/refs/heads/master/installers/UseOrLose-Setup-Latest-Windows-x64.exe)
+[committed Git LFS mirror](https://github.com/joshua-guthrie/use-or-lose/raw/refs/heads/master/installers/UseOrLose-Setup-Latest-Windows-x64.exe)
 is updated by the same workflow. It installs Use or Lose in
 `C:\Program Files\Use or Lose`, registers it in Windows Installed Apps, creates a
 Use or Lose Start menu folder, and offers an optional desktop shortcut.
@@ -292,13 +292,13 @@ Install
 the latest successful `master` build with:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/joshua-guthrie/fedleave/master/installer/linux/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/joshua-guthrie/use-or-lose/master/installer/linux/install.sh | bash
 ```
 
 For unattended installation:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/joshua-guthrie/fedleave/master/installer/linux/install.sh | bash -s -- --unattended
+curl -fsSL https://raw.githubusercontent.com/joshua-guthrie/use-or-lose/master/installer/linux/install.sh | bash -s -- --unattended
 ```
 
 The bootstrap downloads the prebuilt archive and SHA-256 checksum from GitHub
@@ -398,7 +398,7 @@ These scripts handle build, install, repair, rollback, activation, and uninstall
 Linux interactive installation:
 
 ```bash
-git clone https://github.com/joshua-guthrie/fedleave.git
+git clone https://github.com/joshua-guthrie/use-or-lose.git
 cd fedleave
 chmod +x scripts/LinuxInstall.sh
 ./scripts/LinuxInstall.sh
@@ -407,7 +407,7 @@ chmod +x scripts/LinuxInstall.sh
 Windows interactive installation:
 
 ```bat
-git clone https://github.com/joshua-guthrie/fedleave.git
+git clone https://github.com/joshua-guthrie/use-or-lose.git
 cd fedleave
 scripts\WindowsInstall.bat
 ```

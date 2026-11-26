@@ -1,6 +1,6 @@
 [project]
 name = "fedleave"
-version = "0.2.2"
+version = "1.0.0"
 description = "Federal leave and time tracker"
 authors = [
   {name = "Joshua Guthrie"}
@@ -49,7 +49,7 @@ dev = [
 Homepage = "https://www.westmouthbay.com/fedleave-application/"
 Documentation = "https://www.westmouthbay.com/fedleave-application/"
 Support = "https://www.westmouthbay.com/fedleave-application/"
-Repository = "https://github.com/joshua-guthrie/fedleave"
+Repository = "https://github.com/joshua-guthrie/use-or-lose"
 
 [project.scripts]
 fedleave = "fedleave.__main__:main"
