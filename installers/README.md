@@ -1,27 +1,17 @@
-# Committed rolling installers
+# Committed build pointer
 
-This directory is the repository mirror of the most recent successful
-`master` build. GitHub Actions generates these files; do not edit them by hand.
+This directory no longer mirrors installer binaries: releases are on demand,
+and the desktop installers live only on the GitHub release. The only version
+controlled file is `BUILD.txt`, which identifies the source commit and version
+of the most recent published release; GitHub Actions updates it when a release
+is created. Do not edit these files by hand.
 
-Stable committed-file URLs:
-
-- Windows installer:
-  <https://github.com/joshua-guthrie/use-or-lose/raw/refs/heads/master/installers/UseOrLose-Setup-Latest-Windows-x64.exe>
-- Linux bootstrap:
-  <https://raw.githubusercontent.com/joshua-guthrie/use-or-lose/master/installers/install.sh>
-- Linux archive:
-  <https://github.com/joshua-guthrie/use-or-lose/raw/refs/heads/master/installers/UseOrLose-Latest-Linux-x86_64.tar.gz>
-
-The Windows installer and Linux archive are stored with Git LFS because each
-exceeds GitHub's 100 MiB regular-Git file limit. The `BUILD.txt` file identifies
-the source commit and version used to create the mirrored files.
-
-The release-asset URLs in the main README remain the preferred public download
-links. They do not consume the repository owner's Git LFS bandwidth allowance.
+The public download links in the main README point at the current stable
+release on <https://github.com/joshua-guthrie/use-or-lose/releases>.
 
 Both packages include `fedleave-mcp` beside the CLI. Launching it without a
 policy now grants full CLI authority, including destructive operations, to the
 launching OS user. Existing restricted policy files retain their profiles;
 configure `read_only` explicitly to retain the former policy-free restriction.
 See [MCP setup](../docs/MCP.md) for Windows/Linux connection examples and optional
-restricted policies. Installer layout and the public download URLs are unchanged.
+restricted policies.

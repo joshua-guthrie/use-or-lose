@@ -5,6 +5,7 @@ set -Eeuo pipefail
 # never clones the repository and never requires Python or build tools.
 
 readonly REPOSITORY="joshua-guthrie/use-or-lose"
+readonly CURRENT_RELEASE_VERSION="1.0.0"
 readonly DEFAULT_INSTALL_ROOT="/opt/fedleave"
 readonly DEFAULT_BIN_DIR="/usr/local/bin"
 readonly TOP_LEVEL_DIRECTORY="UseOrLose"
@@ -62,7 +63,7 @@ Usage:
 
 Options:
   --unattended             Run without interactive input.
-  --version VERSION        Install a legacy versioned package instead of the rolling build.
+  --version VERSION        Install a specific release instead of the current stable release.
   --install-root PATH      Installation root (default: /opt/fedleave).
   --bin-dir PATH           Command-link directory (default: /usr/local/bin).
   --asset-base-url URL     Override the release asset directory (primarily for testing).
@@ -177,14 +178,14 @@ install_runtime_tools() {
 }
 
 resolve_download() {
+  local version="${RELEASE_VERSION:-$CURRENT_RELEASE_VERSION}"
+  ARCHIVE_NAME="UseOrLose-${version}-Linux-x86_64.tar.gz"
+  DOWNLOAD_BASE_URL="${ASSET_BASE_URL:-https://github.com/${REPOSITORY}/releases/download/v${version}}"
   if [[ -n "$RELEASE_VERSION" ]]; then
-    ARCHIVE_NAME="UseOrLose-${RELEASE_VERSION}-Linux-x86_64.tar.gz"
-    DOWNLOAD_BASE_URL="${ASSET_BASE_URL:-https://github.com/${REPOSITORY}/releases/download/v${RELEASE_VERSION}}"
-    return
+    log "Installing Use or Lose ${version}."
+  else
+    log "Installing the current stable release, Use or Lose ${version}."
   fi
-  ARCHIVE_NAME="UseOrLose-Latest-Linux-x86_64.tar.gz"
-  DOWNLOAD_BASE_URL="${ASSET_BASE_URL:-https://github.com/${REPOSITORY}/releases/download/beta}"
-  log "Using the rolling package from the latest successful master push."
 }
 
 download_archive() {

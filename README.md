@@ -253,25 +253,22 @@ the source repository.
 
 ### Windows installation
 
-Download
-[UseOrLose-Setup-Latest-Windows-x64.exe](https://github.com/joshua-guthrie/use-or-lose/releases/download/beta/UseOrLose-Setup-Latest-Windows-x64.exe)
-and run the installation wizard. This stable link is replaced after every
-successful `master` build. A
-[committed Git LFS mirror](https://github.com/joshua-guthrie/use-or-lose/raw/refs/heads/master/installers/UseOrLose-Setup-Latest-Windows-x64.exe)
-is updated by the same workflow. It installs Use or Lose in
-`C:\Program Files\Use or Lose`, registers it in Windows Installed Apps, creates a
+Download the current stable release,
+[UseOrLose-Setup-1.0.0-Windows-x64.exe](https://github.com/joshua-guthrie/use-or-lose/releases/download/v1.0.0/UseOrLose-Setup-1.0.0-Windows-x64.exe),
+and run the installation wizard. It installs Use or Lose in
+`C:\Program Files\UseOrLose`, registers it in Windows Installed Apps, creates a
 Use or Lose Start menu folder, and offers an optional desktop shortcut.
 
 For an unattended installation:
 
 ```bat
-UseOrLose-Setup-Latest-Windows-x64.exe /S
+UseOrLose-Setup-1.0.0-Windows-x64.exe /S
 ```
 
 Uninstall from Windows Installed Apps, the Start menu shortcut, or run:
 
 ```bat
-"C:\Program Files\Use or Lose\Uninstall.exe" /S
+"C:\Program Files\UseOrLose\Uninstall.exe" /S
 ```
 
 Upgrades and uninstall remove application files only. Leave records, reports,
@@ -288,8 +285,7 @@ Ubuntu 22.04 and Debian 12 containers before publication. Both Calendar and
 Analytics must render using the bundled runtime and preserve datastore hashes.
 Newer build hosts must not silently raise this compatibility baseline; see
 [PyInstaller's Linux portability guidance](https://pyinstaller.org/en/stable/usage.html#gnu-linux).
-Install
-the latest successful `master` build with:
+Install the current stable release with:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/joshua-guthrie/use-or-lose/master/installer/linux/install.sh | bash
@@ -301,9 +297,9 @@ For unattended installation:
 curl -fsSL https://raw.githubusercontent.com/joshua-guthrie/use-or-lose/master/installer/linux/install.sh | bash -s -- --unattended
 ```
 
-The bootstrap downloads the prebuilt archive and SHA-256 checksum from GitHub
-through the rolling `beta` asset channel, verifies it, reads the exact
-commit-derived build version embedded in the archive, and then installs into
+The bootstrap downloads the prebuilt archive and SHA-256 checksum from the
+current stable GitHub release, verifies it, reads the exact build version
+embedded in the archive, and then installs into
 `/opt/fedleave/releases/<version>`. `/opt/fedleave/current` is switched only
 after validation, and commands are linked beneath `/usr/local/bin`. The archive
 contains its own Python runtime; the destination does not need Python, `pip`, a
@@ -673,54 +669,16 @@ python installer\package.py checksum artifacts\UseOrLose-Setup-%VERSION%-Windows
 Package validation fails if any command declared in `project.scripts`, its
 PyInstaller executable, or its embedded support directory is absent.
 
-### CI artifacts and the rolling installer channel
+### Build artifacts and releases
 
-The Distribution workflow builds both platform packages on every pushed
-branch, on pull requests, and when manually dispatched. Builds use a
-development version containing the abbreviated commit hash and appear as
-downloadable artifacts on that workflow run.
+The Distribution workflow builds both platform packages only when manually
+dispatched. A dispatch with a `release_version` builds and validates the desktop
+packages; with `make_release` set it also publishes the tagged GitHub release
+with the Windows installer/checksum, Linux archive/checksum, and `install.sh`.
+No Android artifacts are published. Releases are created only when explicitly
+requested, and installer binaries never enter the repository — only the tiny
+`installers/BUILD.txt` build pointer is version controlled.
 
-After both platform jobs pass for `master`, the workflow also replaces five
-stable public assets on the rolling `beta` release: the Windows
-installer/checksum, Linux archive/checksum, and `install.sh`. The `beta` tag is
-advanced to that commit. It is a rolling download bucket, not a versioned
-release; no version tags or manual release process are used. Feature branches
-and pull requests cannot replace the public installers.
-
-The workflow then commits those five files plus `BUILD.txt` under
-`installers/`. Git LFS stores the Windows installer and Linux archive; their
-checksums, bootstrap, and build identity remain ordinary Git files. The
-generated commit uses `[skip ci]` because it contains the outputs of the source
-commit's already completed Distribution run.
-
-The Linux archive embeds its exact development version and commit hash even
-though its public download filename is stable. The bootstrap installs that
-identity into a separate version directory, preserving rollback behavior.
-
-Every packaged executable also embeds that source commit. The GUI and
-`fedleave check-for-updates` compare it with `installers/BUILD.txt`, which is
-updated only after both platform installers pass and publish. The semantic
-project version remains manually controlled; every successful `master` push
-automatically advances the rolling build identity instead.
-
-In Use or Lose Calendar, **File > Preferences > Software updates** includes
-**Check for updates automatically**, enabled by default. Clear it and choose
-**Save** to disable startup and periodic update checks; the choice persists
-across restarts in the per-user GUI settings, separately from leave data.
-**Help > Check for Updates...** remains available for a manual check. Re-enabling
-automatic checks restores the normal schedule of at most one check per day.
-
-Version `0.2.2` is the one-time migration from semantic-only update checks to
-rolling build checks. An installed `0.2.1` can discover `0.2.2` through the old
-comparison; after that upgrade, each successfully published build is detected
-by its embedded commit identity.
-
-Before changing packaging, run the test suite and the platform build commands above.
-GitHub Actions performs silent install/uninstall and user-data preservation
-checks on Windows. Because Windows binaries cannot be executed in a Linux
-development environment, a clean Windows 11 virtual-machine wizard test and
-SmartScreen review remain prudent final manual checks. Code signing is not
-included.
 
 ## CLI Detailed Help
 
