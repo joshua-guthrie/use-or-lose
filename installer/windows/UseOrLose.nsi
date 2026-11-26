@@ -47,7 +47,7 @@ SetCompressor /SOLID lzma
 
 Name "${PRODUCT_NAME} ${VERSION}"
 OutFile "${OUTPUT_DIR}\UseOrLose-Setup-${VERSION}-Windows-x64.exe"
-InstallDir "$PROGRAMFILES64\Use or Lose"
+InstallDir "$PROGRAMFILES64\UseOrLose"
 InstallDirRegKey HKLM "${PRODUCT_REG_KEY}" "InstallLocation"
 BrandingText "Use or Lose"
 
