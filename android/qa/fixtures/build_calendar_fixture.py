@@ -21,7 +21,7 @@ FIXTURE_DIR = ROOT / "android" / "qa" / "fixtures" / FIXTURE_ID
 GOLDEN_DIR = ROOT / "android" / "qa" / "golden" / FIXTURE_ID
 STORAGE_DIR = ROOT / "android" / "qa" / "fixtures" / "storage"
 CARRYOVER_FIXTURE_ID = "carryover-2026"
-CARRYOVER_FIXTURE_DIR = ROOT / "android" / "qa" / "fixtures" / CARRYOVER_FIXTURE_ID
+CARRYOVER_FIXTURE_DIR = ROOT / "android" / "qa" / "fixtures" / "carryover-fixture" / CARRYOVER_FIXTURE_ID
 MARKER_FIXTURE_ID = "calendar-markers"
 MARKER_FIXTURE_DIR = ROOT / "android" / "qa" / "fixtures" / "marker-fixture" / MARKER_FIXTURE_ID
 FROZEN_DATE = "2026-01-16"
@@ -485,7 +485,7 @@ def build_carryover_fixture() -> None:
     copy_store(carryover_store, CARRYOVER_FIXTURE_DIR)
     files = tree_hashes(CARRYOVER_FIXTURE_DIR)
     write_json(
-        ROOT / "android" / "qa" / "fixtures" / f"{CARRYOVER_FIXTURE_ID}.manifest.json",
+        ROOT / "android" / "qa" / "fixtures" / "carryover-fixture" / f"{CARRYOVER_FIXTURE_ID}.manifest.json",
         {
             "schema_version": 1,
             "fixture_id": CARRYOVER_FIXTURE_ID,
@@ -505,7 +505,7 @@ def build_carryover_fixture() -> None:
             "frozen_local_date": FROZEN_DATE,
             "timezone": TIMEZONE,
             "store": {
-                "path": f"android/qa/fixtures/{CARRYOVER_FIXTURE_ID}",
+                "path": f"android/qa/fixtures/carryover-fixture/{CARRYOVER_FIXTURE_ID}",
                 "files": files,
                 "tree_digest": tree_digest(files),
                 "notes": [

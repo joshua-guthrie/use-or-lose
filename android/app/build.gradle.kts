@@ -63,6 +63,7 @@ android {
         getByName("androidTest") {
             assets.srcDirs(
                 rootProject.file("qa/fixtures/calendar-2026"),
+                rootProject.file("qa/fixtures/carryover-fixture"),
                 rootProject.file("qa/golden/calendar-2026"),
                 rootProject.file("qa/fixtures/storage"),
                 rootProject.file("qa/fixtures/marker-fixture"),

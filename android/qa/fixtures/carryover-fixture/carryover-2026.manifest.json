@@ -1,7 +1,7 @@
 {
   "description": "Pinned synthetic Carryover source fixture for the YEAR-CARRY-01 acceptance case.",
   "desktop_reference": {
-    "generator_source_revision": "ee224344c876cf2cd4fe5cbe46b79fa1c446c7f9",
+    "generator_source_revision": "725465456d614a7463beb75e1986c2b26648a762",
     "published_build": "0.2.2.dev0+g7041ce9e",
     "source_revision": "7041ce9e9921dd4c407595ed3269de1aca43e699"
   },
@@ -26,7 +26,7 @@
       "Automatic accrual rows keep their date-derived audit timestamps.",
       "Local lock files and backup directories are excluded."
     ],
-    "path": "android/qa/fixtures/carryover-2026",
+    "path": "android/qa/fixtures/carryover-fixture/carryover-2026",
     "tree_digest": "413e267d6d0d34dbfabe73b7445c45b9ccea9d36bf40933fa68d72d37611863a"
   },
   "timezone": "America/New_York"

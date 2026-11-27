@@ -27,7 +27,7 @@ def smoke(bundle: Path) -> None:
         }
         env.pop("LD_LIBRARY_PATH", None)
         env.pop("PYTHONPATH", None)
-        cli = bundle / "useorlose"
+        cli = bundle / "use-or-lose"
 
         def run(command):
             subprocess.run(list(map(str, command)), env=env, check=True, timeout=120)

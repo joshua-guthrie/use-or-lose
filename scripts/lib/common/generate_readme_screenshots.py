@@ -12,7 +12,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[3]
 EXAMPLES = ROOT / "examples"
-BACKEND = ROOT / "bin" / "useorlose"
+BACKEND = ROOT / "bin" / "use-or-lose"
 
 
 def _run(command: list[str]) -> None:

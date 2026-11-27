@@ -1,5 +1,10 @@
 package com.westmouthbay.useorlose.calendar
 
+import com.westmouthbay.useorlose.core.CarryoverCreateRequest
+import com.westmouthbay.useorlose.core.CarryoverCreationResult
+import com.westmouthbay.useorlose.core.CarryoverLot
+import com.westmouthbay.useorlose.core.CarryoverPreview
+import com.westmouthbay.useorlose.core.CarryoverReduction
 import com.westmouthbay.useorlose.core.CreationPreview
 import com.westmouthbay.useorlose.core.CreationRead
 import com.westmouthbay.useorlose.core.CreationResult
@@ -126,6 +131,38 @@ class SetupViewModelTest {
                 ),
             )
         }
+
+        override suspend fun previewCarryover(request: CarryoverCreateRequest): CarryoverCreationResult {
+            requests += "carryover" to request.sourceYear.toString()
+            // The fake mirrors the fingerprint contract: it changes when the
+            // source changes, so a stale confirm re-derives a new value.
+            val fingerprint = "fp:" + request.sourceJson.hashCode()
+            val start = LocalDate.parse("2027-01-10")
+            return CarryoverCreationResult(
+                files = mapOf(
+                    "leave_years/${request.year}.json" to testLedger(request.year, "2027-01-10"),
+                ),
+                preview = CarryoverPreview(
+                    year = request.year,
+                    sourceYear = request.sourceYear,
+                    sourceStart = LocalDate.parse("2026-01-11"),
+                    sourceEnd = LocalDate.parse("2027-01-09"),
+                    start = start,
+                    end = start.plusDays(26 * 14 - 1),
+                    payPeriodCount = request.payPeriods ?: 26,
+                    firstPayPeriod = start,
+                    openings = mapOf("annual" to 240.0, "sick" to 600.0, "credit" to 24.0),
+                    reductions = listOf(
+                        CarryoverReduction("annual", 40.0, "cap"),
+                        CarryoverReduction("credit", 6.0, "cap"),
+                    ),
+                    lots = listOf(CarryoverLot("travel_comp", 40.0, 2026, "lot-1", null)),
+                    warnings = emptyList(),
+                    sourceFingerprint = "src",
+                    previewFingerprint = fingerprint,
+                ),
+            )
+        }
     }
 
     private fun storeTree(root: File): Map<String, String> =
@@ -209,6 +246,124 @@ class SetupViewModelTest {
         assertTrue(files.containsKey("leave_years/2027.json"))
         // The existing config is preserved, not replaced.
         assertEquals("{\"schema_version\":1,\"defaults\":{}}", files["config.json"])
+    }
+
+    @Test
+    fun carryoverChoiceAppearsOnlyWithAnAdjacentSource() = runBlocking {
+        val root = tmp.newFolder("store")
+        val coordinator = StoreCoordinator(root)
+        val existing = StoreCandidate()
+        existing.put("config.json", "{\"schema_version\":1,\"defaults\":{}}")
+        existing.put("leave_years/2026.json", testLedger(2026, "2026-01-11"))
+        assertTrue(runBlocking { coordinator.publish(existing, null, "base") } is PublishResult.Published)
+
+        val vm = viewModel(coordinator, FakeCreation())
+        vm.begin(proposal(), resumeDate = null)
+        vm.awaitIdle()
+        assertEquals(2026, vm.state.value.carryoverSourceYear)
+
+        val emptyRoot = tmp.newFolder("empty")
+        val emptyVm = viewModel(StoreCoordinator(emptyRoot), FakeCreation())
+        emptyVm.begin(proposal(), resumeDate = null)
+        emptyVm.awaitIdle()
+        assertNull(emptyVm.state.value.carryoverSourceYear)
+    }
+
+    @Test
+    fun carryoverPreviewThenConfirmPublishesAndPreservesTheSource() = runBlocking {
+        val root = tmp.newFolder("store")
+        val coordinator = StoreCoordinator(root)
+        val existing = StoreCandidate()
+        existing.put("config.json", "{\"schema_version\":1,\"defaults\":{}}")
+        existing.put("leave_years/2026.json", testLedger(2026, "2026-01-11"))
+        assertTrue(runBlocking { coordinator.publish(existing, null, "base") } is PublishResult.Published)
+        val sourceBefore = (coordinator.open() as OpenResult.Ready).snapshot.files["leave_years/2026.json"]
+
+        val vm = viewModel(coordinator, FakeCreation())
+        vm.begin(proposal(), resumeDate = null)
+        vm.awaitIdle()
+        vm.onChooseCarryover()
+        vm.awaitIdle()
+
+        val state = vm.state.value
+        assertEquals(SetupStep.CARRYOVER_REVIEW, state.step)
+        assertEquals(240.0, state.carryoverPreview?.openings?.get("annual") ?: 0.0, 0.0001)
+        assertEquals(2, state.carryoverPreview?.reductions?.size)
+
+        vm.onCarryoverConfirm()
+        vm.awaitIdle()
+
+        assertTrue(vm.state.value.published)
+        val files = (coordinator.open() as OpenResult.Ready).snapshot.files
+        assertTrue(files.containsKey("leave_years/2027.json"))
+        // The source ledger stays byte-identical.
+        assertEquals(sourceBefore, files["leave_years/2026.json"])
+    }
+
+    @Test
+    fun staleCarryoverConfirmationRefreshesAndRequiresANewConfirm() = runBlocking {
+        val root = tmp.newFolder("store")
+        val coordinator = StoreCoordinator(root)
+        val existing = StoreCandidate()
+        existing.put("config.json", "{\"schema_version\":1,\"defaults\":{}}")
+        existing.put("leave_years/2026.json", testLedger(2026, "2026-01-11"))
+        assertTrue(runBlocking { coordinator.publish(existing, null, "base") } is PublishResult.Published)
+
+        val vm = viewModel(coordinator, FakeCreation())
+        vm.begin(proposal(), resumeDate = null)
+        vm.awaitIdle()
+        vm.onChooseCarryover()
+        vm.awaitIdle()
+        val reviewed = vm.state.value.carryoverPreview?.previewFingerprint
+
+        // A competing change republishes the source with different bytes,
+        // advancing the generation like another writer would.
+        val baseBefore = (coordinator.open() as OpenResult.Ready).snapshot.generationId
+        val changed = StoreCandidate()
+        changed.put("config.json", "{\"schema_version\":1,\"defaults\":{}}")
+        changed.put(
+            "leave_years/2026.json",
+            testLedger(2026, "2026-01-11").replace("\"sick_leave_accrual_hours\":4", "\"sick_leave_accrual_hours\":6"),
+        )
+        assertTrue(runBlocking { coordinator.publish(changed, baseBefore, "base2") } is PublishResult.Published)
+
+        vm.onCarryoverConfirm()
+        vm.awaitIdle()
+
+        val state = vm.state.value
+        assertTrue(state.stale)
+        assertFalse(state.published)
+        assertTrue(state.carryoverPreview?.previewFingerprint != reviewed)
+        assertFalse((coordinator.open() as OpenResult.Ready).snapshot.files.containsKey("leave_years/2027.json"))
+
+        // A fresh confirmation against the refreshed preview publishes once.
+        vm.onCarryoverConfirm()
+        vm.awaitIdle()
+        assertTrue(vm.state.value.published)
+    }
+
+    @Test
+    fun carryoverConfirmRejectsAnExistingDestination() = runBlocking {
+        val root = tmp.newFolder("store")
+        val coordinator = StoreCoordinator(root)
+        val existing = StoreCandidate()
+        existing.put("config.json", "{\"schema_version\":1,\"defaults\":{}}")
+        existing.put("leave_years/2026.json", testLedger(2026, "2026-01-11"))
+        existing.put("leave_years/2027.json", testLedger(2027, "2027-01-10"))
+        assertTrue(runBlocking { coordinator.publish(existing, null, "base") } is PublishResult.Published)
+        val destinationBefore = (coordinator.open() as OpenResult.Ready).snapshot.files["leave_years/2027.json"]
+
+        val vm = viewModel(coordinator, FakeCreation())
+        vm.begin(proposal(), resumeDate = null)
+        vm.awaitIdle()
+        vm.onChooseCarryover()
+        vm.awaitIdle()
+        vm.onCarryoverConfirm()
+        vm.awaitIdle()
+
+        assertFalse(vm.state.value.published)
+        assertEquals("DESTINATION_EXISTS", (vm.state.value.error as? com.westmouthbay.useorlose.core.CoreError.Read)?.code)
+        assertEquals(destinationBefore, (coordinator.open() as OpenResult.Ready).snapshot.files["leave_years/2027.json"])
     }
 
     @Test
