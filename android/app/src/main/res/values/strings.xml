@@ -86,11 +86,12 @@
     <string name="setup_carryover_blocked">Carryover unavailable: %1$s</string>
     <string name="carryover_review_title">Review %1$s leave year</string>
     <string name="carryover_source_card">Carry over from %1$d</string>
+    <string name="carryover_review_subtitle">For the balance on %1$s</string>
     <string name="carryover_source_body">%1$s \u2013 %2$s \u00b7 %3$d periods. Source closes %4$s.</string>
     <string name="carryover_opening">%1$s opening</string>
     <string name="carryover_reduction_item">%1$s %2$s h</string>
     <string name="carryover_reduction_suffix">exceed the configured limits.</string>
-    <string name="carryover_reduction_join"> and </string>
+    <string name="carryover_reduction_join">\u0020and\u0020</string>
     <string name="carryover_lots_action">Review lots and warnings</string>
     <string name="carryover_lots_title">Carried lots</string>
     <string name="carryover_warnings_title">Warnings</string>

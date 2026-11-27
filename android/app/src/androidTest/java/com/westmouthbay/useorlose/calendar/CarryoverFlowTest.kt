@@ -110,3 +110,56 @@ class CarryoverFlowTest : CalendarUiTestBase() {
         assertEquals(sourceAsset, files["leave_years/2026.json"])
     }
 }
+
+/**
+ * Evidence captures for the I07 carryover review, rendered from the pinned
+ * carryover fixture, for the image-agent mockup comparison.
+ */
+class CarryoverVisualCaptureTest : CalendarUiTestBase() {
+
+    override fun fixtureAssets(): List<String> = CalendarDeveloperConfig.carryoverFixtureAssets
+
+    override fun assetPrefix(): String = CalendarDeveloperConfig.CARRYOVER_FIXTURE_PREFIX
+
+    override fun fixtureBalanceText(): String = "280 h"
+
+    @OptIn(androidx.compose.ui.test.ExperimentalTestApi::class)
+    @Test
+    fun captureCarryoverReview() {
+        setAppContent()
+        waitForBalanceCard()
+        composeRule.onNodeWithTag("calendar_balance_card").performClick()
+        composeRule.onNodeWithText("Choose date").performClick()
+        waitForPickerGrid()
+        repeat(12) {
+            composeRule.onNodeWithContentDescription("Next month").performClick()
+        }
+        composeRule.waitUntil(timeoutMillis = 20_000) {
+            composeRule.onAllNodes(hasTestTag("balance_picker_day_2027-01-10"))
+                .fetchSemanticsNodes().isNotEmpty()
+        }
+        composeRule.onNodeWithTag("balance_picker_day_2027-01-10").performScrollTo().performClick()
+        composeRule.onNodeWithText("Show January 10").performScrollTo().performClick()
+        composeRule.waitUntil(timeoutMillis = 30_000) {
+            composeRule.onAllNodesWithText("Balance unavailable").fetchSemanticsNodes().isNotEmpty()
+        }
+        composeRule.onNodeWithTag("balances_setup_action").performClick()
+        composeRule.waitUntil(timeoutMillis = 30_000) {
+            composeRule.onAllNodes(hasTestTag("setup_carryover_choice")).fetchSemanticsNodes().isNotEmpty()
+        }
+        composeRule.onNodeWithTag("setup_carryover_choice").performScrollTo().performClick()
+        composeRule.waitUntil(timeoutMillis = 30_000) {
+            composeRule.onAllNodesWithText("Annual leave opening").fetchSemanticsNodes().isNotEmpty()
+        }
+        capture("carryover-review")
+        composeRule.onNodeWithTag("carryover_lots").performScrollTo().performClick()
+        composeRule.waitUntil(timeoutMillis = 10_000) {
+            composeRule.onAllNodesWithText("No expiring lots are carried.").fetchSemanticsNodes().isNotEmpty()
+        }
+        composeRule.mainClock.advanceTimeBy(1_500)
+        capture("carryover-review-lots")
+        composeRule.onNodeWithTag("carryover_back").performScrollTo()
+        composeRule.mainClock.advanceTimeBy(500)
+        capture("carryover-review-lots-actions")
+    }
+}

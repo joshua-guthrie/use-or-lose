@@ -607,8 +607,18 @@ private fun CarryoverReviewStep(
         style = MaterialTheme.typography.headlineMedium,
         modifier = Modifier.padding(vertical = 12.dp),
     )
+    val resumeDate = state.resumeDate?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
     Text(
-        text = context.getString(R.string.setup_review_range, preview.start.format(SETUP_RANGE_FORMAT), preview.end.format(SETUP_RANGE_FORMAT), preview.payPeriodCount),
+        text = if (resumeDate != null) {
+            context.getString(R.string.carryover_review_subtitle, resumeDate.format(SETUP_NOTE_FORMAT))
+        } else {
+            context.getString(
+                R.string.setup_review_range,
+                preview.start.format(SETUP_NOTE_FORMAT),
+                preview.end.format(SETUP_NOTE_FORMAT),
+                preview.payPeriodCount,
+            )
+        },
         style = MaterialTheme.typography.titleMedium,
         modifier = Modifier.padding(bottom = 8.dp),
     )
@@ -629,8 +639,8 @@ private fun CarryoverReviewStep(
             Text(
                 text = context.getString(
                     R.string.carryover_source_body,
-                    preview.start.format(SETUP_RANGE_FORMAT),
-                    preview.end.format(SETUP_RANGE_FORMAT),
+                    preview.start.format(SETUP_NOTE_FORMAT),
+                    preview.end.format(SETUP_NOTE_FORMAT),
                     preview.payPeriodCount,
                     preview.sourceEnd.format(SETUP_NOTE_FORMAT),
                 ),
@@ -639,9 +649,13 @@ private fun CarryoverReviewStep(
             )
         }
     }
+    val categoryOrder = listOf(
+        "annual", "sick", "credit", "comp", "travel_comp", "time_off_award", "restored_annual", "ppl",
+    )
     preview.openings
         .filter { (_, hours) -> hours != 0.0 }
-        .toSortedMap()
+        .entries
+        .sortedBy { categoryOrder.indexOf(it.key).let { index -> if (index == -1) categoryOrder.size else index } }
         .forEach { (category, hours) ->
             ReviewRow(
                 label = context.getString(R.string.carryover_opening, BalancePresentation.fullLabel(context, category)),
@@ -729,8 +743,9 @@ private fun CarryoverReviewStep(
     SecondaryAction(
         text = stringResource(R.string.setup_back_date),
         onClick = viewModel::onCarryoverBack,
-        modifier = Modifier.padding(vertical = 4.dp),
+        modifier = Modifier.padding(vertical = 4.dp).testTag("carryover_back"),
     )
+    Spacer(Modifier.height(24.dp))
 }
 
 private fun reductionText(
