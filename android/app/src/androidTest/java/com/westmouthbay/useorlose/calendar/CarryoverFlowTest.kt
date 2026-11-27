@@ -4,6 +4,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -24,6 +25,8 @@ import org.junit.Test
 class CarryoverFlowTest : CalendarUiTestBase() {
 
     override fun fixtureAssets(): List<String> = CalendarDeveloperConfig.carryoverFixtureAssets
+
+    override fun fixtureBalanceText(): String = "280 h"
 
     override fun assetPrefix(): String = CalendarDeveloperConfig.CARRYOVER_FIXTURE_PREFIX
 
@@ -58,6 +61,9 @@ class CarryoverFlowTest : CalendarUiTestBase() {
             composeRule.onAllNodesWithText("Balance unavailable").fetchSemanticsNodes().isNotEmpty()
         }
         composeRule.onNodeWithTag("balances_setup_action").performClick()
+        composeRule.waitUntil(timeoutMillis = 30_000) {
+            composeRule.onAllNodesWithText("Set up leave year").fetchSemanticsNodes().isNotEmpty()
+        }
 
         // The adjacent 2026 source offers the carryover choice.
         composeRule.waitUntil(timeoutMillis = 30_000) {
@@ -65,16 +71,17 @@ class CarryoverFlowTest : CalendarUiTestBase() {
         }
         composeRule.onNodeWithTag("setup_carryover_choice").performScrollTo().performClick()
 
-        // The review renders the pinned preview values.
+        // The review renders the pinned preview values with full leave-type
+        // names: annual 240 h, sick 600 h, credit 24 h.
         composeRule.waitUntil(timeoutMillis = 30_000) {
-            composeRule.onAllNodesWithText("Annual opening").fetchSemanticsNodes().isNotEmpty()
+            composeRule.onAllNodesWithText("Annual leave opening").fetchSemanticsNodes().isNotEmpty()
         }
         composeRule.onNodeWithText("240 h").assertIsDisplayed()
         composeRule.onNodeWithText("600 h").assertIsDisplayed()
         composeRule.onNodeWithText("24 h").assertIsDisplayed()
-        composeRule.onNodeWithText(
-            "Annual 40 h and credit 6 h exceed the configured limits.",
-        ).assertIsDisplayed()
+        composeRule.onNodeWithText("exceed the configured limits.", substring = true).assertIsDisplayed()
+        composeRule.onNodeWithText("Annual leave 40 h", substring = true).assertIsDisplayed()
+        composeRule.onNodeWithText("Credit hours 6 h", substring = true).assertIsDisplayed()
 
         // The lots detail expands and reports no expiring lots.
         composeRule.onNodeWithTag("carryover_lots").performScrollTo().performClick()

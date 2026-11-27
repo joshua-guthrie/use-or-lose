@@ -19,7 +19,7 @@ The approved [specification plan](planning/specification-plan.md) sets the scope
 
 | Desktop reference | Pinned identity |
 | --- | --- |
-| Current stable release | `v1.0.0` ("Use or Lose 1.0.0"), desktop only, November 26, 2026 |
+| Current stable release | `v1.1.0` ("Use or Lose 1.1.0"), desktop only, November 26, 2026 |
 | Fixture parity source | `7041ce9e9921dd4c407595ed3269de1aca43e699` (historical build the fixtures were verified against) |
 | Baseline check | Verified November 20, 2026 against the release record, tag, and installer build metadata. |
 

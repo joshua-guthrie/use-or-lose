@@ -254,7 +254,7 @@ the source repository.
 ### Windows installation
 
 Download the current stable release,
-[UseOrLose-Setup-1.0.0-Windows-x64.exe](https://github.com/joshua-guthrie/use-or-lose/releases/download/v1.0.0/UseOrLose-Setup-1.0.0-Windows-x64.exe),
+[UseOrLose-Setup-1.1.0-Windows-x64.exe](https://github.com/joshua-guthrie/use-or-lose/releases/download/v1.1.0/UseOrLose-Setup-1.1.0-Windows-x64.exe),
 and run the installation wizard. It installs Use or Lose in
 `C:\Program Files\UseOrLose`, registers it in Windows Installed Apps, creates a
 Use or Lose Start menu folder, and offers an optional desktop shortcut.
@@ -262,7 +262,7 @@ Use or Lose Start menu folder, and offers an optional desktop shortcut.
 For an unattended installation:
 
 ```bat
-UseOrLose-Setup-1.0.0-Windows-x64.exe /S
+UseOrLose-Setup-1.1.0-Windows-x64.exe /S
 ```
 
 Uninstall from Windows Installed Apps, the Start menu shortcut, or run:

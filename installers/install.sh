@@ -5,8 +5,8 @@ set -Eeuo pipefail
 # never clones the repository and never requires Python or build tools.
 
 readonly REPOSITORY="joshua-guthrie/use-or-lose"
-readonly CURRENT_RELEASE_VERSION="1.0.0"
-readonly DEFAULT_INSTALL_ROOT="/opt/fedleave"
+readonly CURRENT_RELEASE_VERSION="1.1.0"
+readonly DEFAULT_INSTALL_ROOT="/opt/use-or-lose"
 readonly DEFAULT_BIN_DIR="/usr/local/bin"
 readonly TOP_LEVEL_DIRECTORY="UseOrLose"
 
@@ -53,7 +53,7 @@ usage() {
 Install the latest successful Use or Lose master build for 64-bit Debian/Ubuntu.
 
 Official project website:
-  https://www.westmouthbay.com/fedleave-application/
+  https://www.westmouthbay.com/UseOrLose-application/
 
 Author:
   Joshua Guthrie
@@ -64,7 +64,7 @@ Usage:
 Options:
   --unattended             Run without interactive input.
   --version VERSION        Install a specific release instead of the current stable release.
-  --install-root PATH      Installation root (default: /opt/fedleave).
+  --install-root PATH      Installation root (default: /opt/use-or-lose).
   --bin-dir PATH           Command-link directory (default: /usr/local/bin).
   --asset-base-url URL     Override the release asset directory (primarily for testing).
   -h, --help               Show this help.
@@ -334,7 +334,7 @@ find_packaged_command() {
   find "$root" -type f -name "$command" -perm -u+x -print -quit
 }
 
-is_legacy_fedleave_wrapper() {
+is_legacy_use_or_lose_wrapper() {
   local path="$1" command="$2" wrapper_line
   [[ -f "$path" && -r "$path" ]] || return 1
   wrapper_line="$(sed -n '2p' "$path")"
@@ -379,15 +379,15 @@ install_release() {
   run_privileged rmdir -- "$STAGING_DIR"
   STAGING_DIR=""
 
-  cli="$(find_packaged_command "$release_dir" fedleave)"
-  [[ -n "$cli" ]] || die "The installed release does not contain the required fedleave CLI."
+  cli="$(find_packaged_command "$release_dir" use-or-lose)"
+  [[ -n "$cli" ]] || die "The installed release does not contain the required use-or-lose CLI."
   if ! "$cli" --version >/dev/null 2>&1; then
     "$cli" --help >/dev/null
   fi
   log "Verified the installed CLI before activation."
 
   local -a optional_commands=(
-    fedleave-mcp
+    use-or-lose-mcp
     UseOrLoseCalendar UseOrLoseAnalytics
     AnnualLeaveChartForTheYear SickLeaveChartForTheYear
     CreditHoursChartForTheYear CompTimeChartForTheYear
@@ -395,11 +395,11 @@ install_release() {
     AnnualLeaveYearlyComparison SickLeaveYearlyComparison
     CreditHoursYearlyComparison CompTimeYearlyComparison
     TravelCompYearlyComparison TimeOffAwardYearlyComparison
-    OvertimeYearlyComparison fedleaveMonthReportGraphic
+    OvertimeYearlyComparison UseOrLoseMonthReportGraphic
   )
   local command path relative link existing_target
 
-  for command in fedleave "${optional_commands[@]}"; do
+  for command in use-or-lose "${optional_commands[@]}"; do
     path="$(find_packaged_command "$release_dir" "$command")"
     if [[ -z "$path" ]]; then
       log "Optional packaged application not found: $command"
@@ -412,7 +412,7 @@ install_release() {
         existing_target="$(readlink "$link")"
         [[ "$existing_target" == "$INSTALL_ROOT/current/"* ]] ||
           die "Refusing to replace command link not owned by Use or Lose: $link"
-      elif is_legacy_fedleave_wrapper "$link" "$command"; then
+      elif is_legacy_use_or_lose_wrapper "$link" "$command"; then
         log "Migrating legacy Use or Lose command wrapper: $link"
       else
         die "Refusing to replace non-symbolic-link command not owned by Use or Lose: $link"
@@ -429,10 +429,10 @@ install_release() {
   run_privileged ln -s "$release_dir" "$pending_link"
   run_privileged mv -Tf "$pending_link" "$current_link"
 
-  "$BIN_DIR/fedleave" --version >/dev/null 2>&1 || "$BIN_DIR/fedleave" --help >/dev/null
+  "$BIN_DIR/use-or-lose" --version >/dev/null 2>&1 || "$BIN_DIR/use-or-lose" --help >/dev/null
   log "Use or Lose ${RELEASE_VERSION} installed successfully."
   log "Launch the calendar with: UseOrLoseCalendar"
-  log "Use the command line with: fedleave --help"
+  log "Use the command line with: use-or-lose --help"
   log "Previous release directories remain available beneath $releases_dir."
 }
 

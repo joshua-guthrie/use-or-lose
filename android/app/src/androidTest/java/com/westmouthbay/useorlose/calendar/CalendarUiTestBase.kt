@@ -83,10 +83,13 @@ abstract class CalendarUiTestBase {
         }
     }
 
+    /** The balance-card figure the fixture renders once loaded. */
+    protected open fun fixtureBalanceText(): String = "90 h"
+
     /** Wait until the Calendar balance card has loaded the fixture values. */
-    protected fun waitForBalanceCard() {
+    protected open fun waitForBalanceCard() {
         composeRule.waitUntil(timeoutMillis = 20_000) {
-            composeRule.onAllNodesWithText("90 h").fetchSemanticsNodes().isNotEmpty()
+            composeRule.onAllNodesWithText(fixtureBalanceText()).fetchSemanticsNodes().isNotEmpty()
         }
     }
 

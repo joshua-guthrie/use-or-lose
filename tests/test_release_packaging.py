@@ -50,7 +50,7 @@ def _fake_bundle(module, root: Path, platform: str = "linux") -> Path:
 
 def _stable_linux_assets(module, bundle: Path, artifacts: Path) -> None:
     """Publish the current stable release archive the bootstrap downloads by default."""
-    module.create_linux_archive(bundle, artifacts, "1.0.0")
+    module.create_linux_archive(bundle, artifacts, "1.1.0")
 
 
 def test_version_and_windows_metadata_come_from_pyproject() -> None:
@@ -320,7 +320,7 @@ def test_bootstrap_installs_local_verified_release_without_python(tmp_path: Path
     assert (install_root / "current").is_symlink()
     assert (bin_dir / "use-or-lose").is_symlink()
     assert (bin_dir / "UseOrLoseCalendar").is_symlink()
-    assert (install_root / "releases" / "1.0.0" / "use-or-lose").is_file()
+    assert (install_root / "releases" / "1.1.0" / "use-or-lose").is_file()
 
 
 @pytest.mark.skipif(os.name == "nt", reason="Linux bootstrap is exercised on POSIX hosts")
@@ -402,7 +402,7 @@ def test_bootstrap_checksum_failure_does_not_create_install_root(tmp_path: Path)
     bundle = _fake_bundle(module, tmp_path / "bundle")
     artifacts = tmp_path / "assets"
     _stable_linux_assets(module, bundle, artifacts)
-    archive = artifacts / "UseOrLose-1.0.0-Linux-x86_64.tar.gz"
+    archive = artifacts / "UseOrLose-1.1.0-Linux-x86_64.tar.gz"
     checksum = archive.with_name(archive.name + ".sha256")
     checksum.write_text(f"{'0' * 64}  {archive.name}\n", encoding="utf-8")
     install_root = tmp_path / "must-not-exist"

@@ -5,7 +5,7 @@ set -Eeuo pipefail
 # never clones the repository and never requires Python or build tools.
 
 readonly REPOSITORY="joshua-guthrie/use-or-lose"
-readonly CURRENT_RELEASE_VERSION="1.0.0"
+readonly CURRENT_RELEASE_VERSION="1.1.0"
 readonly DEFAULT_INSTALL_ROOT="/opt/use-or-lose"
 readonly DEFAULT_BIN_DIR="/usr/local/bin"
 readonly TOP_LEVEL_DIRECTORY="UseOrLose"
