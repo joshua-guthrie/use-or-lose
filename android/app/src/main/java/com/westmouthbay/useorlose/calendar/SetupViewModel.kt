@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.chaquo.python.Python
 import com.westmouthbay.useorlose.core.AppDependencies
+import com.westmouthbay.useorlose.core.CarryoverCreateRequest
 import com.westmouthbay.useorlose.core.CoreError
 import com.westmouthbay.useorlose.core.CreationBridge
 import com.westmouthbay.useorlose.core.ManualCreateRequest
@@ -73,6 +73,7 @@ class SetupViewModel(
     fun begin(proposal: SetupProposal, resumeDate: String?) {
         // A fresh entry resets everything, including a prior published year:
         // consecutive missing years are created one flow at a time.
+        val sourceYear = proposal.year - 1
         _state.update {
             SetupUiState(
                 step = SetupStep.METHOD,
@@ -84,6 +85,13 @@ class SetupViewModel(
                 resumeDate = resumeDate,
                 todayIso = timeSource.today().toString(),
             )
+        }
+        // The carryover choice is offered when the adjacent source file
+        // exists; deeper schedule/policy validation happens at preview.
+        launchRead {
+            val snapshot = (store.open() as? OpenResult.Ready)?.snapshot
+            val available = snapshot?.files?.containsKey("leave_years/$sourceYear.json") == true
+            _state.update { it.copy(carryoverSourceYear = sourceYear.takeIf { available }) }
         }
     }
 
@@ -118,7 +126,15 @@ class SetupViewModel(
     }
 
     fun onBackToMethod() = _state.update {
-        it.copy(step = SetupStep.METHOD, preview = null, previewKind = null, error = null, stale = false)
+        it.copy(
+            step = SetupStep.METHOD,
+            preview = null,
+            previewKind = null,
+            carryoverPreview = null,
+            carryoverPayPeriods = null,
+            error = null,
+            stale = false,
+        )
     }
 
     fun onBackToForm() = _state.update {
@@ -142,6 +158,224 @@ class SetupViewModel(
         val start = runCatching { LocalDate.parse(state.leaveYearStart) }.getOrNull() ?: return false
         val end = start.plusDays((state.payPeriods * 14L) - 1)
         return !timeSource.today().isBefore(start) && !timeSource.today().isAfter(end)
+    }
+
+    fun onChooseCarryover() {
+        val state = _state.value
+        val sourceYear = state.carryoverSourceYear ?: state.year.toIntOrNull()?.minus(1)
+        val year = state.year.toIntOrNull()
+        if (sourceYear == null || year == null) {
+            _state.update {
+                it.copy(error = CoreError.Read("INVALID_REQUEST", "year", "Check the leave-year fields."))
+            }
+            return
+        }
+        _state.update { it.copy(loading = true, error = null, carryoverBlocked = null) }
+        launchRead { previewCarryoverNow(sourceYear, year, state.payPeriods) }
+    }
+
+    fun onCarryoverPayPeriodsChanged(value: Int) {
+        _state.update { it.copy(carryoverPayPeriods = value) }
+        // The schedule override changes the candidate: re-derive a fresh
+        // preview whenever the review already shows one.
+        val state = _state.value
+        val sourceYear = state.carryoverSourceYear ?: state.year.toIntOrNull()?.minus(1)
+        val year = state.year.toIntOrNull()
+        if (sourceYear == null || year == null || state.carryoverPreview == null) {
+            return
+        }
+        _state.update { it.copy(loading = true, error = null) }
+        launchRead { previewCarryoverNow(sourceYear, year, value) }
+    }
+
+    fun onCarryoverBack() {
+        val resumeDate = _state.value.resumeDate
+        if (resumeDate != null) {
+            onCancel()
+        } else {
+            onBackToMethod()
+        }
+    }
+
+    /** Re-read the current store and derive the carryover preview from it. */
+    private suspend fun previewCarryoverNow(
+        sourceYear: Int,
+        year: Int,
+        payPeriods: Int?,
+    ) {
+        val snapshot = (store.open() as? OpenResult.Ready)?.snapshot
+        if (snapshot == null) {
+            _state.update {
+                it.copy(
+                    loading = false,
+                    error = CoreError.Read(
+                        "STORE_UNAVAILABLE",
+                        "store",
+                        "The existing data needs review before a new year can be created.",
+                    ),
+                )
+            }
+            return
+        }
+        val source = snapshot.files["leave_years/$sourceYear.json"]
+        if (source == null) {
+            _state.update {
+                it.copy(
+                    loading = false,
+                    step = SetupStep.METHOD,
+                    carryoverBlocked = "No valid $sourceYear source ledger is available.",
+                )
+            }
+            return
+        }
+        val config = snapshot.files["config.json"]
+        val result = runCatching {
+            creation.previewCarryover(
+                CarryoverCreateRequest(
+                    year = year,
+                    sourceYear = sourceYear,
+                    sourceJson = source,
+                    payPeriods = payPeriods,
+                    configJson = config,
+                ),
+            )
+        }
+        result.fold(
+            onSuccess = { carryoverResult ->
+                val base = snapshot.generationId
+                _state.update {
+                    it.copy(
+                        step = SetupStep.CARRYOVER_REVIEW,
+                        carryoverPreview = carryoverResult.preview,
+                        previewedFiles = carryoverResult.files,
+                        previewKind = SetupKind.CARRYOVER,
+                        previewedBase = base,
+                        loading = false,
+                        stale = false,
+                        error = null,
+                    )
+                }
+            },
+            onFailure = { error ->
+                val core = error.toCoreError()
+                _state.update {
+                    it.copy(
+                        loading = false,
+                        step = SetupStep.METHOD,
+                        carryoverBlocked = core.describe(),
+                    )
+                }
+            },
+        )
+    }
+
+    fun onCarryoverConfirm() {
+        val state = _state.value
+        val year = state.year.toIntOrNull()
+        val sourceYear = state.carryoverSourceYear
+        if (year == null || sourceYear == null || state.published) {
+            return
+        }
+        _state.update { it.copy(loading = true, error = null) }
+        launchRead {
+            val opened = store.open()
+            val snapshot = opened as? OpenResult.Ready
+            if (snapshot == null) {
+                _state.update {
+                    it.copy(
+                        loading = false,
+                        error = CoreError.Read(
+                            "STORE_UNAVAILABLE",
+                            "store",
+                            "The existing data needs review before a new year can be created.",
+                        ),
+                    )
+                }
+                return@launchRead
+            }
+            if (snapshot.snapshot.files.containsKey("leave_years/$year.json")) {
+                _state.update {
+                    it.copy(
+                        loading = false,
+                        error = CoreError.Read(
+                            "DESTINATION_EXISTS",
+                            "year",
+                            "The $year leave year already exists.",
+                        ),
+                    )
+                }
+                return@launchRead
+            }
+            val payPeriods = state.carryoverPayPeriods
+            val result = runCatching {
+                creation.previewCarryover(
+                    CarryoverCreateRequest(
+                        year = year,
+                        sourceYear = sourceYear,
+                        sourceJson = snapshot.snapshot.files.getValue("leave_years/$sourceYear.json"),
+                        payPeriods = payPeriods,
+                        configJson = snapshot.snapshot.files["config.json"],
+                    ),
+                )
+            }
+            result.fold(
+                onSuccess = { carryoverResult ->
+                    val reviewed = state.carryoverPreview?.previewFingerprint
+                    if (reviewed != null && carryoverResult.preview.previewFingerprint != reviewed) {
+                        _state.update {
+                            it.copy(
+                                step = SetupStep.CARRYOVER_REVIEW,
+                                carryoverPreview = carryoverResult.preview,
+                                previewedFiles = carryoverResult.files,
+                                previewedBase = snapshot.snapshot.generationId,
+                                loading = false,
+                                stale = true,
+                            )
+                        }
+                        return@fold
+                    }
+                    val candidate = StoreCandidate()
+                    snapshot.snapshot.files.forEach { (name, text) -> candidate.put(name, text) }
+                    for ((name, text) in carryoverResult.files) {
+                        candidate.put(name, text)
+                    }
+                    val published = store.publish(
+                        candidate,
+                        expectedBase = state.previewedBase,
+                        fingerprint = "carryover:$year",
+                    )
+                    when (published) {
+                        is PublishResult.Published -> _state.update {
+                            it.copy(loading = false, published = true, error = null, stale = false)
+                        }
+                        PublishResult.StaleBase -> _state.update {
+                            it.copy(loading = false, stale = true)
+                        }
+                        is PublishResult.Rejected -> _state.update {
+                            it.copy(
+                                loading = false,
+                                error = CoreError.Read(
+                                    "REJECTED",
+                                    "store",
+                                    published.issues.joinToString("; ") { it.message },
+                                ),
+                            )
+                        }
+                        is PublishResult.Failed -> _state.update {
+                            it.copy(
+                                loading = false,
+                                error = CoreError.Unexpected("Store publish failed: ${published.reason}"),
+                            )
+                        }
+                    }
+                },
+                onFailure = { error ->
+                    _state.update {
+                        it.copy(loading = false, error = error.toCoreError())
+                    }
+                },
+            )
+        }
     }
 
     fun onPreview() {
@@ -195,10 +429,24 @@ class SetupViewModel(
                             timezone = timezone,
                         ),
                     )
+                    SetupKind.CARRYOVER -> null
                 }
             }
             result.fold(
                 onSuccess = { creationResult ->
+                    if (creationResult == null) {
+                        _state.update {
+                            it.copy(
+                                loading = false,
+                                error = CoreError.Read(
+                                    "INVALID_REQUEST",
+                                    "request",
+                                    "Carryover previews use the carryover flow.",
+                                ),
+                            )
+                        }
+                        return@fold
+                    }
                     val base = (store.open() as? OpenResult.Ready)?.snapshot?.generationId
                     _state.update {
                         it.copy(
@@ -318,11 +566,16 @@ class SetupViewModel(
         else -> CoreError.Unexpected(message ?: javaClass.simpleName, this)
     }
 
+    private fun CoreError.describe(): String = when (this) {
+        is CoreError.Read -> message
+        else -> message ?: javaClass.simpleName
+    }
+
     companion object {
         fun factory(dependencies: AppDependencies): ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 SetupViewModel(
-                    creation = CreationBridge(Python.getInstance()),
+                    creation = CreationBridge(),
                     store = dependencies.store,
                     timeSource = dependencies.timeSource,
                 )

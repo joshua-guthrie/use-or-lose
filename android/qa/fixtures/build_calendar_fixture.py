@@ -20,6 +20,8 @@ FIXTURE_ID = "calendar-2026"
 FIXTURE_DIR = ROOT / "android" / "qa" / "fixtures" / FIXTURE_ID
 GOLDEN_DIR = ROOT / "android" / "qa" / "golden" / FIXTURE_ID
 STORAGE_DIR = ROOT / "android" / "qa" / "fixtures" / "storage"
+CARRYOVER_FIXTURE_ID = "carryover-2026"
+CARRYOVER_FIXTURE_DIR = ROOT / "android" / "qa" / "fixtures" / CARRYOVER_FIXTURE_ID
 MARKER_FIXTURE_ID = "calendar-markers"
 MARKER_FIXTURE_DIR = ROOT / "android" / "qa" / "fixtures" / "marker-fixture" / MARKER_FIXTURE_ID
 FROZEN_DATE = "2026-01-16"
@@ -127,6 +129,31 @@ def build_temp_store() -> Path:
             status,
             data_dir=data_dir,
         )
+    return data_dir
+
+
+def build_carryover_store() -> Path:
+    """The YEAR-CARRY-01 source: annual 280 h with zero accrual, sick 496 h
+    accruing 4 h per period (closing 600 h), credit 30 h, and no usage."""
+    data_dir = Path(tempfile.mkdtemp(prefix="use-or-lose-android-fixture-"))
+    run_cli(
+        "init",
+        "--year",
+        "2026",
+        "--leave-year-start",
+        "2026-01-11",
+        "--pay-periods",
+        "26",
+        "--annual-accrual",
+        "0",
+        "--annual-start",
+        "280",
+        "--sick-start",
+        "496",
+        "--credit-start",
+        "30",
+        data_dir=data_dir,
+    )
     return data_dir
 
 
@@ -452,8 +479,53 @@ def build_storage_fixtures(source: Path) -> None:
     )
 
 
+def build_carryover_fixture() -> None:
+    carryover_store = build_carryover_store()
+    normalize_store(carryover_store)
+    copy_store(carryover_store, CARRYOVER_FIXTURE_DIR)
+    files = tree_hashes(CARRYOVER_FIXTURE_DIR)
+    write_json(
+        ROOT / "android" / "qa" / "fixtures" / f"{CARRYOVER_FIXTURE_ID}.manifest.json",
+        {
+            "schema_version": 1,
+            "fixture_id": CARRYOVER_FIXTURE_ID,
+            "description": "Pinned synthetic Carryover source fixture for the YEAR-CARRY-01 acceptance case.",
+            "generated_by": "android/qa/fixtures/build_calendar_fixture.py",
+            "desktop_reference": {
+                "published_build": DESKTOP_REFERENCE_BUILD,
+                "source_revision": DESKTOP_SOURCE_REVISION,
+                "generator_source_revision": git_head(),
+            },
+            "generator_environment": {
+                "python": sys.version.split()[0],
+                "use-or-lose": version("use-or-lose"),
+                "pydantic": version("pydantic"),
+                "holidays": version("holidays"),
+            },
+            "frozen_local_date": FROZEN_DATE,
+            "timezone": TIMEZONE,
+            "store": {
+                "path": f"android/qa/fixtures/{CARRYOVER_FIXTURE_ID}",
+                "files": files,
+                "tree_digest": tree_digest(files),
+                "notes": [
+                    "Manual transaction and holiday-cache timestamps are normalized to the frozen local date.",
+                    "Automatic accrual rows keep their date-derived audit timestamps.",
+                    "Local lock files and backup directories are excluded.",
+                ],
+            },
+        },
+    )
+    print(f"carryover fixture: {CARRYOVER_FIXTURE_DIR}")
+
+
 def main() -> None:
     sys.path.insert(0, str(SRC))
+    if "--only" in sys.argv:
+        if sys.argv[sys.argv.index("--only") + 1] == "carryover":
+            build_carryover_fixture()
+            return
+        raise SystemExit("Unknown --only target; supported: carryover")
     temp_store = build_temp_store()
     try:
         normalize_store(temp_store)

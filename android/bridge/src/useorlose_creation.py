@@ -14,7 +14,9 @@ import json
 import math
 from copy import deepcopy
 
-from useorlose.cross_year import AccountingError
+import useorlose.cross_year as cross_year
+
+from useorlose.cross_year import AccountingError, checked_ledger, derive_carryover, fingerprint
 from useorlose.expirations import EPSILON
 from useorlose.ledger import (
     accrual_hours_for_date,
@@ -307,6 +309,80 @@ def _manual_create(body: dict) -> dict:
     return files, _preview(ledger)
 
 
+def _carryover_create(body: dict) -> dict:
+    """Preview a carryover from the adjacent source ledger (YEAR-CARRY-01).
+
+    Delegates entirely to the bundled pydantic-free cross_year builders and
+    reproduces creation_plan's preview fingerprint tuple, so the phone and
+    the desktop CLI derive identical candidates from identical inputs.
+    """
+    year = _require_int(body, "year")
+    source_year = _require_int(body, "source_year")
+    source_raw = body.get("source")
+    if not isinstance(source_raw, str):
+        raise AccountingError("INVALID_REQUEST", "source must be the source ledger JSON string.")
+    try:
+        parsed = json.loads(source_raw)
+    except ValueError as exc:
+        raise AccountingError("INVALID_REQUEST", f"source is not valid JSON: {exc}") from exc
+    source = checked_ledger(parsed, source_year)
+    config = _config(body) or {}
+    pay_periods = body.get("pay_periods")
+    if pay_periods is not None and (isinstance(pay_periods, bool) or not isinstance(pay_periods, int)):
+        raise AccountingError("INVALID_REQUEST", "pay_periods must be an integer or null.")
+    start = body.get("leave_year_start")
+    if start is not None and not isinstance(start, str):
+        raise AccountingError("INVALID_REQUEST", "leave_year_start must be an ISO date string or null.")
+
+    target, summary = _derive_carryover_pure(source, year, config, start=start, pay_periods=pay_periods)
+    summary.update(
+        {
+            "preview_fingerprint": fingerprint({"target": target, "source": source, "config": config}),
+            "created_file": None,
+            "created_transaction_ids": [],
+        }
+    )
+    files = {f"leave_years/{year}.json": json.dumps(target, sort_keys=True)}
+    preview = {
+        "kind": "carryover",
+        "year": year,
+        "source_year": summary["source_leave_year"],
+        "source_start": summary["source_start"],
+        "source_end": summary["source_end"],
+        "start": summary["leave_year_start"],
+        "end": summary["leave_year_end"],
+        "pay_period_count": summary["pay_period_count"],
+        "first_pay_period": target["pay_periods"][0]["start_date"],
+        "openings": summary["opening_balances"],
+        "reductions": summary["adjustments"],
+        "lots": summary["lots"],
+        "warnings": summary["warnings"],
+        "source_fingerprint": summary["source_fingerprint"],
+        "preview_fingerprint": summary["preview_fingerprint"],
+    }
+    return files, preview
+
+
+def _derive_carryover_pure(source: dict, year: int, config: dict, *, start: str | None, pay_periods: int | None):
+    """derive_carryover with the pydantic accrual writer swapped out.
+
+    The desktop derive_carryover calls ledger.ensure_automatic_accruals for
+    the source copy and seeds the target through cross_year.seed_accruals;
+    both resolve through the module global and both reach pydantic's
+    create_transaction, which has no Android wheel. The bridge already
+    carries the I06 parity-locked pure mirror (_seed_accruals_pure), so this
+    wrapper scope-swaps the module binding for the duration of the call and
+    restores it immediately. Every accounting decision still delegates to
+    the bundled cross_year body; only the accrual-row writer changes.
+    """
+    original = cross_year.ensure_automatic_accruals
+    try:
+        cross_year.ensure_automatic_accruals = _seed_accruals_pure
+        return cross_year.derive_carryover(source, year, config, start=start, pay_periods=pay_periods)
+    finally:
+        cross_year.ensure_automatic_accruals = original
+
+
 def _today_create(body: dict) -> dict:
     year = _require_int(body, "year")
     start = _require_str(body, "leave_year_start")
@@ -383,6 +459,7 @@ def _today_create(body: dict) -> dict:
 _OPERATIONS = {
     "manual_create": _manual_create,
     "today_create": _today_create,
+    "carryover_create": _carryover_create,
 }
 
 

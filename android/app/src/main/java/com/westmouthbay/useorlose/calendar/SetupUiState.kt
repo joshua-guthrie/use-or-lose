@@ -1,5 +1,6 @@
 package com.westmouthbay.useorlose.calendar
 
+import com.westmouthbay.useorlose.core.CarryoverPreview
 import com.westmouthbay.useorlose.core.CoreError
 import com.westmouthbay.useorlose.core.CreationPreview
 
@@ -9,11 +10,13 @@ enum class SetupStep {
     START_FORM,
     TODAY_FORM,
     REVIEW,
+    CARRYOVER_REVIEW,
 }
 
 enum class SetupKind {
     MANUAL,
     TODAY,
+    CARRYOVER,
 }
 
 /** Values proposed by the caller (Calendar metadata or defaults). */
@@ -42,6 +45,14 @@ data class SetupUiState(
     val previewedToday: String? = null,
     /** The store generation at preview time; confirms must match it. */
     val previewedBase: String? = null,
+    /** The adjacent source year the carryover choice previews, when its file exists. */
+    val carryoverSourceYear: Int? = null,
+    /** Why carryover is blocked, when a preview attempt failed. */
+    val carryoverBlocked: String? = null,
+    /** The reviewed carryover preview (fingerprint must match at confirmation). */
+    val carryoverPreview: CarryoverPreview? = null,
+    /** The explicit 26/27 schedule override reviewed for this carryover, if any. */
+    val carryoverPayPeriods: Int? = null,
     /** The injected local day for the Today choice and its review. */
     val todayIso: String? = null,
     val loading: Boolean = false,

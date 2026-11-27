@@ -24,10 +24,10 @@ SetCompressor /SOLID lzma
 
 ; These checks complement package.py's pyproject-driven full validation and
 ; make a direct NSIS invocation fail clearly for the core applications.
-!if ! /FileExists "${SOURCE_DIR}\useorlose.exe"
-  !error "Required useorlose CLI is missing from SOURCE_DIR"
+!if ! /FileExists "${SOURCE_DIR}\use-or-lose.exe"
+  !error "Required use-or-lose CLI is missing from SOURCE_DIR"
 !endif
-!if ! /FileExists "${SOURCE_DIR}\useorlose-mcp.exe"
+!if ! /FileExists "${SOURCE_DIR}\use-or-lose-mcp.exe"
   !error "Required Use or Lose MCP executable is missing from SOURCE_DIR"
 !endif
 !if ! /FileExists "${SOURCE_DIR}\UseOrLoseCalendar.exe"
@@ -39,11 +39,11 @@ SetCompressor /SOLID lzma
 
 !define PRODUCT_NAME "Use or Lose"
 !define PRODUCT_PUBLISHER "Joshua Guthrie"
-!define PRODUCT_URL "https://www.westmouthbay.com/useorlose-application/"
+!define PRODUCT_URL "https://www.westmouthbay.com/UseOrLose-application/"
 !define PRODUCT_REG_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\Use or Lose"
 !define MUI_ABORTWARNING
-!define MUI_ICON "..\..\assets\useorlose-icon.ico"
-!define MUI_UNICON "..\..\assets\useorlose-icon.ico"
+!define MUI_ICON "..\..\assets\use-or-lose-icon.ico"
+!define MUI_UNICON "..\..\assets\use-or-lose-icon.ico"
 
 Name "${PRODUCT_NAME} ${VERSION}"
 OutFile "${OUTPUT_DIR}\UseOrLose-Setup-${VERSION}-Windows-x64.exe"

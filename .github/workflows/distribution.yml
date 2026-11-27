@@ -228,14 +228,15 @@ jobs:
           rolling_dir="$RUNNER_TEMP/use-or-lose-stable-assets"
           mkdir "$rolling_dir"
           cp "artifacts/UseOrLose-${PACKAGE_VERSION}-Linux-x86_64.tar.gz" \
-            "$rolling_dir/UseOrLose-Latest-Linux-x86_64.tar.gz"
+            "$rolling_dir/UseOrLose-${PACKAGE_VERSION}-Linux-x86_64.tar.gz"
           (
             cd "$rolling_dir"
-            sha256sum UseOrLose-Latest-Linux-x86_64.tar.gz \
-              > UseOrLose-Latest-Linux-x86_64.tar.gz.sha256
+            sha256sum "UseOrLose-${PACKAGE_VERSION}-Linux-x86_64.tar.gz" \
+              > "UseOrLose-${PACKAGE_VERSION}-Linux-x86_64.tar.gz.sha256"
           )
           installer/linux/install.sh \
             --unattended \
+            --version "$PACKAGE_VERSION" \
             --asset-base-url "file://$rolling_dir" \
             --install-root "$install_root" \
             --bin-dir "$bin_dir"

@@ -21,6 +21,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -95,6 +99,7 @@ fun SetupScreen(
                 SetupStep.START_FORM -> StartFormStep(viewModel, state)
                 SetupStep.TODAY_FORM -> TodayFormStep(viewModel, state)
                 SetupStep.REVIEW -> ReviewStep(viewModel, state, context)
+                SetupStep.CARRYOVER_REVIEW -> CarryoverReviewStep(viewModel, state, context)
             }
             if (state.stale) {
                 Text(
@@ -176,6 +181,21 @@ private fun MethodStep(viewModel: SetupViewModel, state: SetupUiState, onExit: (
         suffix = stringResource(R.string.setup_hours_per_period, "").trim(),
     )
     Spacer(Modifier.height(12.dp))
+    if (state.carryoverSourceYear != null) {
+        SecondaryAction(
+            text = stringResource(R.string.setup_carryover_choice, state.carryoverSourceYear.toString()),
+            onClick = viewModel::onChooseCarryover,
+            modifier = Modifier.padding(vertical = 4.dp).testTag("setup_carryover_choice"),
+        )
+    }
+    state.carryoverBlocked?.let { blocked ->
+        Text(
+            text = stringResource(R.string.setup_carryover_blocked, blocked),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(vertical = 4.dp),
+        )
+    }
     Text(
         text = stringResource(R.string.setup_which_balances),
         style = MaterialTheme.typography.titleSmall,
@@ -553,7 +573,7 @@ private fun ReviewStep(
                 }
             }
         }
-        null -> Unit
+        null, SetupKind.CARRYOVER -> Unit
     }
     PrimaryAction(
         text = stringResource(R.string.setup_create),
@@ -569,6 +589,162 @@ private fun ReviewStep(
         onClick = viewModel::onBackToForm,
         modifier = Modifier.padding(vertical = 4.dp),
     )
+}
+
+@Composable
+private fun CarryoverReviewStep(
+    viewModel: SetupViewModel,
+    state: SetupUiState,
+    context: android.content.Context,
+) {
+    val preview = state.carryoverPreview
+    if (preview == null) {
+        return
+    }
+    var showDetail by remember { mutableStateOf(false) }
+    Text(
+        text = context.getString(R.string.carryover_review_title, state.year),
+        style = MaterialTheme.typography.headlineMedium,
+        modifier = Modifier.padding(vertical = 12.dp),
+    )
+    Text(
+        text = context.getString(R.string.setup_review_range, preview.start.format(SETUP_RANGE_FORMAT), preview.end.format(SETUP_RANGE_FORMAT), preview.payPeriodCount),
+        style = MaterialTheme.typography.titleMedium,
+        modifier = Modifier.padding(bottom = 8.dp),
+    )
+    Surface(
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+            .testTag("carryover_source_card"),
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = context.getString(R.string.carryover_source_card, preview.sourceYear),
+                style = MaterialTheme.typography.titleMedium,
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = context.getString(
+                    R.string.carryover_source_body,
+                    preview.start.format(SETUP_RANGE_FORMAT),
+                    preview.end.format(SETUP_RANGE_FORMAT),
+                    preview.payPeriodCount,
+                    preview.sourceEnd.format(SETUP_NOTE_FORMAT),
+                ),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+    preview.openings
+        .filter { (_, hours) -> hours != 0.0 }
+        .toSortedMap()
+        .forEach { (category, hours) ->
+            ReviewRow(
+                label = context.getString(R.string.carryover_opening, BalancePresentation.fullLabel(context, category)),
+                value = BalancePresentation.formatHours(hours),
+            )
+        }
+    if (preview.reductions.isNotEmpty()) {
+        Text(
+            text = reductionText(context, preview.reductions),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.error,
+            modifier = Modifier.padding(vertical = 8.dp),
+        )
+    }
+    SecondaryAction(
+        text = stringResource(R.string.carryover_lots_action),
+        onClick = { showDetail = !showDetail },
+        modifier = Modifier.padding(vertical = 4.dp).testTag("carryover_lots"),
+    )
+    if (showDetail) {
+        Surface(
+            color = MaterialTheme.colorScheme.surfaceVariant,
+            shape = RoundedCornerShape(12.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = stringResource(R.string.carryover_lots_title),
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                Spacer(Modifier.height(4.dp))
+                if (preview.lots.isEmpty()) {
+                    Text(
+                        text = stringResource(R.string.carryover_no_lots),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                preview.lots.forEach { lot ->
+                    ReviewRow(
+                        label = BalancePresentation.fullLabel(context, lot.category) +
+                            (lot.originLeaveYear?.let { " \u00b7 $it" } ?: ""),
+                        value = BalancePresentation.formatHours(lot.hours) +
+                            (lot.expirationDate?.let { " \u00b7 $it" } ?: ""),
+                    )
+                }
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text = stringResource(R.string.carryover_warnings_title),
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                Spacer(Modifier.height(4.dp))
+                if (preview.warnings.isEmpty()) {
+                    Text(
+                        text = stringResource(R.string.carryover_no_warnings),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                preview.warnings.forEach { warning ->
+                    Text(
+                        text = warning,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(vertical = 2.dp),
+                    )
+                }
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text = stringResource(R.string.carryover_schedule_override),
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                Spacer(Modifier.height(4.dp))
+                PayPeriodRow(viewModel, state)
+            }
+        }
+    }
+    PrimaryAction(
+        text = stringResource(R.string.setup_create),
+        onClick = viewModel::onCarryoverConfirm,
+        modifier = Modifier.padding(vertical = 4.dp).testTag("carryover_create"),
+    )
+    SecondaryAction(
+        text = stringResource(R.string.setup_back_date),
+        onClick = viewModel::onCarryoverBack,
+        modifier = Modifier.padding(vertical = 4.dp),
+    )
+}
+
+private fun reductionText(
+    context: android.content.Context,
+    reductions: List<com.westmouthbay.useorlose.core.CarryoverReduction>,
+): String {
+    val items = reductions.joinToString(context.getString(R.string.carryover_reduction_join)) { reduction ->
+        context.getString(
+            R.string.carryover_reduction_item,
+            BalancePresentation.fullLabel(context, reduction.category),
+            BalancePresentation.formatHours(reduction.hours),
+        )
+    }
+    return "$items ${context.getString(R.string.carryover_reduction_suffix)}"
 }
 
 @Composable

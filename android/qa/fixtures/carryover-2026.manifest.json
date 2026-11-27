@@ -1,0 +1,33 @@
+{
+  "description": "Pinned synthetic Carryover source fixture for the YEAR-CARRY-01 acceptance case.",
+  "desktop_reference": {
+    "generator_source_revision": "ee224344c876cf2cd4fe5cbe46b79fa1c446c7f9",
+    "published_build": "0.2.2.dev0+g7041ce9e",
+    "source_revision": "7041ce9e9921dd4c407595ed3269de1aca43e699"
+  },
+  "fixture_id": "carryover-2026",
+  "frozen_local_date": "2026-01-16",
+  "generated_by": "android/qa/fixtures/build_calendar_fixture.py",
+  "generator_environment": {
+    "holidays": "0.98",
+    "pydantic": "2.13.4",
+    "python": "3.13.7",
+    "use-or-lose": "1.1.0"
+  },
+  "schema_version": 1,
+  "store": {
+    "files": {
+      "config.json": "4a2a41a7545333f370f2464aaa686cd60db3747629fe65762cf882a3a354fedc",
+      "holiday_cache/federal_holidays_2026.json": "f252e13278065cf60000966accddc8d567e138448924862030545eb9458f5341",
+      "leave_years/2026.json": "2c305a59cb4bff62a52d2b2a6b0acc8cc4afca1b857326f86f7394d8c030968f"
+    },
+    "notes": [
+      "Manual transaction and holiday-cache timestamps are normalized to the frozen local date.",
+      "Automatic accrual rows keep their date-derived audit timestamps.",
+      "Local lock files and backup directories are excluded."
+    ],
+    "path": "android/qa/fixtures/carryover-2026",
+    "tree_digest": "413e267d6d0d34dbfabe73b7445c45b9ccea9d36bf40933fa68d72d37611863a"
+  },
+  "timezone": "America/New_York"
+}

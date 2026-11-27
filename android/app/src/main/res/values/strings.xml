@@ -82,6 +82,21 @@
     <string name="setup_next_accrual">Next accrual \u00b7 %1$s</string>
     <string name="setup_next_accrual_body">Annual %1$s h \u00b7 Sick %2$s h</string>
     <string name="setup_travel_comp_warning">Travel comp hours keep their balance; the earning date and expiration are unknown.</string>
+    <string name="setup_carryover_choice">Carry over from %1$s</string>
+    <string name="setup_carryover_blocked">Carryover unavailable: %1$s</string>
+    <string name="carryover_review_title">Review %1$s leave year</string>
+    <string name="carryover_source_card">Carry over from %1$d</string>
+    <string name="carryover_source_body">%1$s \u2013 %2$s \u00b7 %3$d periods. Source closes %4$s.</string>
+    <string name="carryover_opening">%1$s opening</string>
+    <string name="carryover_reduction_item">%1$s %2$s h</string>
+    <string name="carryover_reduction_suffix">exceed the configured limits.</string>
+    <string name="carryover_reduction_join"> and </string>
+    <string name="carryover_lots_action">Review lots and warnings</string>
+    <string name="carryover_lots_title">Carried lots</string>
+    <string name="carryover_warnings_title">Warnings</string>
+    <string name="carryover_schedule_override">Agency schedule override</string>
+    <string name="carryover_no_lots">No expiring lots are carried.</string>
+    <string name="carryover_no_warnings">No warnings.</string>
     <string name="setup_stale">The store changed. Review the year again.</string>
 
     <!-- Menu -->
