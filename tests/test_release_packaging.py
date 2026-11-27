@@ -397,6 +397,40 @@ def test_bootstrap_preserves_unrelated_regular_commands(tmp_path: Path) -> None:
 
 
 @pytest.mark.skipif(os.name == "nt", reason="Linux bootstrap is exercised on POSIX hosts")
+def test_bootstrap_replaces_links_owned_by_the_prerename_install_root(tmp_path: Path) -> None:
+    """Upgrades from the 1.0.0-era install (/opt/fedleave) are ours to replace."""
+    module = _load_packaging_module()
+    bundle = _fake_bundle(module, tmp_path / "bundle")
+    artifacts = tmp_path / "assets"
+    _stable_linux_assets(module, bundle, artifacts)
+    install_root = tmp_path / "install root"
+    bin_dir = tmp_path / "command links"
+    bin_dir.mkdir()
+    legacy_link = bin_dir / "UseOrLoseCalendar"
+    legacy_link.symlink_to("/opt/fedleave/current/UseOrLoseCalendar/UseOrLoseCalendar")
+
+    result = subprocess.run(
+        [
+            str(BOOTSTRAP),
+            "--unattended",
+            "--asset-base-url",
+            artifacts.as_uri(),
+            "--install-root",
+            str(install_root),
+            "--bin-dir",
+            str(bin_dir),
+        ],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr or result.stdout
+    assert legacy_link.is_symlink()
+    assert legacy_link.readlink() == install_root / "current" / "UseOrLoseCalendar"
+
+
+@pytest.mark.skipif(os.name == "nt", reason="Linux bootstrap is exercised on POSIX hosts")
 def test_bootstrap_checksum_failure_does_not_create_install_root(tmp_path: Path) -> None:
     module = _load_packaging_module()
     bundle = _fake_bundle(module, tmp_path / "bundle")

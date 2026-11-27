@@ -6,6 +6,7 @@ set -Eeuo pipefail
 
 readonly REPOSITORY="joshua-guthrie/use-or-lose"
 readonly CURRENT_RELEASE_VERSION="1.1.0"
+readonly LEGACY_INSTALL_ROOT="/opt/fedleave"
 readonly DEFAULT_INSTALL_ROOT="/opt/use-or-lose"
 readonly DEFAULT_BIN_DIR="/usr/local/bin"
 readonly TOP_LEVEL_DIRECTORY="UseOrLose"
@@ -410,8 +411,10 @@ install_release() {
     if [[ -e "$link" || -L "$link" ]]; then
       if [[ -L "$link" ]]; then
         existing_target="$(readlink "$link")"
-        [[ "$existing_target" == "$INSTALL_ROOT/current/"* ]] ||
+        if [[ "$existing_target" != "$INSTALL_ROOT/current/"* &&
+              "$existing_target" != "$LEGACY_INSTALL_ROOT/current/"* ]]; then
           die "Refusing to replace command link not owned by Use or Lose: $link"
+        fi
       elif is_legacy_use_or_lose_wrapper "$link" "$command"; then
         log "Migrating legacy Use or Lose command wrapper: $link"
       else
