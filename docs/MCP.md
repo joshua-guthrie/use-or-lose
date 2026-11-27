@@ -33,7 +33,7 @@ The server is a sibling of `use-or-lose`:
 
 | Platform | Command | Default leave data |
 | --- | --- | --- |
-| Windows | `C:\Program Files\UseOrLose\use-or-lose-mcp.exe` | `%LOCALAPPDATA%\UseOrLose` |
+| Windows | `C:\Program Files\UseOrLose\use-or-lose-mcp.exe` | `%LOCALAPPDATA%\use-or-lose` |
 | Linux | `/usr/local/bin/use-or-lose-mcp` | `$XDG_DATA_HOME/use-or-lose`, otherwise `~/.local/share/use-or-lose` |
 
 Linux command links point through `/opt/use-or-lose/current` to the active release.

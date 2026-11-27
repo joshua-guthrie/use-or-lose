@@ -1238,7 +1238,7 @@ AnnualLeaveChartForTheYear --year 2026 --outputFile chart.png --resolution 3220
 - `--year YYYY`: Leave year (required if no current leave year can be inferred)
 - `--outputFile PATH`: Output PNG file path (required; must end with `.png`)
 - `--resolution PIXELS`: Image width in pixels; height is scaled maintaining aspect ratio (default: 1610). Common values: 1610 (standard), 3220 (double resolution), 805 (half resolution)
-- `--data-dir PATH`: Optional use-or-lose data directory override. If omitted, the chart app uses the same default data directory as `use-or-lose`: `~/.local/share/use-or-lose` on Linux/macOS, or `%LOCALAPPDATA%\UseOrLose` on Windows.
+- `--data-dir PATH`: Optional use-or-lose data directory override. If omitted, the chart app uses the same default data directory as `use-or-lose`: `~/.local/share/use-or-lose` on Linux/macOS, or `%LOCALAPPDATA%\use-or-lose` on Windows.
 
 ### Requirements
 
@@ -1275,7 +1275,7 @@ SickLeaveChartForTheYear --year 2026 --outputFile sick_chart.png --resolution 32
 - `--year YYYY`: Leave year (required if no current leave year can be inferred)
 - `--outputFile PATH`: Output PNG file path (required; must end with `.png`)
 - `--resolution PIXELS`: Image width in pixels; height is scaled maintaining aspect ratio (default: 1610). Common values: 1610 (standard), 3220 (double resolution), 805 (half resolution)
-- `--data-dir PATH`: Optional use-or-lose data directory override. If omitted, the chart app uses the same default data directory as `use-or-lose`: `~/.local/share/use-or-lose` on Linux/macOS, or `%LOCALAPPDATA%\UseOrLose` on Windows.
+- `--data-dir PATH`: Optional use-or-lose data directory override. If omitted, the chart app uses the same default data directory as `use-or-lose`: `~/.local/share/use-or-lose` on Linux/macOS, or `%LOCALAPPDATA%\use-or-lose` on Windows.
 
 ### Requirements
 
@@ -1307,7 +1307,7 @@ CreditHoursChartForTheYear --year 2026 --outputFile credit_hours_chart.png --res
 - `--year YYYY`: Leave year (required if no current leave year can be inferred)
 - `--outputFile PATH`: Output PNG file path (required; must end with `.png`)
 - `--resolution PIXELS`: Image width in pixels; height is scaled maintaining aspect ratio (default: 1610). Common values: 1610 (standard), 3220 (double resolution), 805 (half resolution)
-- `--data-dir PATH`: Optional use-or-lose data directory override. If omitted, the chart app uses the same default data directory as `use-or-lose`: `~/.local/share/use-or-lose` on Linux/macOS, or `%LOCALAPPDATA%\UseOrLose` on Windows.
+- `--data-dir PATH`: Optional use-or-lose data directory override. If omitted, the chart app uses the same default data directory as `use-or-lose`: `~/.local/share/use-or-lose` on Linux/macOS, or `%LOCALAPPDATA%\use-or-lose` on Windows.
 
 ### Requirements
 
@@ -1339,7 +1339,7 @@ CompTimeChartForTheYear --year 2026 --outputFile comp_time_chart.png --resolutio
 - `--year YYYY`: Leave year (required if no current leave year can be inferred)
 - `--outputFile PATH`: Output PNG file path (required; must end with `.png`)
 - `--resolution PIXELS`: Image width in pixels; height is scaled maintaining aspect ratio (default: 1610). Common values: 1610 (standard), 3220 (double resolution), 805 (half resolution)
-- `--data-dir PATH`: Optional use-or-lose data directory override. If omitted, the chart app uses the same default data directory as `use-or-lose`: `~/.local/share/use-or-lose` on Linux/macOS, or `%LOCALAPPDATA%\UseOrLose` on Windows.
+- `--data-dir PATH`: Optional use-or-lose data directory override. If omitted, the chart app uses the same default data directory as `use-or-lose`: `~/.local/share/use-or-lose` on Linux/macOS, or `%LOCALAPPDATA%\use-or-lose` on Windows.
 
 ### Requirements
 
@@ -1371,7 +1371,7 @@ TravelCompChartForTheYear --year 2026 --outputFile travel_comp_chart.png --resol
 - `--year YYYY`: Leave year (required if no current leave year can be inferred)
 - `--outputFile PATH`: Output PNG file path (required; must end with `.png`)
 - `--resolution PIXELS`: Image width in pixels; height is scaled maintaining aspect ratio (default: 1610). Common values: 1610 (standard), 3220 (double resolution), 805 (half resolution)
-- `--data-dir PATH`: Optional use-or-lose data directory override. If omitted, the chart app uses the same default data directory as `use-or-lose`: `~/.local/share/use-or-lose` on Linux/macOS, or `%LOCALAPPDATA%\UseOrLose` on Windows.
+- `--data-dir PATH`: Optional use-or-lose data directory override. If omitted, the chart app uses the same default data directory as `use-or-lose`: `~/.local/share/use-or-lose` on Linux/macOS, or `%LOCALAPPDATA%\use-or-lose` on Windows.
 
 ### Requirements
 
@@ -1403,7 +1403,7 @@ TimeOffAwardChartForTheYear --year 2026 --outputFile time_off_award_chart.png --
 - `--year YYYY`: Leave year (required if no current leave year can be inferred)
 - `--outputFile PATH`: Output PNG file path (required; must end with `.png`)
 - `--resolution PIXELS`: Image width in pixels; height is scaled maintaining aspect ratio (default: 1610). Common values: 1610 (standard), 3220 (double resolution), 805 (half resolution)
-- `--data-dir PATH`: Optional use-or-lose data directory override. If omitted, the chart app uses the same default data directory as `use-or-lose`: `~/.local/share/use-or-lose` on Linux/macOS, or `%LOCALAPPDATA%\UseOrLose` on Windows.
+- `--data-dir PATH`: Optional use-or-lose data directory override. If omitted, the chart app uses the same default data directory as `use-or-lose`: `~/.local/share/use-or-lose` on Linux/macOS, or `%LOCALAPPDATA%\use-or-lose` on Windows.
 
 ### Requirements
 

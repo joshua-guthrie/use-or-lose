@@ -78,7 +78,7 @@ def test_windows_validation_checks_the_resolved_executable_suffix(tmp_path, monk
 
 @pytest.mark.skipif(os.name != "nt", reason="Native Windows exe/argument integration runs in Windows CI")
 def test_native_windows_cli_keeps_hostile_comments_literal(tmp_path, monkeypatch):
-    executable = Path(sysconfig.get_path("scripts")) / "useorlose.exe"
+    executable = Path(sysconfig.get_path("scripts")) / "use-or-lose.exe"
     assert executable.is_file()
     data = tmp_path / "store"
     subprocess.run(

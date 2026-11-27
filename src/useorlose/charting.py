@@ -158,11 +158,11 @@ def get_default_data_dir() -> Path:
     if sys.platform.startswith("win"):
         local_appdata = os.getenv("LOCALAPPDATA")
         if local_appdata:
-            return Path(local_appdata) / "UseOrLose"
+            return Path(local_appdata) / "use-or-lose"
         xdg_data_home = os.getenv("XDG_DATA_HOME")
         if xdg_data_home:
             return Path(xdg_data_home) / "use-or-lose"
-        return Path.home() / "AppData" / "Local" / "UseOrLose"
+        return Path.home() / "AppData" / "Local" / "use-or-lose"
 
     xdg_data_home = os.getenv("XDG_DATA_HOME")
     if xdg_data_home:

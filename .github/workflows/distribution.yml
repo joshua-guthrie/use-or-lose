@@ -122,7 +122,7 @@ jobs:
           $ErrorActionPreference = "Stop"
           $installer = Join-Path $PWD "artifacts\UseOrLose-Setup-$env:PACKAGE_VERSION-Windows-x64.exe"
           $installDir = Join-Path $env:ProgramFiles "UseOrLose"
-          $userDataDir = Join-Path $env:LOCALAPPDATA "UseOrLose"
+          $userDataDir = Join-Path $env:LOCALAPPDATA "use-or-lose"
           $sentinel = Join-Path $userDataDir "ci-user-data-preserved.txt"
           New-Item -ItemType Directory -Force -Path $userDataDir | Out-Null
           Set-Content -Path $sentinel -Value "must survive install and uninstall"

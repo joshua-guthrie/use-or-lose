@@ -14,7 +14,7 @@ def test_get_default_data_dir_uses_localappdata_on_windows(monkeypatch, tmp_path
     monkeypatch.setenv("LOCALAPPDATA", str(tmp_path / "LocalAppData"))
 
     data_dir = get_default_data_dir(None)
-    assert data_dir == tmp_path / "LocalAppData" / "UseOrLose"
+    assert data_dir == tmp_path / "LocalAppData" / "use-or-lose"
 
 
 def test_get_default_data_dir_uses_xdg_data_home_on_linux(monkeypatch, tmp_path: Path):
