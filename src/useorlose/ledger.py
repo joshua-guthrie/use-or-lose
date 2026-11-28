@@ -84,8 +84,7 @@ def create_transaction(
     existing_ids: list[str] = None,
 ) -> Transaction:
     """Create a validated transaction with a date-based unique identifier."""
-    from pydantic import ValidationError
-
+    from .pure_models import FieldValidationError
     from .transaction_model import Transaction
 
     existing_ids = existing_ids or []
@@ -101,13 +100,10 @@ def create_transaction(
             status=status,
             source=source,
         )
-    except ValidationError as exc:
-        errors = []
-        for err in exc.errors():
-            loc = ".".join(str(part) for part in err.get("loc", []))
-            msg = err.get("msg", "Invalid value")
-            errors.append(f"{loc}: {msg}" if loc else msg)
-        raise ValueError("; ".join(errors)) from exc
+    except FieldValidationError as exc:
+        # Reproduce the previous pydantic reformatting exactly: field-level
+        # failures carry a "<field>: " prefix; model-level failures don't.
+        raise ValueError(f"{exc.field}: {exc.message}") from exc
 
 
 def _parse_iso_date(date_str: str) -> date:
