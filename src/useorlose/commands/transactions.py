@@ -27,6 +27,7 @@ from ..ledger import (
     create_transaction,
     normalize_direction,
 )
+from ..editing import append_entry as core_append_entry, replace_day_group
 from ..storage import load_json, write_json
 
 _SET_DAY_CATEGORIES = [
@@ -91,48 +92,21 @@ def _set_day_values(
         value = float(value)
         direction, hours = _direction_for_signed_day_value(category, value)
 
-        replaced = [
-            transaction
-            for transaction in transactions
-            if transaction.get("date") == date
-            and transaction.get("category") == category
-            and not transaction.get("carryover_generated")
-            and transaction.get("source") != "expiration-rollover"
-            and (category != "ppl" or transaction.get("direction") == ("earned" if value > 0 else "used"))
-        ]
-        existing_comment = next(
-            (
-                str(transaction.get("description", "")).strip()
-                for transaction in replaced
-                if str(transaction.get("description", "")).strip()
-            ),
-            "",
-        )
         raw_comment = comments.get(category)
-        if raw_comment is None:
-            comment = existing_comment
-        else:
-            comment = sanitize_text(raw_comment, field_name=f"{category} comment")
-
-        removed_ids.extend(str(transaction.get("id", "")) for transaction in replaced)
-        transactions[:] = [transaction for transaction in transactions if transaction not in replaced]
-
-        new_id = None
-        if hours:
-            transaction = create_transaction(
-                date=date,
-                category=category,
-                direction=direction,
-                hours=hours,
-                description=comment,
-                status="reconciled",
-                source="set-day",
-                existing_ids=existing_ids,
-            )
-            add_transaction_to_leave_year(leave_year, transaction)
-            existing_ids.append(transaction.id)
-            new_id = transaction.id
-            created_ids.append(transaction.id)
+        if raw_comment is not None:
+            raw_comment = sanitize_text(raw_comment, field_name=f"{category} comment")
+        outcome = replace_day_group(
+            leave_year,
+            date=date,
+            category=category,
+            direction=direction,
+            hours=hours,
+            comment=raw_comment,
+            match_direction=("earned" if value > 0 else "used") if category == "ppl" else None,
+        )
+        removed_ids.extend(outcome["removed_transaction_ids"])
+        created_ids.extend(outcome["created_transaction_ids"])
+        new_id = outcome["created_transaction_ids"][0] if outcome["created_transaction_ids"] else None
 
         changed.append(
             {
@@ -140,7 +114,7 @@ def _set_day_values(
                 "value": value,
                 "direction": direction if hours else None,
                 "hours": hours,
-                "comment": comment,
+                "comment": outcome["comment"],
                 "transaction_id": new_id,
             }
         )
@@ -227,13 +201,26 @@ def add(
         raise typer.Exit(code=1)
 
     existing_ids = [transaction["id"] for transaction in leave_year.get("transactions", [])]
+    replaced_ids: list[str] = []
+    if authoritative:
+        outcome = replace_day_group(
+            leave_year,
+            date=date,
+            category=category,
+            direction=direction,
+            hours=0.0,
+            comment=None,
+            match_direction=direction,
+        )
+        replaced_ids.extend(outcome["removed_transaction_ids"])
     try:
-        transaction = create_transaction(
+        transaction_id = core_append_entry(
+            leave_year,
             date=date,
             category=category,
             direction=direction,
             hours=hours,
-            description=description,
+            comment=description,
             status=status,
             source=source,
             existing_ids=existing_ids,
@@ -241,38 +228,23 @@ def add(
     except ValueError as exc:
         console.print(f"[red]ERROR:[/red] {exc}")
         raise typer.Exit(code=2)
-
-    replaced_ids: list[str] = []
-    if authoritative:
-        retained = []
-        for existing in leave_year.get("transactions", []):
-            if (
-                existing.get("date") == date
-                and existing.get("category") == category
-                and existing.get("direction") == direction
-                and not existing.get("carryover_generated")
-                and existing.get("source") != "expiration-rollover"
-            ):
-                replaced_ids.append(existing.get("id", ""))
-            else:
-                retained.append(existing)
-        leave_year["transactions"] = retained
-
-    add_transaction_to_leave_year(leave_year, transaction)
+    transaction = next(
+        row for row in leave_year["transactions"] if row.get("id") == transaction_id
+    )
     leave_year["_fmla_overlap_acknowledged"] = acknowledge_fmla_overlap is True
     write_json(get_leave_year_path(year, data_dir), leave_year)
     result = {
         "action": "added",
         "year": year,
-        "transaction_id": transaction.id,
-        "transaction": next(row for row in leave_year["transactions"] if row["id"] == transaction.id),
+        "transaction_id": transaction["id"],
+        "transaction": next(row for row in leave_year["transactions"] if row["id"] == transaction["id"]),
         "replaced_transaction_ids": replaced_ids,
         "automatic_accruals_posted": 0,
     }
     if json_output:
         _print_json(result)
         return
-    detail = f"transaction [bold]{transaction.id}[/bold]" if show_transaction_ids else "transaction"
+    detail = f"transaction [bold]{transaction['id']}[/bold]" if show_transaction_ids else "transaction"
     if replaced_ids:
         replaced_detail = (
             f"; replaced {', '.join(replaced_ids)}"
