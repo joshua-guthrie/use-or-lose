@@ -13,10 +13,11 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
-from pydantic import BaseModel, Field
+from dataclasses import dataclass, field
 from rich.console import Console
 
 from .holidays import DEFAULT_OPM_ICS_URL, generate_federal_holidays
+from .pure_models import PureModel
 from .rule_defaults import DEFAULT_RULES
 from .storage import atomic_write_json, ensure_data_dir
 from .validation import sanitize_url
@@ -24,14 +25,16 @@ from .validation import sanitize_url
 console = Console()
 
 
-class UserConfig(BaseModel):
+@dataclass(init=False)
+class UserConfig(PureModel):
     """User-facing identity and time-zone preferences."""
 
     display_name: str = "User"
     timezone: str = "America/New_York"
 
 
-class DefaultsConfig(BaseModel):
+@dataclass(init=False)
+class DefaultsConfig(PureModel):
     """Default accrual, schedule, and time-entry settings."""
 
     annual_leave_accrual_hours: float = 6.0
@@ -41,10 +44,11 @@ class DefaultsConfig(BaseModel):
     workday_end: str = "15:30"
     lunch_start: str = "11:30"
     lunch_end: str = "12:00"
-    normal_workdays: list[str] = Field(default_factory=lambda: ["mon", "tue", "wed", "thu", "fri"])
+    normal_workdays: list[str] = field(default_factory=lambda: ["mon", "tue", "wed", "thu", "fri"])
 
 
-class HolidaysConfig(BaseModel):
+@dataclass(init=False)
+class HolidaysConfig(PureModel):
     """Holiday source, caching, and display policy."""
 
     enabled: bool = True
@@ -59,7 +63,8 @@ class HolidaysConfig(BaseModel):
     fail_if_holidays_unavailable: bool = False
 
 
-class AnnualRules(BaseModel):
+@dataclass(init=False)
+class AnnualRules(PureModel):
     """Annual-leave carryover and use-or-lose policy."""
 
     carryover_limit_hours: float = 240.0
@@ -67,14 +72,16 @@ class AnnualRules(BaseModel):
     allow_restored_leave: bool = True
 
 
-class SickRules(BaseModel):
+@dataclass(init=False)
+class SickRules(PureModel):
     """Sick-leave carryover and expiration policy."""
 
     carryover_limit_hours: float | None = None
     expires: bool = False
 
 
-class CompRules(BaseModel):
+@dataclass(init=False)
+class CompRules(PureModel):
     """Compensatory-time expiration and reminder policy."""
 
     expires: bool = True
@@ -83,10 +90,11 @@ class CompRules(BaseModel):
     allow_payout_tracking: bool = True
     allow_forfeiture_tracking: bool = True
     allow_extension: bool = True
-    reminder_pay_periods: list[int] = Field(default_factory=lambda: [1, 3, 6, 12])
+    reminder_pay_periods: list[int] = field(default_factory=lambda: [1, 3, 6, 12])
 
 
-class TravelCompRules(BaseModel):
+@dataclass(init=False)
+class TravelCompRules(PureModel):
     """Travel-comp expiration, extension, and reminder policy."""
 
     expires: bool = True
@@ -94,10 +102,11 @@ class TravelCompRules(BaseModel):
     expiration_action: str = "forfeit"
     allow_extension: bool = True
     extension_pay_periods: int = 26
-    reminder_pay_periods: list[int] = Field(default_factory=lambda: [1, 3, 6, 12])
+    reminder_pay_periods: list[int] = field(default_factory=lambda: [1, 3, 6, 12])
 
 
-class CreditRules(BaseModel):
+@dataclass(init=False)
+class CreditRules(PureModel):
     """Credit-hour earning, use, balance, and carryover limits."""
 
     enabled: bool = True
@@ -113,7 +122,8 @@ class CreditRules(BaseModel):
     requires_flexible_work_schedule: bool = True
 
 
-class TimeOffAwardRules(BaseModel):
+@dataclass(init=False)
+class TimeOffAwardRules(PureModel):
     """Time-off-award expiration and extension policy."""
 
     expires: bool = False
@@ -121,37 +131,48 @@ class TimeOffAwardRules(BaseModel):
     agency_policy_required: bool = True
     expiration_action: str = "forfeit"
     allow_extension: bool = True
-    reminder_pay_periods: list[int] = Field(default_factory=lambda: [1, 3, 6, 12])
+    reminder_pay_periods: list[int] = field(default_factory=lambda: [1, 3, 6, 12])
 
 
-class RestoredAnnualRules(BaseModel):
+@dataclass(init=False)
+class RestoredAnnualRules(PureModel):
     """Restored annual-leave expiration and extension policy."""
 
     expires: bool = True
     expiration_leave_years_after_restored: int = 2
     expiration_action: str = "forfeit"
     allow_extension: bool = True
-    reminder_pay_periods: list[int] = Field(default_factory=lambda: [1, 3, 6, 12])
+    reminder_pay_periods: list[int] = field(default_factory=lambda: [1, 3, 6, 12])
 
 
-class ReligiousCompRules(BaseModel):
+@dataclass(init=False)
+class ReligiousCompRules(PureModel):
     """Religious compensatory-time policy flags."""
 
     expires: bool = False
     agency_policy_required: bool = True
 
 
-class Config(BaseModel):
+@dataclass(init=False)
+class Config(PureModel):
     """Complete schema for the persisted ``config.json`` file."""
 
+    @classmethod
+    def model_validate(cls, value: dict) -> "Config":
+        """Validate and construct from a dict (the pydantic classmethod shape)."""
+        if not isinstance(value, dict):
+            raise ValueError("Input should be a valid dictionary")
+        return cls(**value)
+
     schema_version: int = 1
-    user: UserConfig = Field(default_factory=UserConfig)
-    defaults: DefaultsConfig = Field(default_factory=DefaultsConfig)
-    holidays: HolidaysConfig = Field(default_factory=HolidaysConfig)
-    rules: dict[str, object] = Field(default_factory=lambda: deepcopy(DEFAULT_RULES))
+    user: UserConfig = field(default_factory=UserConfig)
+    defaults: DefaultsConfig = field(default_factory=DefaultsConfig)
+    holidays: HolidaysConfig = field(default_factory=HolidaysConfig)
+    rules: dict[str, object] = field(default_factory=lambda: deepcopy(DEFAULT_RULES))
 
 
-class LeaveYear(BaseModel):
+@dataclass(init=False)
+class LeaveYear(PureModel):
     """Persisted ledger metadata and transactions for one federal leave year."""
 
     schema_version: int = 1
@@ -163,10 +184,10 @@ class LeaveYear(BaseModel):
     sick_leave_accrual_hours: float
     starting_balances: dict[str, float]
     carryover_from_previous_year: dict[str, float]
-    transactions: list[dict] = Field(default_factory=list)
-    pay_periods: list[dict] = Field(default_factory=list)
-    holidays: list[dict] = Field(default_factory=list)
-    rollover_status: dict[str, object] = Field(
+    transactions: list[dict] = field(default_factory=list)
+    pay_periods: list[dict] = field(default_factory=list)
+    holidays: list[dict] = field(default_factory=list)
+    rollover_status: dict[str, object] = field(
         default_factory=lambda: {
             "rolled_from_previous_year": False,
             "rolled_to_next_year": False,

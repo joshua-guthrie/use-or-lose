@@ -96,3 +96,7 @@ class PureModel:
         object.__setattr__(self, "fields_set", provided & set(declared))
         if hasattr(self, "__post_init__"):
             self.__post_init__()  # type: ignore[attr-defined]
+
+    def model_dump(self) -> dict[str, Any]:
+        """The pydantic-style recursive dump of every field (plus any extras)."""
+        return model_dump(self)
