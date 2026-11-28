@@ -69,8 +69,7 @@ class Transaction(PureModel):
         if self.status not in TRANSACTION_STATUSES:
             raise FieldValidationError(
                 "status",
-                f"Value error, Invalid status: {self.status}. "
-                f"Valid statuses: {', '.join(TRANSACTION_STATUSES)}.",
+                f"Value error, Invalid status: {self.status}. Valid statuses: {', '.join(TRANSACTION_STATUSES)}.",
             )
         # The previous model coerced numeric input to float; the CLI always
         # passes floats, and invalid values surface through the same rules.
@@ -92,8 +91,7 @@ class Transaction(PureModel):
         except ValueError:
             raise FieldValidationError(
                 "date",
-                f"Value error, Invalid date: {self.date}. "
-                "Use YYYY-MM-DD, for example 2026-01-11.",
+                f"Value error, Invalid date: {self.date}. Use YYYY-MM-DD, for example 2026-01-11.",
             ) from None
         object.__setattr__(self, "date", normalized)
 
@@ -101,9 +99,7 @@ class Transaction(PureModel):
             raise ValueError("Value error, FMLA_USAGE_ONLY: FMLA has used transactions only")
         if self.category == "ppl" and self.direction not in {"earned", "used"}:
             if not (self.direction == "expired" and self.source == "expiration-engine"):
-                raise ValueError(
-                    "Value error, INVALID_PPL_DIRECTION: PPL accepts earned and used transactions only"
-                )
+                raise ValueError("Value error, INVALID_PPL_DIRECTION: PPL accepts earned and used transactions only")
 
     @classmethod
     def model_validate(cls, value: dict) -> "Transaction":

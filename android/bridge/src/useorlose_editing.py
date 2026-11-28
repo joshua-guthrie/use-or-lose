@@ -13,10 +13,8 @@ from __future__ import annotations
 import json
 import math
 
-from useorlose.categories import CATEGORY_POLICIES
 from useorlose.cross_year import AccountingError
-from useorlose.ledger import generate_transaction_id
-from useorlose.transaction_effects import TRANSACTION_DIRECTIONS, TRANSACTION_STATUSES
+from useorlose.editing import append_entry, is_protected, replace_day_group
 from useorlose.validation import sanitize_text
 
 SCHEMA_VERSION = 1
@@ -64,54 +62,6 @@ def _require_number(body: dict, field: str) -> float:
     return number
 
 
-def _transaction_row(
-    date: str,
-    category: str,
-    direction: str,
-    hours: float,
-    description: str,
-    status: str,
-    source: str,
-    existing_ids: list[str],
-) -> dict:
-    """The desktop Transaction model dump, built without pydantic.
-
-    Validation mirrors the model validators: category, direction and status
-    must be known, hours finite and nonnegative. Timestamps are deterministic
-    (date-derived) so phone candidates are reproducible; the parity gate
-    normalizes the CLI's now()-timestamps before comparing.
-    """
-    if category not in CATEGORY_POLICIES:
-        raise AccountingError("INVALID_CATEGORY", "category", f"Unknown category: {category}")
-    if direction not in TRANSACTION_DIRECTIONS:
-        raise AccountingError("INVALID_DIRECTION", "direction", f"Unknown direction: {direction}")
-    if status not in TRANSACTION_STATUSES:
-        raise AccountingError("INVALID_STATUS", "status", f"Unknown status: {status}")
-    if not math.isfinite(hours) or hours < 0:
-        raise AccountingError("INVALID_HOURS", "hours", "Hours must be a finite nonnegative number.")
-    if category == "fmla" and direction != "used":
-        raise AccountingError("FMLA_USAGE_ONLY", "direction", "FMLA has used transactions only")
-    if category == "ppl" and direction not in {"earned", "used"}:
-        raise AccountingError("INVALID_PPL_DIRECTION", "direction", "PPL accepts earned and used transactions only")
-    return {
-        "id": generate_transaction_id(date, existing_ids),
-        "date": date,
-        "category": category,
-        "direction": direction,
-        "hours": hours,
-        "description": description,
-        "status": status,
-        "source": source,
-        "created_at": f"{date}T00:00:00",
-        "updated_at": f"{date}T00:00:00",
-        "expiration_date": None,
-        "expiration_pay_period": None,
-        "earned_transaction_id": None,
-        "expiration_extension_reason": None,
-        "expiration_extended_at": None,
-    }
-
-
 def _parse_ledger(body: dict) -> tuple[int, dict]:
     year = _require_int(body, "year")
     raw = body.get("ledger")
@@ -129,11 +79,7 @@ def _parse_ledger(body: dict) -> tuple[int, dict]:
 
 
 def _is_protected(tx: dict) -> bool:
-    return (
-        tx.get("carryover_generated") is True
-        or tx.get("source") in _PROTECTED_SOURCES
-        or tx.get("source") == "expiration-rollover"
-    )
+    return is_protected(tx, protected_sources=_PROTECTED_SOURCES)
 
 
 def _edit_day(body: dict) -> tuple[dict, dict]:
@@ -179,35 +125,18 @@ def _edit_day(body: dict) -> tuple[dict, dict]:
             "protected_rows": [dict(tx) for tx in protected],
         }
 
-    existing_comment = next(
-        (str(tx.get("description", "")).strip() for tx in editable if str(tx.get("description", "")).strip()),
-        "",
+    if comment is not None:
+        comment = sanitize_text(comment, field_name="comment")
+    outcome = replace_day_group(
+        ledger,
+        date=date,
+        category=category,
+        direction=direction,
+        hours=hours,
+        comment=comment,
+        match_direction=direction,
+        protected_sources=_PROTECTED_SOURCES,
     )
-    if comment is None:
-        description = existing_comment
-    else:
-        description = sanitize_text(comment, field_name="comment")
-
-    removed_ids = [str(tx.get("id", "")) for tx in editable]
-    # The desktop captures the id pool before replacement, so the created
-    # row advances past the removed ids (20260116-002, not -001).
-    existing_ids = [str(tx.get("id", "")) for tx in transactions]
-    transactions[:] = [tx for tx in transactions if tx not in editable]
-
-    created_ids: list[str] = []
-    if hours > 0:
-        row = _transaction_row(
-            date=date,
-            category=category,
-            direction=direction,
-            hours=hours,
-            description=description,
-            status="reconciled",
-            source="set-day",
-            existing_ids=existing_ids,
-        )
-        transactions.append(row)
-        created_ids.append(row["id"])
 
     before = sum(float(tx.get("hours", 0.0)) for tx in editable)
     files = {f"leave_years/{year}.json": json.dumps(ledger, sort_keys=True)}
@@ -219,9 +148,9 @@ def _edit_day(body: dict) -> tuple[dict, dict]:
         "direction": direction,
         "before_hours": before,
         "after_hours": hours if hours > 0 else 0.0,
-        "removed_transaction_ids": removed_ids,
-        "created_transaction_ids": created_ids,
-        "comment": description,
+        "removed_transaction_ids": outcome["removed_transaction_ids"],
+        "created_transaction_ids": outcome["created_transaction_ids"],
+        "comment": outcome["comment"],
         "protected_rows": [dict(tx) for tx in protected],
     }
     return files, preview
@@ -241,19 +170,16 @@ def _add_entry(body: dict) -> tuple[dict, dict]:
     if hours <= 0:
         raise AccountingError("INVALID_HOURS", "hours", "Hours must be positive.")
 
-    transactions = ledger.setdefault("transactions", [])
-    existing_ids = [str(tx.get("id", "")) for tx in transactions]
-    row = _transaction_row(
+    row_id = append_entry(
+        ledger,
         date=date,
         category=category,
         direction=direction,
         hours=hours,
-        description=description,
+        comment=description,
         status=status,
         source="manual",
-        existing_ids=existing_ids,
     )
-    transactions.append(row)
     files = {f"leave_years/{year}.json": json.dumps(ledger, sort_keys=True)}
     preview = {
         "kind": "add_entry",
@@ -264,7 +190,7 @@ def _add_entry(body: dict) -> tuple[dict, dict]:
         "hours": hours,
         "comment": description,
         "status": status,
-        "created_transaction_ids": [row["id"]],
+        "created_transaction_ids": [row_id],
     }
     return files, preview
 

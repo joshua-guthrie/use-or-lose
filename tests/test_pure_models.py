@@ -3,7 +3,6 @@ shapes and defaults to the previous implementation."""
 
 import json
 import math
-from datetime import date
 from pathlib import Path
 
 import pytest
@@ -134,5 +133,3 @@ def test_config_model_dump_matches_the_recorded_golden():
     dumped = Config().model_dump()
     golden = json.loads((GOLDEN_DIR / "config-golden.json").read_text(encoding="utf-8"))
     assert dumped == golden
-
-

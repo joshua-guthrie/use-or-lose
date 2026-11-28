@@ -4,10 +4,8 @@ from __future__ import annotations
 
 import json
 import os
-from pathlib import Path
-from typing import Literal
-
 from dataclasses import dataclass, field
+from pathlib import Path
 
 from useorlose.config import get_default_data_dir
 from useorlose.pure_models import PureModel
@@ -169,9 +167,7 @@ class Policy(PureModel):
 
     def __post_init__(self):
         if self.mode not in {"full_access", "read_only", "unattended", "confirm_writes"}:
-            raise ValueError(
-                "Input should be 'full_access', 'read_only', 'unattended' or 'confirm_writes'"
-            )
+            raise ValueError("Input should be 'full_access', 'read_only', 'unattended' or 'confirm_writes'")
         for name in ("allow_high_impact", "allow_imports", "allow_file_output", "allow_network"):
             if not isinstance(getattr(self, name), bool):
                 raise ValueError(f"{name}: Input should be a valid boolean")
@@ -182,9 +178,7 @@ class Policy(PureModel):
             coerced = int(value) if name == "max_output_bytes" else float(value)
             object.__setattr__(self, name, coerced)
         object.__setattr__(self, "data_dir", _as_path(self.data_dir, "data_dir"))
-        object.__setattr__(
-            self, "allowed_data_dirs", _as_paths(self.allowed_data_dirs, "allowed_data_dirs")
-        )
+        object.__setattr__(self, "allowed_data_dirs", _as_paths(self.allowed_data_dirs, "allowed_data_dirs"))
         object.__setattr__(self, "file_read_roots", _as_paths(self.file_read_roots, "file_read_roots"))
         object.__setattr__(self, "file_write_roots", _as_paths(self.file_write_roots, "file_write_roots"))
         object.__setattr__(self, "executable", _as_optional_path(self.executable, "executable"))
@@ -196,9 +190,7 @@ class Policy(PureModel):
         if not (0 <= self.lock_timeout_seconds <= 3600):
             raise ValueError("Input should be greater than or equal to 0 and less than or equal to 3600")
         if not (1024 <= self.max_output_bytes <= 16 * 1024 * 1024):
-            raise ValueError(
-                "Input should be greater than or equal to 1024 and less than or equal to 16777216"
-            )
+            raise ValueError("Input should be greater than or equal to 1024 and less than or equal to 16777216")
         # Reject even explicit false/empty restrictions: there is no partially
         # restricted full_access profile. Runtime limits/logging remain optional.
         restrictive = self.model_fields_set & {
@@ -214,9 +206,7 @@ class Policy(PureModel):
             "allow_network",
         }
         if self.mode == "full_access" and restrictive:
-            raise ValueError(
-                f"full_access is incompatible with restrictive fields: {', '.join(sorted(restrictive))}"
-            )
+            raise ValueError(f"full_access is incompatible with restrictive fields: {', '.join(sorted(restrictive))}")
 
     @classmethod
     def load(cls, path: Path | None):

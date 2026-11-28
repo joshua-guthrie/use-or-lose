@@ -1,11 +1,10 @@
-"""Android write-side creation adapter over the approved desktop builders.
+"""Android write-side creation adapter over the shared pure core.
 
-Reuses the pure accounting builders already bundled for the read path —
-``cross_year.manual_ledger``, ``ledger.upsert_accrual_rate_change``,
-``ledger.calculate_balances``, ``ledger.create_transaction`` — so the phone
-creates desktop-compatible schema-v1 ledgers without importing the desktop
-CLI stack (typer, rich, pydantic) and without adding any accounting logic
-of its own. The final store publish remains the Kotlin I04 writer.
+Calls the same bundled core builders the CLI uses — ``cross_year.manual_ledger``,
+``cross_year.derive_carryover``, ``ledger.ensure_automatic_accruals``,
+``ledger.upsert_accrual_rate_change``, ``ledger.create_transaction`` — so the
+phone creates desktop-compatible schema-v1 ledgers with no duplicated
+accounting logic. The final store publish remains the Kotlin I04 writer.
 """
 
 from __future__ import annotations
@@ -17,14 +16,13 @@ from copy import deepcopy
 import useorlose.cross_year as cross_year
 
 from useorlose.cross_year import AccountingError, checked_ledger, derive_carryover, fingerprint
-from useorlose.expirations import EPSILON
 from useorlose.ledger import (
     accrual_hours_for_date,
     calculate_balances,
-    generate_transaction_id,
+    create_transaction,
+    ensure_automatic_accruals,
     upsert_accrual_rate_change,
 )
-from useorlose.payperiods import generate_pay_periods, leave_year_period_count
 from useorlose.rule_defaults import DEFAULT_RULES
 
 SCHEMA_VERSION = 1
@@ -164,123 +162,6 @@ def _number(value, description: str) -> float:
     return number
 
 
-def _has_auto_accrual(ledger: dict, category: str, accrual_date: str) -> bool:
-    return any(
-        tx.get("source") == "auto_accrual"
-        and tx.get("category") == category
-        and tx.get("date") == accrual_date
-        for tx in ledger.get("transactions", [])
-    )
-
-
-def _accrual_row(ledger: dict, category: str, accrual_date: str, period_number, existing_ids: list[str]) -> dict:
-    """The canonical auto_accrual row (from the desktop Transaction model),
-    built without pydantic; deterministic timestamps from the accrual date."""
-    return {
-        "id": generate_transaction_id(accrual_date, existing_ids),
-        "date": accrual_date,
-        "category": category,
-        "direction": "earned",
-        "hours": accrual_hours_for_date(ledger, category, accrual_date),
-        "description": f"Automatic {category} leave accrual for pay period {period_number}",
-        "status": "reconciled",
-        "source": "auto_accrual",
-        "created_at": f"{accrual_date}T00:00:00",
-        "updated_at": f"{accrual_date}T00:00:00",
-        "expiration_date": None,
-        "expiration_pay_period": None,
-        "earned_transaction_id": None,
-        "expiration_extension_reason": None,
-        "expiration_extended_at": None,
-    }
-
-
-def _seed_accruals_pure(ledger: dict, through_date: str) -> int:
-    """Mirror of ledger.ensure_automatic_accruals with pydantic-free rows."""
-    cutoff = through_date
-    existing_ids = [str(tx.get("id", "")) for tx in ledger.get("transactions", [])]
-    added = 0
-    for pay_period in ledger.get("pay_periods", []):
-        period_number = pay_period.get("pay_period_number")
-        accrual_date = pay_period.get("accrual_date") or pay_period.get("end_date")
-        if not accrual_date or accrual_date > cutoff:
-            continue
-        for category in ("annual", "sick"):
-            hours = accrual_hours_for_date(ledger, category, accrual_date)
-            if hours <= 0 or _has_auto_accrual(ledger, category, accrual_date):
-                continue
-            row = _accrual_row(ledger, category, accrual_date, period_number, existing_ids)
-            ledger.setdefault("transactions", []).append(row)
-            existing_ids.append(row["id"])
-            added += 1
-    return added
-
-
-def _manual_ledger_pure(
-    year: int,
-    start: str,
-    annual_accrual: float,
-    balances: dict,
-    *,
-    pay_periods: int | None = None,
-    config: dict | None = None,
-) -> dict:
-    """Mirror of cross_year.manual_ledger with pydantic-free accrual rows.
-
-    Every semantic decision delegates to the core's pure helpers
-    (generate_pay_periods, leave_year_period_count, accrual_hours_for_date,
-    generate_transaction_id); only the row and envelope construction lives
-    here, because the desktop builders create rows through the pydantic
-    Transaction model. The device parity gate locks the drift risk.
-    """
-    if any(float(balances.get(category, 0.0)) for category in ("ppl", "fmla")):
-        raise AccountingError("INVALID_PARENTAL_OPENING", "PPL needs a dated earned entitlement; FMLA is usage only")
-    if not 1 <= year <= 9998:
-        raise AccountingError("INVALID_YEAR", "Leave-year identifier must be between 1 and 9998")
-    increment = _number((config or {}).get("defaults", {}).get("time_increment_hours", 0.25), "time increment")
-    if increment <= 0:
-        raise AccountingError("INVALID_HOURS", "Time increment must be positive")
-    for category, value in {**balances, "annual_accrual": annual_accrual}.items():
-        hours = _number(value, category)
-        if hours < 0 or abs(hours / increment - round(hours / increment)) > EPSILON:
-            raise AccountingError("INVALID_HOURS", f"{category} must be nonnegative in increments of {increment}")
-    first = __import__("datetime").date.fromisoformat(start)
-    count = (
-        pay_periods
-        if pay_periods is not None
-        else (
-            leave_year_period_count(first, year)
-            if first.month == 1 and first.year == year and first.day <= 14
-            else 26
-        )
-    )
-    if count not in {26, 27}:
-        raise AccountingError("UNSUPPORTED_PAY_PERIODS", "Choose 26 or 27 periods")
-    periods = generate_pay_periods(first, count)
-    ledger = {
-        "schema_version": 1,
-        "leave_year": year,
-        "leave_year_start": start,
-        "leave_year_end": periods[-1]["end_date"],
-        "pay_period_count": count,
-        "pay_periods": periods,
-        "annual_leave_accrual_hours": annual_accrual,
-        "sick_leave_accrual_hours": (config or {}).get("defaults", {}).get("sick_leave_accrual_hours", 4.0),
-        "starting_balances": deepcopy(balances),
-        "carryover_from_previous_year": deepcopy(balances),
-        "transactions": [],
-        "holidays": [],
-        "initialization": {"mode": "manual", "method": "manual", "source_leave_year": None},
-        "rollover_status": {
-            "rolled_from_previous_year": False,
-            "rolled_to_next_year": False,
-            "rollover_completed_at": None,
-        },
-    }
-    _seed_accruals_pure(ledger, str(ledger["leave_year_end"]))
-    return ledger
-
-
 def _manual_create(body: dict) -> dict:
     year = _require_int(body, "year")
     start = _require_str(body, "leave_year_start")
@@ -295,7 +176,7 @@ def _manual_create(body: dict) -> dict:
 
     build_config = deepcopy(config) if config is not None else {"defaults": deepcopy(_DEFAULT_DEFAULTS)}
     build_config.setdefault("defaults", {})["sick_leave_accrual_hours"] = sick_accrual
-    ledger = _manual_ledger_pure(
+    ledger = cross_year.manual_ledger(
         year,
         start,
         annual_accrual,
@@ -334,7 +215,7 @@ def _carryover_create(body: dict) -> dict:
     if start is not None and not isinstance(start, str):
         raise AccountingError("INVALID_REQUEST", "leave_year_start must be an ISO date string or null.")
 
-    target, summary = _derive_carryover_pure(source, year, config, start=start, pay_periods=pay_periods)
+    target, summary = derive_carryover(source, year, config, start=start, pay_periods=pay_periods)
     summary.update(
         {
             "preview_fingerprint": fingerprint({"target": target, "source": source, "config": config}),
@@ -363,26 +244,6 @@ def _carryover_create(body: dict) -> dict:
     return files, preview
 
 
-def _derive_carryover_pure(source: dict, year: int, config: dict, *, start: str | None, pay_periods: int | None):
-    """derive_carryover with the pydantic accrual writer swapped out.
-
-    The desktop derive_carryover calls ledger.ensure_automatic_accruals for
-    the source copy and seeds the target through cross_year.seed_accruals;
-    both resolve through the module global and both reach pydantic's
-    create_transaction, which has no Android wheel. The bridge already
-    carries the I06 parity-locked pure mirror (_seed_accruals_pure), so this
-    wrapper scope-swaps the module binding for the duration of the call and
-    restores it immediately. Every accounting decision still delegates to
-    the bundled cross_year body; only the accrual-row writer changes.
-    """
-    original = cross_year.ensure_automatic_accruals
-    try:
-        cross_year.ensure_automatic_accruals = _seed_accruals_pure
-        return cross_year.derive_carryover(source, year, config, start=start, pay_periods=pay_periods)
-    finally:
-        cross_year.ensure_automatic_accruals = original
-
-
 def _today_create(body: dict) -> dict:
     year = _require_int(body, "year")
     start = _require_str(body, "leave_year_start")
@@ -402,7 +263,7 @@ def _today_create(body: dict) -> dict:
         "defaults": deepcopy(_DEFAULT_DEFAULTS),
     }
     build_config.setdefault("defaults", {})["sick_leave_accrual_hours"] = 0.0
-    ledger = _manual_ledger_pure(year, start, 0.0, {}, pay_periods=pay_periods, config=build_config)
+    ledger = cross_year.manual_ledger(year, start, 0.0, {}, pay_periods=pay_periods, config=build_config)
     ledger["annual_leave_accrual_hours"] = 0.0
     ledger["sick_leave_accrual_hours"] = 0.0
     upsert_accrual_rate_change(
@@ -416,7 +277,7 @@ def _today_create(body: dict) -> dict:
     # Seed the scheduled accruals through year-end at the dated rates, so an
     # accrual scheduled for Today is part of the pre-adjustment balance (the
     # target includes it and must still be exact).
-    _seed_accruals_pure(ledger, str(ledger["leave_year_end"]))
+    ensure_automatic_accruals(ledger, str(ledger["leave_year_end"]))
 
     current = calculate_balances(ledger, until_date=today)
     existing_ids = [str(tx.get("id", "")) for tx in ledger.get("transactions", [])]
@@ -425,27 +286,19 @@ def _today_create(body: dict) -> dict:
         if abs(difference) <= 0.000001:
             continue
         # The canonical forced-balance row from the desktop command, built
-        # without the pydantic Transaction model. Timestamps are derived
-        # from the setup date so candidates are deterministic on the phone.
-        transaction = {
-            "id": generate_transaction_id(today, existing_ids),
-            "date": today,
-            "category": category,
-            "direction": "forced_increase" if difference > 0 else "forced_decrease",
-            "hours": abs(difference),
-            "description": SETUP_REASON,
-            "status": "reconciled",
-            "source": "forced-balance",
-            "created_at": f"{today}T00:00:00",
-            "updated_at": f"{today}T00:00:00",
-            "expiration_date": None,
-            "expiration_pay_period": None,
-            "earned_transaction_id": None,
-            "expiration_extension_reason": None,
-            "expiration_extended_at": None,
-        }
-        ledger.setdefault("transactions", []).append(transaction)
-        existing_ids.append(transaction["id"])
+        # through the same shared create_transaction the CLI uses.
+        transaction = create_transaction(
+            date=today,
+            category=category,
+            direction="forced_increase" if difference > 0 else "forced_decrease",
+            hours=abs(difference),
+            description=SETUP_REASON,
+            status="reconciled",
+            source="forced-balance",
+            existing_ids=existing_ids,
+        )
+        ledger.setdefault("transactions", []).append(transaction.model_dump())
+        existing_ids.append(transaction.id)
 
     initialization = ledger.setdefault("initialization", {})
     initialization["baseline_as_of"] = today

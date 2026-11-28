@@ -58,11 +58,7 @@ def replace_day_group(
     replaced = [tx for tx in matching if not is_protected(tx, protected_sources=protected_sources)]
     protected = [tx for tx in matching if is_protected(tx, protected_sources=protected_sources)]
     existing_comment = next(
-        (
-            str(tx.get("description", "")).strip()
-            for tx in replaced
-            if str(tx.get("description", "")).strip()
-        ),
+        (str(tx.get("description", "")).strip() for tx in replaced if str(tx.get("description", "")).strip()),
         "",
     )
     description = existing_comment if comment is None else comment

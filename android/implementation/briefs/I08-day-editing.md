@@ -7,7 +7,7 @@
 ### D1 · Write surface — **approved: bridge mirror for now; single-point-of-truth refactor planned**
 
 - Approved as implemented: the bundled `useorlose_editing` module mirrors the CLI's `set-day`/`add` row semantics with pydantic-free rows, parity-locked byte-for-byte against the CLI on the pinned fixtures.
-- **Agreed follow-up (core-refactor milestone, pending its own brief):** extract the row builder and replace/add operations into a pydantic-free core module (`src/useorlose/editing.py`) that *both* the CLI and the Android bridge import. The CLI's behavior, output and every desktop test stay unchanged (they are the compatibility gate); the phone then runs the identical accounting code and the mirror modules are deleted. This is the single point of truth for the write path, matching the already-shared read path.
+- **Agreed follow-up — now complete:** pydantic was removed from the project (spec in `untracked/pydantic-removal-spec.md`) and the row builder plus the replace/add operations moved into the shared pure core (`src/useorlose/editing.py`, `pure_models.py`, the pure `transaction_model.py`). The CLI and the Android bridge import the same functions; the mirror modules were deleted; the CLI's behavior, output and every desktop test stay unchanged (they were the compatibility gate).
 
 ### D2 · Replacement scope — **approved: one leave type + direction per edit**
 

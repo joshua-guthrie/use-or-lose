@@ -18,6 +18,8 @@ from ..cli_helpers import (
     sanitize_text,
 )
 from ..config import load_config
+from ..editing import append_entry as core_append_entry
+from ..editing import replace_day_group
 from ..ledger import (
     TRANSACTION_CATEGORIES,
     TRANSACTION_DIRECTIONS,
@@ -27,7 +29,6 @@ from ..ledger import (
     create_transaction,
     normalize_direction,
 )
-from ..editing import append_entry as core_append_entry, replace_day_group
 from ..storage import load_json, write_json
 
 _SET_DAY_CATEGORIES = [
@@ -79,8 +80,6 @@ def _set_day_values(
 
     date = parse_iso_date(date).isoformat()
     year, leave_year = resolve_leave_year_for_date(date, data_dir)
-    transactions = leave_year.setdefault("transactions", [])
-    existing_ids = [transaction.get("id", "") for transaction in transactions]
     changed: list[dict] = []
     removed_ids: list[str] = []
     created_ids: list[str] = []
@@ -228,9 +227,7 @@ def add(
     except ValueError as exc:
         console.print(f"[red]ERROR:[/red] {exc}")
         raise typer.Exit(code=2)
-    transaction = next(
-        row for row in leave_year["transactions"] if row.get("id") == transaction_id
-    )
+    transaction = next(row for row in leave_year["transactions"] if row.get("id") == transaction_id)
     leave_year["_fmla_overlap_acknowledged"] = acknowledge_fmla_overlap is True
     write_json(get_leave_year_path(year, data_dir), leave_year)
     result = {

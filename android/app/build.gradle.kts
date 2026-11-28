@@ -22,6 +22,9 @@ val prepareBridgePython by tasks.registering(Sync::class) {
         include("read_api.py")
         include("rule_defaults.py")
         include("validation.py")
+        include("pure_models.py")
+        include("transaction_model.py")
+        include("editing.py")
         into("useorlose")
     }
     from(rootProject.file("bridge/src")) {

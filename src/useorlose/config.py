@@ -10,10 +10,10 @@ import json
 import os
 import sys
 from copy import deepcopy
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from dataclasses import dataclass, field
 from rich.console import Console
 
 from .holidays import DEFAULT_OPM_ICS_URL, generate_federal_holidays

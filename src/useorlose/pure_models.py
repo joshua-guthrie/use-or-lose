@@ -9,7 +9,8 @@ Linux, Windows and the Android runtime.
 
 from __future__ import annotations
 
-from dataclasses import MISSING, Field, fields as dataclass_fields, is_dataclass
+from dataclasses import MISSING, Field, is_dataclass
+from dataclasses import fields as dataclass_fields
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -36,18 +37,13 @@ def model_dump(value: Any) -> Any:
     """
     if isinstance(value, PureModel):
         declared = value.__dataclass_fields__
-        result: dict[str, Any] = {
-            name: model_dump(getattr(value, name)) for name in declared
-        }
+        result: dict[str, Any] = {name: model_dump(getattr(value, name)) for name in declared}
         for name, item in vars(value).items():
             if name not in declared and name != "model_fields_set":
                 result[name] = model_dump(item)
         return result
     if is_dataclass(value) and not isinstance(value, type):
-        return {
-            field.name: model_dump(getattr(value, field.name))
-            for field in dataclass_fields(value)
-        }
+        return {field.name: model_dump(getattr(value, field.name)) for field in dataclass_fields(value)}
     if isinstance(value, Path):
         return str(value)
     if isinstance(value, datetime):
