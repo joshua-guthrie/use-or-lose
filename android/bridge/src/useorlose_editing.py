@@ -1,7 +1,7 @@
 """Android write-side day-editing adapter over the approved desktop semantics.
 
 Mirrors the CLI writes for the phone without importing the CLI stack
-(typer, rich) or pydantic: ``edit_day`` follows ``commands/transactions.py``
+(typer, rich): ``edit_day`` follows the shared ``useorlose.editing`` operations
 ``_set_day_values`` scoped to one category+direction group, and ``add_entry``
 follows ``add``. Row shape and validation mirror the desktop ``Transaction``
 model dump; IDs and direction/status/category rules delegate to the bundled

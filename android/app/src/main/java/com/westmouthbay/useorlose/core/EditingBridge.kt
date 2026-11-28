@@ -9,7 +9,7 @@ import java.time.LocalDate
 /**
  * The typed write-side day-editing surface over the bridge module
  * `useorlose_editing`, which mirrors the CLI writes (set-day group
- * replacement and add) with pydantic-free rows. Returns candidate files for
+ * replacement and add) over the shared pure core. Returns candidate files for
  * the I04 store publisher plus a preview. All calls run off the main thread
  * and map failures to [CoreError].
  */

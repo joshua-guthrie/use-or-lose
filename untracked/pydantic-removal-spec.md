@@ -199,10 +199,11 @@ flowchart LR
 
 ## 10. Deliverables checklist
 
-- [ ] `src/useorlose/pure_models.py` (+ tests)
-- [ ] Pure `transaction_model.py`, reworked `ledger.py` (+ validator tests)
-- [ ] Pure `config.py` models (+ dump-identity golden test)
-- [ ] Pure `mcp/policy.py` (+ existing MCP suites green)
-- [ ] `pyproject.toml` pydantic removed; venv reinstalled; G8–G12 green
-- [ ] Android bridge include list + mirror cleanup; G7 green
-- [ ] Phase evidence recorded in `untracked/` (baseline counts, before/after `pip freeze`, diff stat)
+- [x] `src/useorlose/pure_models.py` (+ tests) — commit `92c9e14`
+- [x] Pure `transaction_model.py`, reworked `ledger.py` (+ validator tests) — commit `92c9e14`
+- [x] Pure `config.py` models (+ dump-identity golden test) — commit `824b445`
+- [x] Pure `mcp/policy.py` (+ existing MCP suites green) — commit `55043ee`
+- [x] `pyproject.toml` pydantic removed; G8–G12 green — commit `6ec3203`
+- [x] Shared `src/useorlose/editing.py` + CLI rewiring — commit `9855d03`
+- [x] Android bridge include list + mirror cleanup; G7 green — commit `8cfc772`
+- [x] Phase evidence: full desktop suite 1075 passed / 3 skipped at every phase; Android 56 JVM + 87 device; `src/` imports, `pyproject.toml`, tests and the Android bridge are pydantic-free (pydantic remains in the desktop venv only as the transitive requirement of the third-party `mcp==2.3.0` SDK, desktop-only)

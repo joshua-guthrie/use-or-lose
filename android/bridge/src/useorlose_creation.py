@@ -193,7 +193,7 @@ def _manual_create(body: dict) -> dict:
 def _carryover_create(body: dict) -> dict:
     """Preview a carryover from the adjacent source ledger (YEAR-CARRY-01).
 
-    Delegates entirely to the bundled pydantic-free cross_year builders and
+    Delegates entirely to the bundled pure cross_year builders and
     reproduces creation_plan's preview fingerprint tuple, so the phone and
     the CLI derive identical candidates from identical inputs.
     """
