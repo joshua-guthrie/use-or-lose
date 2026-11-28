@@ -18,7 +18,7 @@
 
 **Expected changes.** Add Android-specific packaging configuration under `android/bridge/` (record the actual path and contract in the report) and the Chaquopy wiring in the I01 app module. Add a debug-only probe route and its instrumentation test. Copy or build-time sync the fixture from `android/qa/fixtures/calendar-2026/` into the Android test assets without hand-editing the source fixture. Record the fixture tree digest from the manifest in the report.
 
-**Preserve.** Desktop CLI, GUI, packaging and `src/` behavior; the I01 launch screen and toolchain; the root `pyproject.toml` dependency set unless the owner approves a change; and the app's release manifest beyond new packaging configuration. Do not import terminal, MCP, Qt or desktop chart modules into the Android build graph.
+**Preserve.** The CLI, the GUIs, packaging and `src/` behavior; the I01 launch screen and toolchain; the root `pyproject.toml` dependency set unless the owner approves a change; and the app's release manifest beyond new packaging configuration. Do not import terminal, MCP, Qt or desktop chart modules into the Android build graph.
 
 ## Behavior and contract
 

@@ -74,7 +74,7 @@ class CarryoverFlowTest : CalendarUiTestBase() {
         // The review renders the pinned preview values with full leave-type
         // names: annual 240 h, sick 600 h, credit 24 h.
         composeRule.waitUntil(timeoutMillis = 30_000) {
-            composeRule.onAllNodesWithText("Annual leave opening").fetchSemanticsNodes().isNotEmpty()
+            composeRule.onAllNodesWithText("Annual leave starting balance").fetchSemanticsNodes().isNotEmpty()
         }
         composeRule.onNodeWithText("240 h").assertIsDisplayed()
         composeRule.onNodeWithText("600 h").assertIsDisplayed()
@@ -149,7 +149,7 @@ class CarryoverVisualCaptureTest : CalendarUiTestBase() {
         }
         composeRule.onNodeWithTag("setup_carryover_choice").performScrollTo().performClick()
         composeRule.waitUntil(timeoutMillis = 30_000) {
-            composeRule.onAllNodesWithText("Annual leave opening").fetchSemanticsNodes().isNotEmpty()
+            composeRule.onAllNodesWithText("Annual leave starting balance").fetchSemanticsNodes().isNotEmpty()
         }
         capture("carryover-review")
         composeRule.onNodeWithTag("carryover_lots").performScrollTo().performClick()

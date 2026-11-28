@@ -62,10 +62,10 @@
     <string name="setup_start_choice">Balances at start of leave year</string>
     <string name="setup_today_choice">Balances as of Today</string>
     <string name="setup_start_title">Start-of-year balances</string>
-    <string name="setup_annual_opening">Annual opening</string>
-    <string name="setup_sick_opening">Sick opening</string>
+    <string name="setup_annual_opening">Annual starting balance</string>
+    <string name="setup_sick_opening">Sick starting balance</string>
     <string name="setup_other_starting">Other starting balances</string>
-    <string name="setup_independent_card">Independent opening</string>
+    <string name="setup_independent_card">Independent starting balance</string>
     <string name="setup_independent_body">Earlier balances, earned dates and expiration history stay in their original year.</string>
     <string name="setup_review_action">Review leave year</string>
     <string name="setup_today_title">Balances as of Today</string>
@@ -119,7 +119,7 @@
     <string name="carryover_source_card">Carry over from %1$d</string>
     <string name="carryover_review_subtitle">For the balance on %1$s</string>
     <string name="carryover_source_body">%1$s \u2013 %2$s \u00b7 %3$d periods. Source closes %4$s.</string>
-    <string name="carryover_opening">%1$s opening</string>
+    <string name="carryover_opening">%1$s starting balance</string>
     <string name="carryover_reduction_item">%1$s %2$s h</string>
     <string name="carryover_reduction_suffix">exceed the configured limits.</string>
     <string name="carryover_reduction_join">\u0020and\u0020</string>

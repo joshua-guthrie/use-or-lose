@@ -2,7 +2,7 @@
 
 ## Recommendation
 
-Build the phone UI in Kotlin and Jetpack Compose. Keep the desktop CLI, and extract a small importable Python accounting library from its existing implementation. The Android app should call this library in process through a typed Kotlin adapter. Pilot Chaquopy for that bridge. The existing CLI keeps its commands, arguments, output and error contracts and becomes another adapter over the shared operations. Linux and Windows GUI users continue to use their installed desktop applications. [Current dependency boundaries](../../../../docs/ARCHITECTURE.md#dependency-direction) · [Chaquopy Gradle integration](https://chaquo.com/chaquopy/doc/current/android.html)
+Build the phone UI in Kotlin and Jetpack Compose. Keep the CLI, and extract a small importable Python accounting library from its existing implementation. The Android app should call this library in process through a typed Kotlin adapter. Pilot Chaquopy for that bridge. The existing CLI keeps its commands, arguments, output and error contracts and becomes another adapter over the shared operations. Linux and Windows GUI users continue to use their installed desktop applications. [Current dependency boundaries](../../../../docs/ARCHITECTURE.md#dependency-direction) · [Chaquopy Gradle integration](https://chaquo.com/chaquopy/doc/current/android.html)
 
 This preserves one implementation for hard-to-reproduce behavior such as linked-year recalculation, expiration allocation, and overlapping PPL windows. Embedding Python adds a runtime and native-dependency packaging work. The first implementation milestone is a small build and parity experiment. Technical approval of the bridge depends on that experiment.
 
@@ -18,7 +18,7 @@ This preserves one implementation for hard-to-reproduce behavior such as linked-
 flowchart LR
     Phone[Android UI and local store] --> Adapter[Kotlin operation adapter]
     Adapter --> Core[Shared accounting library]
-    CLI[Desktop CLI and desktop store] --> Core
+    CLI[CLI and desktop store] --> Core
     GUI[Existing desktop GUIs] --> CLI
 ```
 

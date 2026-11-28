@@ -18,7 +18,7 @@
 
 **Expected changes.** Add storage code under the I01 application package, for example `storage/StorePaths.kt`, `StorageSnapshot.kt`, `StoreCandidate.kt`, `StoreValidator.kt`, `StoreCoordinator.kt`, `Recovery.kt` and `AtomicPointer.kt`. Add unit tests under `app/src/test/` and device tests under `app/src/androidTest/`. Add a debug-only developer fixture entry and its test assets. Add the backup exclusion to the manifest and XML rules. Record every actual path in the I04 report.
 
-**Preserve.** The I03 read contract, the I02 bridge, desktop CLI and GUI behavior, the canonical JSON schema, and all release UI. Do not add document-picker, share, restore, migration or setup flows. Do not rewrite the active store merely to display data.
+**Preserve.** The I03 read contract, the I02 bridge, CLI and GUI behavior, the canonical JSON schema, and all release UI. Do not add document-picker, share, restore, migration or setup flows. Do not rewrite the active store merely to display data.
 
 ## Behavior and contract
 

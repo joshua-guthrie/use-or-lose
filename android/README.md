@@ -119,7 +119,7 @@ flowchart LR
     UI[Kotlin and Compose UI] --> Store[App-private canonical JSON store]
     UI --> Bridge[Typed Kotlin bridge]
     Bridge --> Core[Shared Python accounting core]
-    CLI[Desktop CLI and GUI] --> Core
+    CLI[CLI and the desktop GUIs] --> Core
     CLI --> Desktop[Desktop datastore]
 ```
 

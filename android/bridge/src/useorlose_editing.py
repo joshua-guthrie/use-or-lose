@@ -1,6 +1,6 @@
 """Android write-side day-editing adapter over the approved desktop semantics.
 
-Mirrors the desktop CLI writes for the phone without importing the CLI stack
+Mirrors the CLI writes for the phone without importing the CLI stack
 (typer, rich) or pydantic: ``edit_day`` follows ``commands/transactions.py``
 ``_set_day_values`` scoped to one category+direction group, and ``add_entry``
 follows ``add``. Row shape and validation mirror the desktop ``Transaction``
@@ -79,7 +79,7 @@ def _transaction_row(
     Validation mirrors the model validators: category, direction and status
     must be known, hours finite and nonnegative. Timestamps are deterministic
     (date-derived) so phone candidates are reproducible; the parity gate
-    normalizes the desktop CLI's now()-timestamps before comparing.
+    normalizes the CLI's now()-timestamps before comparing.
     """
     if category not in CATEGORY_POLICIES:
         raise AccountingError("INVALID_CATEGORY", "category", f"Unknown category: {category}")

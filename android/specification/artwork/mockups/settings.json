@@ -181,7 +181,7 @@
     "subtitle": "Make each dated change explicit and distinguish forecasts from corrections.",
     "screens": [
       {"id": "STARTING-BALANCE-EDIT", "title": "Correct opening balance", "subtitle": "Manual year · 2026", "items": [
-        {"type": "row", "text": "Annual opening", "value": "20 h → 25 h", "note": 1},
+        {"type": "row", "text": "Annual starting balance", "value": "20 h → 25 h", "note": 1},
         {"type": "row", "text": "Reason", "value": "Verified baseline"},
         {"type": "action", "text": "Save revised opening"}
       ]},

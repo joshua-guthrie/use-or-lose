@@ -63,7 +63,7 @@ Rules:
 - Category keys, warning codes and enumeration values stay identical. Finite hours use the desktop values exactly. Preserve `None` and unavailable meanings.
 - The functions are pure with respect to their inputs. Do not mutate `files`, its nested mappings or their lists. The underlying core may synthesize or deep-copy internally; expose only computed output.
 - `config.json` is required for current desktop parity and supplies carryover policy and category rules. A missing or invalid config file raises `MISSING_CONFIG`, not a silent default.
-- Unknown operation or field values raise structured errors. Define `ReadApiError` with `code`, `field` and a safe `message`, and use at least `MISSING_CONFIG`, `LEAVE_YEAR_NOT_FOUND`, `INVALID_DATE`, `INVALID_MONTH`, `INVALID_SNAPSHOT` and `UNKNOWN_OPERATION`. Do not change the desktop CLI's existing messages or exit codes; adapt them in the command layer.
+- Unknown operation or field values raise structured errors. Define `ReadApiError` with `code`, `field` and a safe `message`, and use at least `MISSING_CONFIG`, `LEAVE_YEAR_NOT_FOUND`, `INVALID_DATE`, `INVALID_MONTH`, `INVALID_SNAPSHOT` and `UNKNOWN_OPERATION`. Do not change the CLI's existing messages or exit codes; adapt them in the command layer.
 
 Concrete checks:
 

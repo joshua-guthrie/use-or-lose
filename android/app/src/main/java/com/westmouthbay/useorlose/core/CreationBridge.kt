@@ -10,7 +10,7 @@ import java.time.LocalDate
  * The typed write-side creation surface over the bridge module
  * `useorlose_creation`, which reuses the approved desktop builders
  * (`manual_ledger`, dated accrual changes, forced-balance rows) without
- * importing the desktop CLI stack. Returns candidate files for the I04
+ * importing the CLI stack. Returns candidate files for the I04
  * store publisher plus a preview summary. All calls run off the main
  * thread and map failures to [CoreError].
  */

@@ -22,8 +22,8 @@
           {"type": "row", "text": "First pay period starts", "value": "Jan 11, 2026", "note": 3},
           {"type": "row", "text": "Pay periods", "value": "26"},
           {"type": "row", "text": "Annual accrual", "value": "6 h / period"},
-          {"type": "row", "text": "Annual opening", "value": "100 h"},
-          {"type": "row", "text": "Sick opening", "value": "20 h"},
+          {"type": "row", "text": "Annual starting balance", "value": "100 h"},
+          {"type": "row", "text": "Sick starting balance", "value": "20 h"},
           {"type": "action", "text": "Other starting balances", "emphasis": false},
           {"type": "card", "text": "Independent opening", "body": "Earlier balances, earned dates and expiration history stay in their original year.", "note": 4},
           {"type": "action", "text": "Review leave year"}
@@ -35,9 +35,9 @@
         "subtitle": "For the balance on February 1, 2027",
         "items": [
           {"type": "card", "text": "Carry over from 2026", "body": "Jan 10, 2027 – Jan 8, 2028 · 26 periods. Source closes Jan 9, 2027.", "note": 5},
-          {"type": "row", "text": "Annual opening", "value": "240 h"},
-          {"type": "row", "text": "Sick opening", "value": "600 h"},
-          {"type": "row", "text": "Credit opening", "value": "24 h"},
+          {"type": "row", "text": "Annual starting balance", "value": "240 h"},
+          {"type": "row", "text": "Sick starting balance", "value": "600 h"},
+          {"type": "row", "text": "Credit starting balance", "value": "24 h"},
           {"type": "text", "text": "Annual 40 h and credit 6 h exceed the configured limits.", "note": 6},
           {"type": "action", "text": "Review lots and warnings", "emphasis": false},
           {"type": "action", "text": "Create leave year", "note": 7},

@@ -59,7 +59,7 @@ For a plotted report, tap its chart to open the full-screen view. Back returns t
 
 ![Expanded Settings sections showing the Accounting and leave years and Holidays and reminders lists](../../artwork/mockups/settings-navigation.png)
 
-**Leave years** opens the year chooser and setup. Choosing an existing year explicitly goes to Calendar in that year and keeps the balance cutoff. **Accounting settings** opens the work tour, increment, accrual defaults and rules. **Leave-year maintenance** has **Correct opening balance**, **Force Balance**, **Change accrual**, and **Annual use or lose**. **Expiring leave** links to lot details and approved extensions.
+**Leave years** opens the year chooser and setup. Choosing an existing year explicitly goes to Calendar in that year and keeps the balance cutoff. **Accounting settings** opens the work tour, increment, accrual defaults and rules. **Leave-year maintenance** has **Correct starting balance**, **Force Balance**, **Change accrual**, and **Annual use or lose**. **Expiring leave** links to lot details and approved extensions.
 
 To look up a date symbol, tap **Calendar → Settings → Help and about → Calendar date markers**. The Help article shows each symbol beside its meaning. Back returns to Help, then to Settings. **About Use or Lose** shows the version and project website. [Settings screen details](../03-reports-data/03-03-data-and-settings-screens.md) · [Date markers Help mockup](../../artwork/mockups/settings-calendar-markers-help.png)
 

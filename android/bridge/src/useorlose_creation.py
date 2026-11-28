@@ -70,7 +70,7 @@ def _error(code: str, field: str, message: str) -> str:
 def default_config(annual_accrual: float, sick_accrual: float, timezone: str) -> dict:
     """The default config shape from the desktop Config model; the rules
     section comes from the bundled DEFAULT_RULES and the parity gate locks
-    this shape against the desktop CLI output."""
+    this shape against the CLI output."""
     defaults = deepcopy(_DEFAULT_DEFAULTS)
     defaults["annual_leave_accrual_hours"] = float(annual_accrual)
     defaults["sick_leave_accrual_hours"] = float(sick_accrual)
@@ -314,7 +314,7 @@ def _carryover_create(body: dict) -> dict:
 
     Delegates entirely to the bundled pydantic-free cross_year builders and
     reproduces creation_plan's preview fingerprint tuple, so the phone and
-    the desktop CLI derive identical candidates from identical inputs.
+    the CLI derive identical candidates from identical inputs.
     """
     year = _require_int(body, "year")
     source_year = _require_int(body, "source_year")
