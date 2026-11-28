@@ -16,6 +16,8 @@ object AppRoutes {
     const val BALANCE_DATE_PICKER = "balance_date_picker"
     const val WELCOME = "welcome"
     const val SETUP = "setup/{for_date}"
+    const val DAY_EDIT = "day_edit/{date}"
+    const val DAY_ADD = "day_add/{date}"
     const val REPORTS = "reports"
     const val SETTINGS = "settings"
 
@@ -25,6 +27,10 @@ object AppRoutes {
     fun day(date: LocalDate): String = "day/${date}"
 
     fun setup(forDate: String): String = "setup/$forDate"
+
+    fun dayEdit(date: LocalDate): String = "day_edit/${date}"
+
+    fun dayAdd(date: LocalDate): String = "day_add/${date}"
 
     const val SETUP_FOR_WELCOME = "welcome"
 }

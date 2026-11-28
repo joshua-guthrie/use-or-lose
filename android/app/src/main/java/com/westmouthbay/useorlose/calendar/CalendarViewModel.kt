@@ -103,6 +103,15 @@ class CalendarViewModel(
      * and resume the reads (including the balance lookup that asked for the
      * missing year).
      */
+    /** The editor draft preserved across a setup handoff (T-CAL-YEAR-02). */
+    private var _editorDraft: EditorDraft? = null
+
+    fun stashEditorDraft(draft: EditorDraft) {
+        _editorDraft = draft
+    }
+
+    fun consumeEditorDraft(): EditorDraft? = _editorDraft.also { _editorDraft = null }
+
     fun refreshAfterSetup() {
         launchRead {
             val open = store.open()

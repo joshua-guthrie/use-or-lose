@@ -169,7 +169,7 @@
           {"type": "row", "text": "Hours · 0.25 h increments", "value": "3.5"},
           {"type": "row", "text": "Comment", "value": "Appointment"},
           {"type": "action", "text": "View the 2 current entries", "emphasis": false, "note": 2},
-          {"type": "row", "text": "Sick leave", "value": "1 h used"},
+          {"type": "text", "text": "An unchanged Sick leave entry stays at 1 h."},
           {"type": "action", "text": "Review changes"}
         ]
       },

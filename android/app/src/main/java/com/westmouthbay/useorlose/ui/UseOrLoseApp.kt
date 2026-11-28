@@ -37,7 +37,10 @@ import com.westmouthbay.useorlose.R
 import com.westmouthbay.useorlose.calendar.BalanceDatePicker
 import com.westmouthbay.useorlose.calendar.BalanceScreen
 import com.westmouthbay.useorlose.calendar.CalendarViewModel
+import com.westmouthbay.useorlose.calendar.DayEditScreen
+import com.westmouthbay.useorlose.calendar.DayEditViewModel
 import com.westmouthbay.useorlose.calendar.DayScreen
+import com.westmouthbay.useorlose.calendar.EditMode
 import com.westmouthbay.useorlose.calendar.MonthPicker
 import com.westmouthbay.useorlose.calendar.CalendarScreen
 import com.westmouthbay.useorlose.calendar.SetupScreen
@@ -63,6 +66,10 @@ fun UseOrLoseApp(dependencies: AppDependencies) {
     val setupViewModel: SetupViewModel = viewModel(
         viewModelStoreOwner = activity,
         factory = SetupViewModel.factory(dependencies),
+    )
+    val dayEditViewModel: DayEditViewModel = viewModel(
+        viewModelStoreOwner = activity,
+        factory = DayEditViewModel.factory(dependencies),
     )
     val calendarState by calendarViewModel.state.collectAsState()
 
@@ -153,6 +160,17 @@ fun UseOrLoseApp(dependencies: AppDependencies) {
                     onCreated = {
                         calendarViewModel.refreshAfterSetup()
                         navController.popBackStack(AppRoutes.CALENDAR, inclusive = false)
+                        val editorDraft = calendarViewModel.consumeEditorDraft()
+                        if (editorDraft != null) {
+                            calendarViewModel.stashEditorDraft(editorDraft)
+                            navController.navigate(
+                                if (editorDraft.mode == EditMode.ADD) {
+                                    AppRoutes.dayAdd(editorDraft.date)
+                                } else {
+                                    AppRoutes.dayEdit(editorDraft.date)
+                                },
+                            )
+                        }
                     },
                 )
             }
@@ -167,6 +185,72 @@ fun UseOrLoseApp(dependencies: AppDependencies) {
                     viewModel = calendarViewModel,
                     date = date,
                     onBack = { navController.popBackStack() },
+                    onEditDay = {
+                        calendarViewModel.stashEditorDraft(
+                            com.westmouthbay.useorlose.calendar.EditorDraft(
+                                date = date,
+                                mode = EditMode.EDIT,
+                                category = "",
+                                direction = "",
+                                hoursText = "",
+                                comment = "",
+                            ),
+                        )
+                        navController.navigate(AppRoutes.dayEdit(date))
+                    },
+                    onAddEntry = {
+                        navController.navigate(AppRoutes.dayAdd(date))
+                    },
+                )
+            }
+            composable(
+                route = AppRoutes.DAY_EDIT,
+                arguments = listOf(navArgument(AppRoutes.DAY_ARG) { type = NavType.StringType }),
+            ) { entry ->
+                val date = LocalDate.parse(
+                    checkNotNull(entry.arguments?.getString(AppRoutes.DAY_ARG)),
+                )
+                LaunchedEffect(date) {
+                    dayEditViewModel.begin(date, calendarViewModel.consumeEditorDraft())
+                }
+                DayEditScreen(
+                    viewModel = dayEditViewModel,
+                    onBack = { navController.popBackStack() },
+                    onSetUp = { target ->
+                        calendarViewModel.stashEditorDraft(
+                            checkNotNull(dayEditViewModel.draft()),
+                        )
+                        navController.navigate(AppRoutes.setup(target.toString()))
+                    },
+                    onCreated = {
+                        calendarViewModel.refreshAfterSetup()
+                        navController.popBackStack(AppRoutes.CALENDAR, inclusive = false)
+                    },
+                )
+            }
+            composable(
+                route = AppRoutes.DAY_ADD,
+                arguments = listOf(navArgument(AppRoutes.DAY_ARG) { type = NavType.StringType }),
+            ) { entry ->
+                val date = LocalDate.parse(
+                    checkNotNull(entry.arguments?.getString(AppRoutes.DAY_ARG)),
+                )
+                LaunchedEffect(date) {
+                    dayEditViewModel.begin(date, calendarViewModel.consumeEditorDraft(), EditMode.ADD)
+                }
+                DayEditScreen(
+                    viewModel = dayEditViewModel,
+                    onBack = { navController.popBackStack() },
+                    onSetUp = { target ->
+                        calendarViewModel.stashEditorDraft(
+                            checkNotNull(dayEditViewModel.draft()),
+                        )
+                        navController.navigate(AppRoutes.setup(target.toString()))
+                    },
+                    onCreated = {
+                        calendarViewModel.refreshAfterSetup()
+                        navController.popBackStack(AppRoutes.CALENDAR, inclusive = false)
+                    },
                 )
             }
             composable(AppRoutes.MONTH_PICKER) {
@@ -207,9 +291,22 @@ private fun UseOrLoseBottomBar(
                 .fillMaxWidth()
                 .height(56.dp),
         ) {
+            // The day, editor, setup and picker routes belong to the
+            // Calendar tab: the tab stays selected while they are open.
+            val onCalendar = currentRoute == AppRoutes.CALENDAR ||
+                (currentRoute != null && (
+                    currentRoute.startsWith(AppRoutes.DAY) ||
+                        currentRoute.startsWith("day_edit") ||
+                        currentRoute.startsWith("day_add") ||
+                        currentRoute.startsWith("setup") ||
+                        currentRoute == AppRoutes.WELCOME ||
+                        currentRoute == AppRoutes.BALANCES ||
+                        currentRoute == AppRoutes.BALANCE_DATE_PICKER ||
+                        currentRoute == AppRoutes.MONTH_PICKER
+                    ))
             BottomTab(
                 label = stringResource(R.string.tab_calendar),
-                selected = currentRoute == AppRoutes.CALENDAR,
+                selected = onCalendar,
                 tag = "tab_calendar",
                 onClick = { onSelect(AppRoutes.CALENDAR) },
                 modifier = Modifier.weight(1f),

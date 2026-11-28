@@ -20,6 +20,8 @@ FIXTURE_ID = "calendar-2026"
 FIXTURE_DIR = ROOT / "android" / "qa" / "fixtures" / FIXTURE_ID
 GOLDEN_DIR = ROOT / "android" / "qa" / "golden" / FIXTURE_ID
 STORAGE_DIR = ROOT / "android" / "qa" / "fixtures" / "storage"
+EDITABLE_FIXTURE_ID = "editable-day-2026"
+EDITABLE_FIXTURE_DIR = ROOT / "android" / "qa" / "fixtures" / "editable-fixture" / EDITABLE_FIXTURE_ID
 CARRYOVER_FIXTURE_ID = "carryover-2026"
 CARRYOVER_FIXTURE_DIR = ROOT / "android" / "qa" / "fixtures" / "carryover-fixture" / CARRYOVER_FIXTURE_ID
 MARKER_FIXTURE_ID = "calendar-markers"
@@ -154,6 +156,30 @@ def build_carryover_store() -> Path:
         "30",
         data_dir=data_dir,
     )
+    return data_dir
+
+
+def build_editable_store() -> Path:
+    """The Editable day fixture for T-CAL-DAY-01: the calendar store plus a
+    second Jan 16 annual-use row and 1 h of sick use (annual 89 h, sick 19 h)."""
+    data_dir = Path(tempfile.mkdtemp(prefix="use-or-lose-android-fixture-"))
+    run_cli(
+        "init", "--year", "2026", "--leave-year-start", "2026-01-11", "--pay-periods", "26",
+        "--annual-accrual", "6", "--annual-start", "100", "--sick-start", "20", data_dir=data_dir,
+    )
+    entries = (
+        ("2026-01-13", "annual", "used", "8", "approved"),
+        ("2026-01-16", "annual", "used", "2", "approved"),
+        ("2026-01-16", "annual", "used", "1", "approved"),
+        ("2026-01-16", "sick", "used", "1", "approved"),
+        ("2026-01-22", "annual", "used", "4", "planned"),
+        ("2026-01-25", "annual", "used", "3", "planned"),
+    )
+    for day, category, direction, hours, status in entries:
+        run_cli(
+            "add", "--year", "2026", "--date", day, "--category", category,
+            "--used", hours, "--status", status, data_dir=data_dir,
+        )
     return data_dir
 
 
@@ -479,17 +505,14 @@ def build_storage_fixtures(source: Path) -> None:
     )
 
 
-def build_carryover_fixture() -> None:
-    carryover_store = build_carryover_store()
-    normalize_store(carryover_store)
-    copy_store(carryover_store, CARRYOVER_FIXTURE_DIR)
-    files = tree_hashes(CARRYOVER_FIXTURE_DIR)
+def _write_manifest(fixture_id: str, fixture_dir: Path, description: str) -> None:
+    files = tree_hashes(fixture_dir)
     write_json(
-        ROOT / "android" / "qa" / "fixtures" / "carryover-fixture" / f"{CARRYOVER_FIXTURE_ID}.manifest.json",
+        ROOT / "android" / "qa" / "fixtures" / fixture_dir.parent.name / f"{fixture_id}.manifest.json",
         {
             "schema_version": 1,
-            "fixture_id": CARRYOVER_FIXTURE_ID,
-            "description": "Pinned synthetic Carryover source fixture for the YEAR-CARRY-01 acceptance case.",
+            "fixture_id": fixture_id,
+            "description": description,
             "generated_by": "android/qa/fixtures/build_calendar_fixture.py",
             "desktop_reference": {
                 "published_build": DESKTOP_REFERENCE_BUILD,
@@ -505,7 +528,7 @@ def build_carryover_fixture() -> None:
             "frozen_local_date": FROZEN_DATE,
             "timezone": TIMEZONE,
             "store": {
-                "path": f"android/qa/fixtures/carryover-fixture/{CARRYOVER_FIXTURE_ID}",
+                "path": f"android/qa/fixtures/{fixture_dir.parent.name}/{fixture_id}",
                 "files": files,
                 "tree_digest": tree_digest(files),
                 "notes": [
@@ -516,16 +539,43 @@ def build_carryover_fixture() -> None:
             },
         },
     )
+
+
+def build_editable_fixture() -> None:
+    editable_store = build_editable_store()
+    normalize_store(editable_store)
+    copy_store(editable_store, EDITABLE_FIXTURE_DIR)
+    _write_manifest(
+        EDITABLE_FIXTURE_ID,
+        EDITABLE_FIXTURE_DIR,
+        "Pinned synthetic Editable day fixture for the T-CAL-DAY-01 acceptance case.",
+    )
+    print(f"editable fixture: {EDITABLE_FIXTURE_DIR}")
+
+
+def build_carryover_fixture() -> None:
+    carryover_store = build_carryover_store()
+    normalize_store(carryover_store)
+    copy_store(carryover_store, CARRYOVER_FIXTURE_DIR)
+    _write_manifest(
+        CARRYOVER_FIXTURE_ID,
+        CARRYOVER_FIXTURE_DIR,
+        "Pinned synthetic Carryover source fixture for the YEAR-CARRY-01 acceptance case.",
+    )
     print(f"carryover fixture: {CARRYOVER_FIXTURE_DIR}")
 
 
 def main() -> None:
     sys.path.insert(0, str(SRC))
     if "--only" in sys.argv:
-        if sys.argv[sys.argv.index("--only") + 1] == "carryover":
+        target = sys.argv[sys.argv.index("--only") + 1]
+        if target == "carryover":
             build_carryover_fixture()
             return
-        raise SystemExit("Unknown --only target; supported: carryover")
+        if target == "editable":
+            build_editable_fixture()
+            return
+        raise SystemExit("Unknown --only target; supported: carryover, editable")
     temp_store = build_temp_store()
     try:
         normalize_store(temp_store)

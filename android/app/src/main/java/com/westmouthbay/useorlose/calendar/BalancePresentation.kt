@@ -140,6 +140,15 @@ object BalancePresentation {
         }
 
     /** "90.0" → "90", "2.25" → "2.25". */
+    /** The full direction label for the editor ("Use", "Earn", "Worked"). */
+    fun directionLabel(context: Context, direction: String): String = when (direction) {
+        "used" -> context.getString(R.string.direction_use)
+        "earned" -> context.getString(R.string.direction_earn)
+        "worked" -> context.getString(R.string.direction_worked)
+        "paid_out" -> context.getString(R.string.direction_paid_out)
+        else -> direction
+    }
+
     fun formatHours(hours: Double): String =
         if (hours % 1.0 == 0.0) hours.toLong().toString() else hours.toString()
 

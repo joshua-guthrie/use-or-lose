@@ -21,11 +21,13 @@ val prepareBridgePython by tasks.registering(Sync::class) {
         include("parental.py")
         include("read_api.py")
         include("rule_defaults.py")
+        include("validation.py")
         into("useorlose")
     }
     from(rootProject.file("bridge/src")) {
         include("useorlose_probe.py")
         include("useorlose_creation.py")
+        include("useorlose_editing.py")
     }
     into(bridgePythonSrc)
 }
@@ -64,6 +66,7 @@ android {
             assets.srcDirs(
                 rootProject.file("qa/fixtures/calendar-2026"),
                 rootProject.file("qa/fixtures/carryover-fixture"),
+                rootProject.file("qa/fixtures/editable-fixture"),
                 rootProject.file("qa/golden/calendar-2026"),
                 rootProject.file("qa/fixtures/storage"),
                 rootProject.file("qa/fixtures/marker-fixture"),

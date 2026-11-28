@@ -46,6 +46,8 @@ fun DayScreen(
     viewModel: CalendarViewModel,
     date: LocalDate,
     onBack: () -> Unit,
+    onEditDay: () -> Unit,
+    onAddEntry: () -> Unit,
 ) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
@@ -149,6 +151,25 @@ fun DayScreen(
                         modifier = Modifier.padding(vertical = 3.dp),
                     )
                 }
+            }
+            Spacer(Modifier.height(12.dp))
+            androidx.compose.material3.Button(
+                onClick = onEditDay,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp)
+                    .testTag("day_edit_entry"),
+            ) {
+                Text(stringResource(R.string.day_edit_entry_label))
+            }
+            androidx.compose.material3.Button(
+                onClick = onAddEntry,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp)
+                    .testTag("day_add_entry"),
+            ) {
+                Text(stringResource(R.string.day_add_title))
             }
         }
     }

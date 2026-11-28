@@ -35,6 +35,18 @@ object CalendarDeveloperConfig {
     const val CARRYOVER_FIXTURE_PREFIX = "carryover-2026/"
 
     /**
+     * Asset names of the pinned Editable day fixture (asset root
+     * `qa/fixtures/editable-fixture`, prefix `editable-day-2026/`).
+     */
+    val editableFixtureAssets: List<String> = listOf(
+        "editable-day-2026/config.json",
+        "editable-day-2026/leave_years/2026.json",
+        "editable-day-2026/holiday_cache/federal_holidays_2026.json",
+    )
+
+    const val EDITABLE_FIXTURE_PREFIX = "editable-day-2026/"
+
+    /**
      * Asset names of the pinned marker overlap fixture (asset root
      * `qa/fixtures/marker-fixture`, prefix `calendar-markers/`).
      */

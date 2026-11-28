@@ -1,0 +1,33 @@
+{
+  "description": "Pinned synthetic Editable day fixture for the T-CAL-DAY-01 acceptance case.",
+  "desktop_reference": {
+    "generator_source_revision": "8a9b528ac522557d91481076bac67d913f865995",
+    "published_build": "0.2.2.dev0+g7041ce9e",
+    "source_revision": "7041ce9e9921dd4c407595ed3269de1aca43e699"
+  },
+  "fixture_id": "editable-day-2026",
+  "frozen_local_date": "2026-01-16",
+  "generated_by": "android/qa/fixtures/build_calendar_fixture.py",
+  "generator_environment": {
+    "holidays": "0.98",
+    "pydantic": "2.13.4",
+    "python": "3.13.7",
+    "use-or-lose": "1.1.0"
+  },
+  "schema_version": 1,
+  "store": {
+    "files": {
+      "config.json": "af661f09d1e11368202bd278d6538fe9f609959db63649f02c4d32fb92302aaf",
+      "holiday_cache/federal_holidays_2026.json": "f252e13278065cf60000966accddc8d567e138448924862030545eb9458f5341",
+      "leave_years/2026.json": "4ae8dd30a15499f39e9647274e2d0e05a4bc6fbcb343ebf43eeef93a669fc25c"
+    },
+    "notes": [
+      "Manual transaction and holiday-cache timestamps are normalized to the frozen local date.",
+      "Automatic accrual rows keep their date-derived audit timestamps.",
+      "Local lock files and backup directories are excluded."
+    ],
+    "path": "android/qa/fixtures/editable-fixture/editable-day-2026",
+    "tree_digest": "372b4c728e79a17da89ddf04e6faf8537407f8ab2132ee611251f804e857046e"
+  },
+  "timezone": "America/New_York"
+}

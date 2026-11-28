@@ -63,6 +63,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.westmouthbay.useorlose.R
+import com.westmouthbay.useorlose.core.CoreError
 import com.westmouthbay.useorlose.core.MonthDay
 import com.westmouthbay.useorlose.core.MonthViewResult
 import java.time.DayOfWeek
@@ -163,6 +164,29 @@ fun CalendarScreen(
                         contentAlignment = Alignment.Center,
                     ) {
                         CircularProgressIndicator()
+                    }
+                }
+                month == null &&
+                    state.monthError?.code == CoreError.LEAVE_YEAR_NOT_FOUND &&
+                    state.displayMonth != null -> {
+                    // P-E6: an uncovered month renders an empty grid with
+                    // tappable dates so the day editor (and its setup entry)
+                    // stays reachable; browsing still writes nothing.
+                    val uncovered = state.displayMonth
+                    if (uncovered != null) {
+                        CalendarGridOrList(
+                            month = emptyMonth(uncovered, state.today ?: LocalDate.now()),
+                            displayMonth = uncovered,
+                            selectedDay = state.selectedDay,
+                            today = state.today,
+                            settings = viewModel.displaySettings,
+                            fullListMode = fullListMode,
+                            periodNumberFor = { null },
+                            yearEndFor = { null },
+                            yearNumberFor = { null },
+                            context = context,
+                            onOpenDay = onOpenDay,
+                        )
                     }
                 }
                 month == null -> MonthUnavailable()
@@ -361,6 +385,36 @@ private fun MonthRow(
             )
         }
     }
+}
+
+private fun emptyMonth(displayMonth: YearMonth, today: LocalDate): MonthViewResult {
+    val days = (1..displayMonth.lengthOfMonth()).map { day ->
+        val date = displayMonth.atDay(day)
+        MonthDay(
+            date = date,
+            inDisplayMonth = true,
+            holidayName = null,
+            isToday = date == today,
+            isPayday = false,
+            isPayPeriodEnd = false,
+            entries = emptyList(),
+            displayLines = emptyList(),
+        )
+    }
+    return MonthViewResult(
+        year = displayMonth.year,
+        month = displayMonth.monthValue,
+        today = today,
+        monthStart = displayMonth.atDay(1),
+        monthEnd = displayMonth.atEndOfMonth(),
+        calendarStart = displayMonth.atDay(1),
+        calendarEnd = displayMonth.atEndOfMonth(),
+        days = days,
+        payPeriods = emptyList(),
+        payDates = emptySet(),
+        payPeriodEndDates = emptySet(),
+        warnings = emptyList(),
+    )
 }
 
 @Composable

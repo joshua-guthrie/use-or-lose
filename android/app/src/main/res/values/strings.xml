@@ -82,6 +82,36 @@
     <string name="setup_next_accrual">Next accrual \u00b7 %1$s</string>
     <string name="setup_next_accrual_body">Annual %1$s h \u00b7 Sick %2$s h</string>
     <string name="setup_travel_comp_warning">Travel comp hours keep their balance; the earning date and expiration are unknown.</string>
+    <string name="direction_use">Use</string>
+    <string name="direction_earn">Earn</string>
+    <string name="direction_worked">Worked</string>
+    <string name="direction_paid_out">Paid out</string>
+    <string name="day_edit_title">Edit day</string>
+    <string name="day_edit_entry_label">Edit activity</string>
+    <string name="day_add_title">Add entry</string>
+    <string name="day_review_title">Review day changes</string>
+    <string name="day_edit_uncovered">This date is outside every stored leave year. Create the containing year first, then the draft continues here.</string>
+    <string name="setup_action">Set up leave year</string>
+    <string name="day_edit_group_label">Edit group</string>
+    <string name="day_edit_group_choose">Choose a group</string>
+    <string name="day_edit_group_value">%1$s \u00b7 %2$s</string>
+    <string name="day_edit_hours_label">Hours \u00b7 %1$s h increments</string>
+    <string name="day_add_hours_label">Hours</string>
+    <string name="day_edit_comment_label">Comment</string>
+    <string name="day_edit_review_action">Review changes</string>
+    <string name="day_add_submit">Add entry</string>
+    <string name="day_review_card">%1$s \u00b7 %2$s</string>
+    <string name="day_review_use_label">%1$s %2$s</string>
+    <string name="day_review_body">Replace %1$s. %2$s: %3$s h \u2192 %4$s h.</string>
+    <string name="day_review_add_card">%1$s \u00b7 %2$s \u00b7 %3$s</string>
+    <string name="day_review_comment">Comment: %1$s</string>
+    <string name="day_save">Save changes</string>
+    <string name="day_back_draft">Back to draft</string>
+    <string name="day_edit_view_entries">View the %1$d current entries</string>
+    <string name="day_edit_untouched">An unchanged %1$s entry stays at %2$s h.</string>
+    <string name="day_add_group_label">Leave type</string>
+    <string name="day_add_direction_label">Direction</string>
+    <string name="day_edit_mixed">These entries cannot be combined because their stored status, source or comments differ. Individual correction arrives in a later update.</string>
     <string name="setup_carryover_choice">Carry over from %1$s</string>
     <string name="setup_carryover_blocked">Carryover unavailable: %1$s</string>
     <string name="carryover_review_title">Review %1$s leave year</string>
@@ -150,6 +180,7 @@
 
     <!-- Hours -->
     <string name="hours_value">%1$s h</string>
+    <string name="hours_suffix">h</string>
     <string name="hours_earned">%1$s h earned</string>
     <string name="hours_used">%1$s h used</string>
     <string name="hours_direction">%1$s h %2$s</string>
