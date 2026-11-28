@@ -40,7 +40,7 @@ def model_dump(value: Any) -> Any:
             name: model_dump(getattr(value, name)) for name in declared
         }
         for name, item in vars(value).items():
-            if name not in declared and name != "fields_set":
+            if name not in declared and name != "model_fields_set":
                 result[name] = model_dump(item)
         return result
     if is_dataclass(value) and not isinstance(value, type):
@@ -93,10 +93,22 @@ class PureModel:
         if self.__extra__ == "allow":
             for name in sorted(provided - set(declared)):
                 object.__setattr__(self, name, kwargs[name])
-        object.__setattr__(self, "fields_set", provided & set(declared))
+        object.__setattr__(self, "model_fields_set", provided & set(declared))
         if hasattr(self, "__post_init__"):
             self.__post_init__()  # type: ignore[attr-defined]
 
     def model_dump(self) -> dict[str, Any]:
         """The pydantic-style recursive dump of every field (plus any extras)."""
         return model_dump(self)
+
+    def model_copy(self, *, update: dict[str, Any] | None = None):
+        """Return a re-validated copy with optional field updates (pydantic shape)."""
+        declared = self.__dataclass_fields__
+        values: dict[str, Any] = {name: getattr(self, name) for name in declared}
+        if self.__extra__ == "allow":
+            for name, item in vars(self).items():
+                if name not in declared and name != "model_fields_set":
+                    values[name] = item
+        if update:
+            values.update(update)
+        return type(self)(**values)

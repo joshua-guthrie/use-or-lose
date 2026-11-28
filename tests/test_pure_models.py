@@ -120,6 +120,14 @@ def test_transaction_id_advances_past_existing_ids():
     assert second.id == "20260113-002"
 
 
+def test_policy_error_message_for_full_access_restrictions_is_unchanged():
+    from useorlose.mcp.policy import Policy
+
+    with pytest.raises(ValueError) as excinfo:
+        Policy(mode="full_access", allowed_tools=("balance",))
+    assert str(excinfo.value) == "full_access is incompatible with restrictive fields: allowed_tools"
+
+
 def test_config_model_dump_matches_the_recorded_golden():
     from useorlose.config import Config
 

@@ -7,9 +7,10 @@ import os
 from pathlib import Path
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from dataclasses import dataclass, field
 
 from useorlose.config import get_default_data_dir
+from useorlose.pure_models import PureModel
 from useorlose.storage_guard import same_file
 
 
@@ -53,6 +54,36 @@ CLASSIFICATIONS = {
     "void": "high_impact",
     "years": "read",
 }
+
+
+def _as_path(value, name: str) -> Path:
+    if isinstance(value, Path):
+        return value
+    if isinstance(value, str):
+        return Path(value)
+    raise ValueError(f"{name}: Input should be a valid path")
+
+
+def _as_optional_path(value, name: str):
+    if value is None:
+        return None
+    return _as_path(value, name)
+
+
+def _as_paths(value, name: str) -> tuple[Path, ...]:
+    if isinstance(value, (list, tuple)):
+        return tuple(_as_path(item, name) for item in value)
+    raise ValueError(f"{name}: Input should be a valid list")
+
+
+def _as_strings(value, name: str):
+    if value is None:
+        return None
+    if isinstance(value, (list, tuple)):
+        if not all(isinstance(item, str) for item in value):
+            raise ValueError(f"{name}: Input should be a valid string")
+        return tuple(item for item in value)
+    raise ValueError(f"{name}: Input should be a valid list")
 
 
 def classification(path, special=None):
@@ -115,11 +146,12 @@ def canonical(path):
     return Path(path).expanduser().resolve()
 
 
-class Policy(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
+@dataclass(init=False, frozen=True)
+class Policy(PureModel):
+    __extra__ = "forbid"
 
-    mode: Literal["full_access", "read_only", "unattended", "confirm_writes"] = "full_access"
-    data_dir: Path = Field(default_factory=get_default_data_dir)
+    mode: str = "full_access"
+    data_dir: Path = field(default_factory=get_default_data_dir)
     allowed_data_dirs: tuple[Path, ...] = ()
     file_read_roots: tuple[Path, ...] = ()
     file_write_roots: tuple[Path, ...] = ()
@@ -130,13 +162,43 @@ class Policy(BaseModel):
     allow_file_output: bool = False
     allow_network: bool = False
     executable: Path | None = None
-    timeout_seconds: float = Field(default=60, gt=0, le=3600)
-    lock_timeout_seconds: float = Field(default=30, ge=0, le=3600)
-    max_output_bytes: int = Field(default=1024 * 1024, ge=1024, le=16 * 1024 * 1024)
+    timeout_seconds: float = 60
+    lock_timeout_seconds: float = 30
+    max_output_bytes: int = 1024 * 1024
     audit_log: Path | None = None
 
-    @model_validator(mode="after")
-    def unambiguous_full_access(self):
+    def __post_init__(self):
+        if self.mode not in {"full_access", "read_only", "unattended", "confirm_writes"}:
+            raise ValueError(
+                "Input should be 'full_access', 'read_only', 'unattended' or 'confirm_writes'"
+            )
+        for name in ("allow_high_impact", "allow_imports", "allow_file_output", "allow_network"):
+            if not isinstance(getattr(self, name), bool):
+                raise ValueError(f"{name}: Input should be a valid boolean")
+        for name in ("timeout_seconds", "lock_timeout_seconds", "max_output_bytes"):
+            value = getattr(self, name)
+            if isinstance(value, bool) or not isinstance(value, (int, float)):
+                raise ValueError(f"{name}: Input should be a valid number")
+            coerced = int(value) if name == "max_output_bytes" else float(value)
+            object.__setattr__(self, name, coerced)
+        object.__setattr__(self, "data_dir", _as_path(self.data_dir, "data_dir"))
+        object.__setattr__(
+            self, "allowed_data_dirs", _as_paths(self.allowed_data_dirs, "allowed_data_dirs")
+        )
+        object.__setattr__(self, "file_read_roots", _as_paths(self.file_read_roots, "file_read_roots"))
+        object.__setattr__(self, "file_write_roots", _as_paths(self.file_write_roots, "file_write_roots"))
+        object.__setattr__(self, "executable", _as_optional_path(self.executable, "executable"))
+        object.__setattr__(self, "audit_log", _as_optional_path(self.audit_log, "audit_log"))
+        object.__setattr__(self, "allowed_tools", _as_strings(self.allowed_tools, "allowed_tools"))
+        object.__setattr__(self, "denied_tools", _as_strings(self.denied_tools, "denied_tools"))
+        if not (0 < self.timeout_seconds <= 3600):
+            raise ValueError("Input should be greater than 0 and less than or equal to 3600")
+        if not (0 <= self.lock_timeout_seconds <= 3600):
+            raise ValueError("Input should be greater than or equal to 0 and less than or equal to 3600")
+        if not (1024 <= self.max_output_bytes <= 16 * 1024 * 1024):
+            raise ValueError(
+                "Input should be greater than or equal to 1024 and less than or equal to 16777216"
+            )
         # Reject even explicit false/empty restrictions: there is no partially
         # restricted full_access profile. Runtime limits/logging remain optional.
         restrictive = self.model_fields_set & {
@@ -152,8 +214,9 @@ class Policy(BaseModel):
             "allow_network",
         }
         if self.mode == "full_access" and restrictive:
-            raise ValueError(f"full_access is incompatible with restrictive fields: {', '.join(sorted(restrictive))}")
-        return self
+            raise ValueError(
+                f"full_access is incompatible with restrictive fields: {', '.join(sorted(restrictive))}"
+            )
 
     @classmethod
     def load(cls, path: Path | None):
@@ -162,9 +225,10 @@ class Policy(BaseModel):
         content = json.loads(path.read_text(encoding="utf-8"))
         # Historically, an explicit policy without a mode selected read_only.
         # Preserve that meaning; only policy-free launches change their default.
-        if isinstance(content, dict):
-            content.setdefault("mode", "read_only")
-        return cls.model_validate_json(json.dumps(content, allow_nan=False), strict=True)
+        if not isinstance(content, dict):
+            raise ValueError("Input should be a valid dictionary")
+        content.setdefault("mode", "read_only")
+        return cls(**content)
 
     def authorize(self, command, supplied, *, protected=()):
         values = command.values(supplied)
