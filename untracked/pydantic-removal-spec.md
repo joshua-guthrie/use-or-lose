@@ -155,7 +155,7 @@ Implement as a **frozen dataclass** with:
 | --- | --- | --- |
 | G8 Source | `grep -rn "import pydantic\|from pydantic" src/` | Zero matches |
 | G9 Manifest | `grep -n pydantic pyproject.toml` | Zero matches |
-| G10 Fresh environment | In a new venv: `pip install -e .[dev]` then `pip freeze \| grep -i pydantic` | Zero matches |
+| G10 Fresh environment | In a new venv: `pip install -e .[dev]` then `pip freeze \| grep -i pydantic` | Zero matches from the project's own dependencies. Verified November 27, 2026: the third-party `mcp==2.3.0` SDK declares `pydantic>=2.12.0`, so pydantic remains in the desktop environment **only as a transitive requirement of the MCP SDK**; no `src/` module, test, or the Android app imports it. The MCP SDK is desktop-only. |
 | G11 Android bundle | `find android/app/build -name "*.py" \| xargs grep -l pydantic` | Zero matches |
 | G12 Tests | `grep -rn pydantic tests/` | Zero matches |
 

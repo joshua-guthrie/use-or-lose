@@ -1,8 +1,8 @@
-"""Canonical default category rules, kept pydantic-free.
+"""Canonical default category rules, kept dependency-free.
 
 Both the desktop configuration model and the platform-independent read paths
 derive their defaults from this table, so the phone bridge can resolve policy
-without importing pydantic.
+without importing optional dependencies.
 """
 
 from __future__ import annotations

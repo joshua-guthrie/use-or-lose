@@ -522,7 +522,6 @@ def _write_manifest(fixture_id: str, fixture_dir: Path, description: str) -> Non
             "generator_environment": {
                 "python": sys.version.split()[0],
                 "use-or-lose": version("use-or-lose"),
-                "pydantic": version("pydantic"),
                 "holidays": version("holidays"),
             },
             "frozen_local_date": FROZEN_DATE,
@@ -597,8 +596,7 @@ def main() -> None:
                 "generator_environment": {
                     "python": sys.version.split()[0],
                     "use-or-lose": version("use-or-lose"),
-                    "pydantic": version("pydantic"),
-                    "holidays": version("holidays"),
+                        "holidays": version("holidays"),
                 },
                 "frozen_local_date": FROZEN_DATE,
                 "timezone": TIMEZONE,

@@ -1,5 +1,5 @@
 """The pure standard-library models: identical validation messages, dump
-shapes and defaults to the previous pydantic implementation."""
+shapes and defaults to the previous implementation."""
 
 import json
 import math
