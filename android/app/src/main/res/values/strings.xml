@@ -92,6 +92,7 @@
     <string name="day_review_title">Review day changes</string>
     <string name="day_edit_uncovered">This date is outside every stored leave year. Create the containing year first, then the draft continues here.</string>
     <string name="setup_action">Set up leave year</string>
+    <string name="month_uncovered_body">No leave year covers %1$d, so holidays and accruals are unavailable. Create the %1$d leave year to view this month.</string>
     <string name="day_edit_group_label">Edit group</string>
     <string name="day_edit_group_choose">Choose a group</string>
     <string name="day_edit_group_value">%1$s \u00b7 %2$s</string>

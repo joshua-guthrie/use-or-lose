@@ -108,6 +108,13 @@ fun UseOrLoseApp(dependencies: AppDependencies) {
                     },
                     onOpenMonthPicker = { navController.navigate(AppRoutes.MONTH_PICKER) },
                     onOpenBalances = { navController.navigate(AppRoutes.BALANCES) },
+                    onSetUpForMonth = { month ->
+                        setupViewModel.begin(
+                            calendarViewModel.setupProposalFor(month.atDay(1)),
+                            resumeDate = null,
+                        )
+                        navController.navigate(AppRoutes.setup(month.atDay(1).toString()))
+                    },
                 )
             }
             composable(AppRoutes.BALANCES) {

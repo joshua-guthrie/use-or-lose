@@ -82,6 +82,7 @@ fun CalendarScreen(
     onOpenDay: (LocalDate) -> Unit,
     onOpenMonthPicker: () -> Unit,
     onOpenBalances: () -> Unit,
+    onSetUpForMonth: ((YearMonth) -> Unit)? = null,
 ) {
     val state by viewModel.state.collectAsState()
     var menuExpanded by remember { mutableStateOf(false) }
@@ -169,27 +170,13 @@ fun CalendarScreen(
                 month == null &&
                     state.monthError?.code == CoreError.LEAVE_YEAR_NOT_FOUND &&
                     state.displayMonth != null -> {
-                    // P-E6: an uncovered month renders an empty grid with
-                    // tappable dates so the day editor (and its setup entry)
-                    // stays reachable; browsing still writes nothing.
                     val uncovered = state.displayMonth
-                    if (uncovered != null) {
-                        CalendarGridOrList(
-                            month = emptyMonth(uncovered, state.today ?: LocalDate.now()),
-                            displayMonth = uncovered,
-                            selectedDay = state.selectedDay,
-                            today = state.today,
-                            settings = viewModel.displaySettings,
-                            fullListMode = fullListMode,
-                            periodNumberFor = { null },
-                            yearEndFor = { null },
-                            yearNumberFor = { null },
-                            context = context,
-                            onOpenDay = onOpenDay,
-                        )
-                    }
+                    MonthUnavailable(
+                        month = uncovered,
+                        onCreateYear = { if (uncovered != null) onSetUpForMonth?.invoke(uncovered) },
+                    )
                 }
-                month == null -> MonthUnavailable()
+                month == null -> MonthUnavailable(month = null, onCreateYear = {})
                 else -> CalendarGridOrList(
                     month = month,
                     displayMonth = state.displayMonth,
@@ -387,44 +374,32 @@ private fun MonthRow(
     }
 }
 
-private fun emptyMonth(displayMonth: YearMonth, today: LocalDate): MonthViewResult {
-    val days = (1..displayMonth.lengthOfMonth()).map { day ->
-        val date = displayMonth.atDay(day)
-        MonthDay(
-            date = date,
-            inDisplayMonth = true,
-            holidayName = null,
-            isToday = date == today,
-            isPayday = false,
-            isPayPeriodEnd = false,
-            entries = emptyList(),
-            displayLines = emptyList(),
-        )
-    }
-    return MonthViewResult(
-        year = displayMonth.year,
-        month = displayMonth.monthValue,
-        today = today,
-        monthStart = displayMonth.atDay(1),
-        monthEnd = displayMonth.atEndOfMonth(),
-        calendarStart = displayMonth.atDay(1),
-        calendarEnd = displayMonth.atEndOfMonth(),
-        days = days,
-        payPeriods = emptyList(),
-        payDates = emptySet(),
-        payPeriodEndDates = emptySet(),
-        warnings = emptyList(),
-    )
-}
-
 @Composable
-private fun MonthUnavailable() {
-    Text(
-        text = stringResource(R.string.unavailable),
-        style = MaterialTheme.typography.bodyMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 24.dp),
-    )
+private fun MonthUnavailable(
+    month: YearMonth?,
+    onCreateYear: () -> Unit,
+) {
+    Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 24.dp)) {
+        Text(
+            text = stringResource(R.string.unavailable),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        if (month != null) {
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = stringResource(R.string.month_uncovered_body, month.year),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(Modifier.height(8.dp))
+            PrimaryAction(
+                text = stringResource(R.string.setup_action),
+                onClick = onCreateYear,
+                modifier = Modifier.testTag("month_setup_action"),
+            )
+        }
+    }
 }
 
 // ---- grid and list -------------------------------------------------------

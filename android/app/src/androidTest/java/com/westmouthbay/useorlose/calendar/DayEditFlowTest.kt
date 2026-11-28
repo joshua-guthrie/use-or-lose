@@ -3,6 +3,7 @@ package com.westmouthbay.useorlose.calendar
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onFirst
@@ -93,33 +94,33 @@ class DayEditFlowTest : CalendarUiTestBase() {
     }
 
     @Test
-    fun uncoveredEditOffersSetupAndResumesTheDraft() {
+    fun uncoveredMonthOffersSetupAndThenOpensTheEditor() {
         setAppContent()
         waitForBalance("89 h")
         // Browse to February 2027 through the month picker.
         composeRule.onNodeWithTag("calendar_month_selector").performClick()
-        // Expand the year chip row and pick 2027.
         composeRule.onNodeWithText("2026").performClick()
         composeRule.onNodeWithText("2027").performClick()
         composeRule.onNodeWithText("February").performScrollTo().performClick()
         composeRule.waitUntil(timeoutMillis = 20_000) {
             composeRule.onAllNodesWithText("February 2027").fetchSemanticsNodes().isNotEmpty()
         }
-        // Open the uncovered day's edit form.
-        composeRule.onNodeWithTag("calendar_day_2027-02-01").performClick()
+        // The uncovered month does not render dates: it asks to create the
+        // leave year first (holidays and accruals need the year file).
         composeRule.waitUntil(timeoutMillis = 20_000) {
-            composeRule.onAllNodes(hasTestTag("day_edit_entry")).fetchSemanticsNodes().isNotEmpty()
+            composeRule.onAllNodes(hasTestTag("month_setup_action")).fetchSemanticsNodes().isNotEmpty()
         }
-        composeRule.onNodeWithTag("day_edit_entry").performClick()
-        composeRule.waitUntil(timeoutMillis = 20_000) {
-            composeRule.onAllNodes(hasTestTag("day_edit_setup")).fetchSemanticsNodes().isNotEmpty()
-        }
-        composeRule.onNodeWithTag("day_edit_setup").performScrollTo().performClick()
-
-        // Create the containing year via the manual start-of-year flow.
+        // Cancel once: nothing is created and the prompt remains available.
+        composeRule.onNodeWithTag("month_setup_action").performClick()
         composeRule.waitUntil(timeoutMillis = 30_000) {
             composeRule.onAllNodesWithText("Set up leave year").fetchSemanticsNodes().isNotEmpty()
         }
+        composeRule.onNodeWithText("Cancel").performScrollTo().performClick()
+        composeRule.waitUntil(timeoutMillis = 20_000) {
+            composeRule.onAllNodes(hasTestTag("month_setup_action")).fetchSemanticsNodes().isNotEmpty()
+        }
+        // A separate attempt creates the containing year.
+        composeRule.onNodeWithTag("month_setup_action").performClick()
         composeRule.onNodeWithTag("setup_start_choice").performScrollTo().performClick()
         composeRule.onNodeWithText("Start-of-year balances").assertIsDisplayed()
         composeRule.onNodeWithTag("setup_review_action").performScrollTo().performClick()
@@ -128,9 +129,18 @@ class DayEditFlowTest : CalendarUiTestBase() {
         }
         composeRule.onNodeWithTag("setup_create").performScrollTo().performClick()
 
-        // The editor reopens on the same date with the preserved draft.
+        // The calendar returns to February 2027, now populated, and the
+        // day editor opens for Feb 1.
         composeRule.waitUntil(timeoutMillis = 30_000) {
-            composeRule.onAllNodesWithText("Feb 1, 2027", substring = true).fetchSemanticsNodes().isNotEmpty() &&
+            composeRule.onAllNodes(hasTestTag("calendar_day_2027-02-01")).fetchSemanticsNodes().isNotEmpty()
+        }
+        composeRule.onNodeWithTag("calendar_day_2027-02-01").performClick()
+        composeRule.waitUntil(timeoutMillis = 20_000) {
+            composeRule.onAllNodes(hasTestTag("day_edit_entry")).fetchSemanticsNodes().isNotEmpty()
+        }
+        composeRule.onNodeWithTag("day_edit_entry").performClick()
+        composeRule.waitUntil(timeoutMillis = 20_000) {
+            composeRule.onAllNodesWithText("Edit day").fetchSemanticsNodes().isNotEmpty() &&
                 composeRule.onAllNodes(hasTestTag("day_edit_group")).fetchSemanticsNodes().isNotEmpty()
         }
     }
