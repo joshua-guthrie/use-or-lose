@@ -8,39 +8,72 @@ The product specification, acceptance plan, orchestration rules and the first im
 
 | Track | State |
 | --- | --- |
-| Product specification and parity | Specification v1.1 (November 24, 2026: Calendar grid revision — uniform stretched cells, fixed-size grid text, manual Full list mode). Menu review approved November 23, 2026 |
+| Product specification and parity | Specification v1.3 (November 26, 2026: internal-identifier rename). Menu review approved November 23, 2026 |
 | Orchestration specification | Complete; OR01 pilot not started |
-| Implementation briefs | I01–I06 complete; I06-02 delivered within I06 |
-| Android project | I06 complete — open or create a leave year (welcome, method/start-of-year/Today setup, review, stale-safe publish, resume) passes the mockup-verified visual loop plus 47 unit and 80 device tests; next is I07 carryover |
-| Fixtures | Calendar 2026 store, golden outputs, malformed-store variants and the marker overlap fixture under `qa/` (builder emits both; digests `03e9e175…` and `d60bd8d0…`) |
+| Implementation briefs | I01–I08 complete; next is I09 (history and corrections) |
+| Android project | I08 complete — day editing (group editor, save review with exact IDs, add entry, editor resume after setup). 56 unit and 87 device tests pass; visual loop PASS on every screen through I08 |
+| Fixtures | Calendar 2026 store, Carryover source, Editable day store, golden outputs, malformed-store variants and the marker overlap fixture under `qa/` (builder emits each; digests pinned in the per-fixture manifests) |
 
 Keep this file current. Each milestone replaces planned commands and toolchain values with the tested values from its report.
 
 ## Open and run in Android Studio
 
-1. Install the current stable **Android Studio** for your platform, including the Android SDK, Platform-Tools and an emulator image.
-2. **Open the `android/` directory, not the repository root.** `android/settings.gradle.kts` is the Gradle root and Studio discovers the single `app` module.
-3. Let the Gradle sync finish. On Linux, verify hardware virtualization if the emulator is slow.
-4. Create a compact phone AVD for the development host's architecture, or connect a physical phone with USB debugging enabled.
-5. Select the device and run the `app` configuration.
+Step-by-step, verified on this host (Ubuntu x86-64). The project is pre-Play maturity (I08 of I20): it opens, builds and runs in the emulator today, but release builds, signing and Play uploads belong to I19/I20.
 
-The beginner walkthrough, SDK details and device matrix are in [Developer setup and testing](specification/chapters/05-quality/05-01-developer-setup-and-testing.md). The provisional minimum is **API 26**. The permanent app ID, signing identity and final API floor are recorded by I01 and I02.
+### 1. One-time prerequisites
 
-The pinned versions below were verified by I01's report. A clean-sync launch from the Android Studio GUI has not been run on this machine; do it once when Studio is installed and update the QA report if anything differs.
+1. **Android Studio** — install the current stable release from developer.android.com (this host used the latest Hedgehog-series stable; any recent stable works).
+2. **JDK 21** — Gradle runs on JDK 21. On Ubuntu: `sudo apt install openjdk-21-jdk`. Studio bundles its own JBR, but the pinned Gradle commands below use `JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64`.
+3. **Emulator support** — install a system image for your host architecture (API 36, `google_apis`, `x86_64` on this host) and enable hardware virtualization (KVM on Linux: `ls /dev/kvm`).
 
-### Pinned toolchain
+### 2. Open the project
 
-| Item | Value |
-| --- | --- |
-| Application ID | `com.westmouthbay.useorlose` (owner-approved) |
-| Android Gradle Plugin / Gradle | 8.13.2 / 8.14.3 (wrapper) |
-| Kotlin / Compose BOM / Material 3 | 2.2.20 / 2025.06.01 / from BOM |
-| JDK | 21 to run Gradle; source/target 17 |
-| compileSdk / targetSdk / minSdk | 36 / 36 / 26 |
-| Emulator | `fedleave_test` AVD, pixel_5, API 36 `google_apis` `x86_64`, 1080x2340 @ 440 dpi |
-| Bridge runtime and Chaquopy | Chaquopy 17.2.0 with Python 3.13, ABIs `arm64-v8a` and `x86_64` |
+1. Check out the repository: `git clone https://github.com/joshua-guthrie/use-or-lose.git`.
+2. In Android Studio: **File → Open…** and select the **`android/` directory**, not the repository root. `android/settings.gradle.kts` is the Gradle root; Studio discovers the single `app` module.
+3. Wait for the first Gradle sync (it downloads the pinned toolchain). If Studio asks to create `local.properties` or install SDK components, accept — `local.properties` is git-ignored and machine-specific.
+4. If sync complains about the SDK location: **Settings → Languages & Frameworks → Android SDK** and point it at your SDK directory (this host: `~/Android/Sdk`).
 
-## Compile and test
+### 3. First build
+
+From a terminal inside `android/` (or the Studio terminal):
+
+```bash
+export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+export PATH="$PWD/../.venv/bin:$PATH"   # Chaquopy's host Python must match the app's Python 3.13
+./gradlew :app:assembleDebug
+```
+
+The first build creates the local Python venv only if it doesn't exist — the repository's `.venv` is the pinned one. If you built nothing before, the desktop venv lives at the repository root and the build just uses it.
+
+### 4. Run the app in the emulator
+
+The app's frozen-clock developer config and the pinned fixtures are wired for the test harness; a plain interactive run starts from an **empty store** and walks the real first-use flow (Welcome → Set up leave year → Calendar).
+
+1. **Create the development AVD** (name, device and profile are pinned so tests and captures match):
+   - Android Studio: **Device Manager → Create Virtual Device** → *Pixel 5* → system image **API 36, google_apis, x86_64** → name it **`fedleave_test`**.
+   - Or from the terminal: `avdmanager create avd -n fedleave_test -k "system-images;android-36;google_apis;x86_64" -d pixel_5`.
+2. **Boot it** (from a terminal; stop the Gradle daemon first on memory-constrained hosts like this one):
+   ```bash
+   ./gradlew --stop
+   ~/Android/Sdk/emulator/emulator -avd fedleave_test -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect &
+   ```
+   Wait until `adb shell getprop sys.boot_completed` prints `1`.
+3. **Run the app**:
+   - In Studio: select the `app` configuration and the booted device, press **Run ▸**.
+   - Or from the terminal: `./gradlew :app:installDebug && adb shell am start -n com.westmouthbay.useorlose/.MainActivity`.
+4. **What you'll see**: the Welcome screen (**Set up leave year**; Restore backup arrives in I17). Walk the setup (start-of-year or Today balances; carryover appears when a prior year exists) and land on the Calendar. Tap a day for the read-only day route and **Edit activity / Add entry** for the I08 editor.
+5. **See the fixture data instead of an empty store**: the pinned fixtures (Calendar 2026, Carryover, Editable day) are imported by the connected tests, not by the interactive app. Run the device suite to exercise them end-to-end, or `adb pull` the app-private store after a test run (`android/qa/pull-evidence.sh`) to inspect the exact bytes.
+
+### 5. Run the tests
+
+```bash
+./gradlew :app:testDebugUnitTest       # JVM unit tests
+./gradlew :app:connectedDebugAndroidTest   # device tests on the booted fedleave_test AVD
+```
+
+Device evidence screenshots land in the app files dir; refresh the local copies with `android/qa/pull-evidence.sh` after each run (keep `android.injected.androidTest.leaveApksInstalledAfterRun=true` in `gradle.properties`).
+
+## Compile and test## Compile and test
 
 Run from `android/` with `JAVA_HOME` pointing at the pinned JDK and the repository virtual environment on `PATH` (Chaquopy's host Python must match the app's Python 3.13). On Windows use `gradlew.bat` for the same tasks. All of these passed in I01 and I02:
 
